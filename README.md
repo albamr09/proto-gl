@@ -1,4 +1,10 @@
-# How to run
+# CS10CG
+
+Real Time Computer Graphics with WebGL
+
+---
+
+## How to run
 
 First of all you will need to install the dependencies by running:
 
@@ -6,7 +12,7 @@ First of all you will need to install the dependencies by running:
 yarn
 ```
 
-## Development
+### Development
 
 First serve the files with:
 
@@ -22,7 +28,7 @@ yarn start
 
 This will simply transpile the `typescript` code and update the transpilation whenever there is change on the source code. To see changes you will have to refresh the page.
 
-## Production
+### Production
 
 You build the project as follows:
 
@@ -42,6 +48,6 @@ Without custom configuration, the server will commonly run on port $3000$. To pr
 
 You can now easily navigate through the folders of this project, that contains all the examples from the book.
 
-# Source code
+## Source code
 
 Assets: https://github.com/PacktPublishing/Real-Time-3D-Graphics-with-WebGL-2
