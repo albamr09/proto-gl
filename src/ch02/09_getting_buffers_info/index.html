@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <title>Obtaining basic information about our buffers!</title>
+
+    <style>
+      #info {
+        position: absolute;
+        color: white !important;
+        bottom: 30px;
+        right: 30px;
+        border: 1px solid white;
+        border-radius: 25px;
+        padding: 15px;
+        font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+      }
+
+      tr {
+        color: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="webgl-canvas"> </canvas>
+    <!-- Table for buffer info -->
+    <div id="info">
+      <table>
+        <tr>
+          <th>Buffer</th>
+          <th>Name</th>
+          <th>Size</th>
+          <th>Usage</th>
+        </tr>
+        <tr>
+          <td>VBO:</td>
+          <td id="t-vbo-name"></td>
+          <td id="t-vbo-size"></td>
+          <td id="t-vbo-usage"></td>
+        </tr>
+        <tr>
+          <td>IBO:</td>
+          <td id="t-ibo-name"></td>
+          <td id="t-ibo-size"></td>
+          <td id="t-ibo-usage"></td>
+        </tr>
+      </table>
+
+      <ul>
+        <li>Is vertices a VBO? <strong id="s-is-vertices-vbo"></strong></li>
+        <li>
+          Is coneVertexBuffer a VBO?
+          <strong id="s-is-cone-vertex-buffer-vbo"></strong>
+        </li>
+      </ul>
+    </div>
+  </body>
+
+  <script type="module" src="index.js"></script>
+</html>
