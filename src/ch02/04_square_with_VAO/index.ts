@@ -2,6 +2,7 @@ import { vertexShaderSource } from "./vs.glsl.js";
 import { fragmentShaderSource } from "./fs.glsl.js";
 
 import {
+  autoResizeCanvas,
   configureCanvas,
   createProgram,
   getGLContext,
@@ -94,7 +95,8 @@ const draw = () => {
 
 /** Initialize application */
 const init = () => {
-  configureCanvas();
+  const canvas = configureCanvas();
+  autoResizeCanvas(canvas);
   gl = getGLContext();
 
   // Set the clear color to be black

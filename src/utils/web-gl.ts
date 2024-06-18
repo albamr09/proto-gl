@@ -12,6 +12,7 @@ export const configureCanvas = () => {
   // Set the canvas to the size of the screen
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  return canvas;
 };
 
 /**
@@ -105,4 +106,22 @@ export const clearScene = (gl: WebGL2RenderingContext) => {
   // Clear the scene
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+};
+
+/**
+ * Makes sure the canvas occupies the whole screen even when the screen 
+ * resizes
+ * @param canvas 
+ */
+
+export const autoResizeCanvas = (canvas: HTMLCanvasElement)  => {
+
+  const expandFullScreen = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  };
+
+  expandFullScreen();
+
+  window.addEventListener('resize', expandFullScreen);
 };

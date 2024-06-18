@@ -4,6 +4,7 @@ import {
   getGLContext,
   createProgram,
   clearScene,
+  autoResizeCanvas,
 } from "../../utils/web-gl.js";
 import { calculateNormals } from "../../utils/math.js";
 import { mat4 } from "../../lib/gl-matrix/esm/index.js";
@@ -60,25 +61,7 @@ let gl: WebGL2RenderingContext,
   projectionMatrix = mat4.create(),
   normalMatrix = mat4.create(),
   shininess = 10;
-
-/** Initialize application */
-const init = async () => {
-  configureCanvas();
-
-  // Initialize shaders and entry data for shaders
-  initProgram();
-  initLights();
-  initBuffers();
-
-  // Render
-  render();
-
-  // Form for controls
-  initControls();
-};
-
-window.onload = init;
-
+  
 // Initialize WebGL program
 const initProgram = () => {
   gl = getGLContext();
@@ -317,3 +300,21 @@ const initControls = () => {
     },
   });
 };
+
+const init = async () => {
+  const canvas = configureCanvas();
+  autoResizeCanvas(canvas);
+
+  // Initialize shaders and entry data for shaders
+  initProgram();
+  initLights();
+  initBuffers();
+
+  // Render
+  render();
+
+  // Form for controls
+  initControls();
+};
+
+window.onload = init;

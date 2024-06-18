@@ -1,5 +1,6 @@
 import { calculateNormals } from "../../utils/math.js";
 import {
+  autoResizeCanvas,
   clearScene,
   configureCanvas,
   createProgram,
@@ -25,23 +26,6 @@ let gl: WebGL2RenderingContext,
   sphereVAO: WebGLVertexArrayObject | null,
   sphereIndicesBuffer: WebGLBuffer | null;
 const clearColor = [0.9, 0.9, 0.9, 1, 0];
-
-const init = async () => {
-  // Set up our canvas
-  configureCanvas();
-
-  // Initialize programs
-  initProgram();
-  initMetadata();
-
-  // Populate with data
-  initBuffers();
-
-  // Render
-  render();
-
-  // Initialize controls
-};
 
 const initProgram = () => {
   gl = getGLContext();
@@ -120,6 +104,22 @@ const draw = () => {
 const render = () => {
   requestAnimationFrame(render);
   draw();
+};
+
+const init = async () => {
+  // Set up our canvas
+  const canvas = configureCanvas();
+  autoResizeCanvas(canvas);
+
+  // Initialize programs
+  initProgram();
+  initMetadata();
+
+  // Populate with data
+  initBuffers();
+
+  // Render
+  render();
 };
 
 window.onload = init;

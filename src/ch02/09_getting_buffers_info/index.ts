@@ -4,6 +4,7 @@ import { fragmentShaderSource } from "./fs.glsl.js";
 import { mat4 } from "../../lib/gl-matrix/esm/index.js";
 
 import {
+  autoResizeCanvas,
   configureCanvas,
   createProgram,
   getGLContext,
@@ -156,7 +157,8 @@ const updateInfo = () => {
 
 /** Initialize application */
 const init = () => {
-  configureCanvas();
+  const canvas = configureCanvas();
+  autoResizeCanvas(canvas);
   gl = getGLContext();
   // Set the clear color to be black
   gl.clearColor(0, 0, 0, 1);
