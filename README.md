@@ -54,6 +54,11 @@ Assets: https://github.com/PacktPublishing/Real-Time-3D-Graphics-with-WebGL-2
 
 ## Code
 
+### Chapter 1
+
+- [Canvas](./src/ch01/01/): Creates a canvas
+- [Canvas](./src/ch01/01/): Creates a canvas that changes its background color.
+
 ### Chapter 2
 
 - [Square](./src/ch02/01/): Renders a simple square

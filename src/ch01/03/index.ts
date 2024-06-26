@@ -1,5 +1,8 @@
 "use strict";
 
+import { createDescriptionPanel } from "../../utils/gui/index";
+import { setupStyles } from "../../utils/gui/styles";
+
 let gl: WebGL2RenderingContext | null;
 
 /**
@@ -52,6 +55,13 @@ const checkKey = (event: KeyboardEvent) => {
  */
 
 const init = () => {
+  // Setup GUI
+  setupStyles();
+  createDescriptionPanel(
+    "Creates a canvas that changes colors when pressing the keys: 1, 2, 3 or 4"
+  );
+
+  // Setup canvas
   const canvas = document.getElementById("webgl-canvas") as HTMLCanvasElement;
   // Ensure we have a canvas
   if (!canvas) {
