@@ -74,13 +74,13 @@ You can now easily navigate through the folders of this project, that contains a
 
 ### Chapter 3
 
-- [Goraud Shading with Phong Lights](./src/ch03/01/): Renders an sphere while applying Goraud Shading in combination with the Phong Light Model.
-- [Goraud Shading with Lambert Lights](./src/ch03/03/): Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model.
+- [Goraud Shading with Phong Lights](./src/ch03/01/): Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model.
+- [Goraud Shading with Lambert Lights](./src/ch03/03/): Renders an sphere while applying Goraud Shading in combination with the Phong Light Model.
 - [Phong Shading](./src/ch03/04/): Renders an sphere while applying Phong Shading.
 
 #### Challenges
 
-- [Moving Light](./src/ch03/challenges/02/):
+- [Moving Light](./src/ch03/challenges/02/): Animates the light source when using the Lambert Light Model.
 
 
 ---

@@ -1,3 +1,4 @@
+import { initGUI, createDescriptionPanel } from "../../utils/gui/index.js";
 import { calculateNormals } from "../../utils/math.js";
 import {
   autoResizeCanvas,
@@ -107,6 +108,10 @@ const render = () => {
 };
 
 const init = async () => {
+  // Setup GUI
+  initGUI();
+  createDescriptionPanel("Renders an sphere while applying Phong Shading.");
+  
   // Set up our canvas
   const canvas = configureCanvas();
   autoResizeCanvas(canvas);

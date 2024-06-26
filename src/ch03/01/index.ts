@@ -11,10 +11,11 @@ import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import { vertices, indices } from "../data/data.js";
 import {
+  initGUI,
   createColorInputForm,
   createDescriptionPanel,
   createSliderInputForm,
-  initGUI,
+  initController,
 } from "../../utils/gui/index.js";
 import {
   denormalizeColor,
@@ -22,7 +23,6 @@ import {
   normalizeColor,
   rgbToHex,
 } from "../../utils/colors.js";
-import { setupStyles } from "../../utils/gui/styles.js";
 
 type ProgramAttributes = {
   aVertexPosition: number;
@@ -180,7 +180,7 @@ const render = () => {
 };
 
 const initControls = () => {
-  initGUI();
+  initController();
   createColorInputForm({
     label: "Sphere color",
     value: rgbToHex(denormalizeColor(sphereColor)),
@@ -244,9 +244,9 @@ const initControls = () => {
 
 const init = async () => {
   // Setup GUI
-  setupStyles();
+  initGUI();
   createDescriptionPanel(
-    "Renders an sphere while applying Goraud Shading in combination with the Phong Light Model"
+    "Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model"
   );
 
   // Setup canvas

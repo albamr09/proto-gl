@@ -1,7 +1,6 @@
 "use strict";
 
-import { createDescriptionPanel } from "../../utils/gui/index";
-import { setupStyles } from "../../utils/gui/styles";
+import { initGUI, createDescriptionPanel } from "../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext | null;
 
@@ -56,7 +55,7 @@ const checkKey = (event: KeyboardEvent) => {
 
 const init = () => {
   // Setup GUI
-  setupStyles();
+  initGUI();
   createDescriptionPanel(
     "Creates a canvas that changes colors when pressing the keys: 1, 2, 3 or 4"
   );

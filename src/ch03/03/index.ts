@@ -12,9 +12,11 @@ import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import { vertices, indices } from "../data/data.js";
 import {
-  createColorInputForm,
-  createSliderInputForm,
   initGUI,
+  createColorInputForm,
+  createDescriptionPanel,
+  createSliderInputForm,
+  initController,
 } from "../../utils/gui/index.js";
 import {
   denormalizeColor,
@@ -61,7 +63,7 @@ let gl: WebGL2RenderingContext,
   projectionMatrix = mat4.create(),
   normalMatrix = mat4.create(),
   shininess = 10;
-  
+
 // Initialize WebGL program
 const initProgram = () => {
   gl = getGLContext();
@@ -189,7 +191,7 @@ const render = () => {
 
 // Initialize control forms
 const initControls = () => {
-  initGUI();
+  initController();
   createColorInputForm({
     label: "Sphere color",
     value: rgbToHex(denormalizeColor(sphereColor)),
@@ -302,6 +304,13 @@ const initControls = () => {
 };
 
 const init = async () => {
+  // Setup GUI
+  initGUI();
+  createDescriptionPanel(
+    "Renders an sphere while applying Goraud Shading in combination with the Phong Light Model"
+  );
+
+  // Setup canvas
   const canvas = configureCanvas();
   autoResizeCanvas(canvas);
 

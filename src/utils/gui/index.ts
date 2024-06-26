@@ -1,7 +1,12 @@
+import { setupStyles } from "./styles.js";
 
 const CONTROL_CONTAINER_ID = "control-container";
 
 export const initGUI = () => {
+  setupStyles();
+}
+
+export const initController = () => {
   const controlContainer = document.createElement("div");
 
   // Set the id attribute for the div

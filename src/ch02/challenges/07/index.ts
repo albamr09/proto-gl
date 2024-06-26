@@ -7,8 +7,12 @@ import {
   getGLContext,
 } from "../../../utils/web-gl.js";
 
-import { initGUI, createSelectorForm, createDescriptionPanel } from "../../../utils/gui/index.js";
-import { setupStyles } from "../../../utils/gui/styles.js";
+import {
+  initGUI,
+  initController,
+  createSelectorForm,
+  createDescriptionPanel,
+} from "../../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -177,7 +181,7 @@ const draw = () => {
  */
 const initControls = () => {
   // Initialize form
-  initGUI();
+  initController();
   createSelectorForm({
     label: "Rendering mode",
     value: currentRenderingMode,
@@ -199,7 +203,7 @@ const initControls = () => {
 /** Initialize application */
 const init = () => {
   // Setup gui
-  setupStyles();
+  initGUI();
   createDescriptionPanel("Renders a M using LINES mode");
   // Setup canvas
   configureCanvas();

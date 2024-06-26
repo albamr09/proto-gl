@@ -8,12 +8,14 @@ import {
   getGLContext,
   createProgram,
   clearScene,
+  autoResizeCanvas,
 } from "../../../utils/web-gl.js";
 import { calculateNormals } from "../../../utils/math.js";
 import { mat4 } from "../../../lib/gl-matrix/esm/index.js";
 import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import { vertices, indices } from "../../data/data.js";
+import { initGUI, createDescriptionPanel } from "../../../utils/gui/index.js";
 
 type ProgramAttributes = {
   aVertexPosition: number;
@@ -45,22 +47,6 @@ let gl: WebGL2RenderingContext,
   // New variables to animate angle
   angle = 0,
   lastTime: number;
-
-/** Initialize application */
-const init = async () => {
-  // Configure the canvas for WebGL rendering
-  configureCanvas();
-
-  // Initialize shaders and data
-  initProgram();
-  initLights();
-  initBuffers();
-
-  // Start rendering
-  render();
-};
-
-window.onload = init;
 
 const initProgram = () => {
   // Set up WebGL and shaders
@@ -200,6 +186,25 @@ const render = () => {
   requestAnimationFrame(render);
   animate();
   draw();
+};
+
+/** Initialize application */
+const init = async () => {
+  // Setup GUI
+  initGUI();
+  createDescriptionPanel("Animates the light source when using the Lambert Light Model.")
+  
+  // Configure the canvas for WebGL rendering
+  const canvas = configureCanvas();
+  autoResizeCanvas(canvas);
+
+  // Initialize shaders and data
+  initProgram();
+  initLights();
+  initBuffers();
+
+  // Start rendering
+  render();
 };
 
 window.onload = init;

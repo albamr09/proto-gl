@@ -10,10 +10,10 @@ import {
 
 import {
   initGUI,
+  initController,
   createSelectorForm,
   createDescriptionPanel,
 } from "../../utils/gui/index.js";
-import { setupStyles } from "../../utils/gui/styles.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -182,7 +182,7 @@ const draw = () => {
  */
 const initControls = () => {
   // Initialize form
-  initGUI();
+  initController();
   createSelectorForm({
     label: "Rendering mode",
     value: currentRenderingMode,
@@ -204,7 +204,7 @@ const initControls = () => {
 /** Initialize application */
 const init = () => {
   // Setup GUI
-  setupStyles();
+  initGUI();
   createDescriptionPanel(
     "Showcases the different rendering modes when using drawElements: TRIANGLES, LINES, POINTS, LINE_LOOP, LINE_STRIP, TRIANGLE_STRIP, TRIANGLE_FAN"
   );

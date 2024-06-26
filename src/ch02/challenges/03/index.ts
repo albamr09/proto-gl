@@ -6,8 +6,7 @@ import {
   createProgram,
   getGLContext,
 } from "../../../utils/web-gl.js";
-import { setupStyles } from "../../../utils/gui/styles.js";
-import { createDescriptionPanel } from "../../../utils/gui/index.js";
+import { initGUI, createDescriptionPanel } from "../../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -86,7 +85,7 @@ const draw = () => {
 
 const init = () => {
   // Setup gui
-  setupStyles();
+  initGUI();
   createDescriptionPanel("Renders a square using drawElements");
 
   // Setup canvas
