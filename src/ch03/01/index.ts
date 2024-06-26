@@ -12,6 +12,7 @@ import fragmentShaderSource from "./fs.glsl.js";
 import { vertices, indices } from "../data/data.js";
 import {
   createColorInputForm,
+  createDescriptionPanel,
   createSliderInputForm,
   initGUI,
 } from "../../utils/gui/index.js";
@@ -21,6 +22,7 @@ import {
   normalizeColor,
   rgbToHex,
 } from "../../utils/colors.js";
+import { setupStyles } from "../../utils/gui/styles.js";
 
 type ProgramAttributes = {
   aVertexPosition: number;
@@ -241,6 +243,13 @@ const initControls = () => {
 };
 
 const init = async () => {
+  // Setup GUI
+  setupStyles();
+  createDescriptionPanel(
+    "Renders an sphere while applying Goraud Shading in combination with the Phong Light Model"
+  );
+
+  // Setup canvas
   const canvas = configureCanvas();
   autoResizeCanvas(canvas);
 

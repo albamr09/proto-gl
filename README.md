@@ -48,16 +48,12 @@ Without custom configuration, the server will commonly run on port $3000$. To pr
 
 You can now easily navigate through the folders of this project, that contains all the examples from the book.
 
-## Source code
-
-Assets: https://github.com/PacktPublishing/Real-Time-3D-Graphics-with-WebGL-2
-
 ## Code
 
 ### Chapter 1
 
 - [Canvas](./src/ch01/01/): Creates a canvas
-- [Canvas](./src/ch01/01/): Creates a canvas that changes its background color.
+- [Colorful Canvas](./src/ch01/01/): Creates a canvas that changes its background color.
 
 ### Chapter 2
 
@@ -75,3 +71,20 @@ Assets: https://github.com/PacktPublishing/Real-Time-3D-Graphics-with-WebGL-2
 - [M](./src/ch02/challenges/07/): Renders a M using `LINES` mode.
 - [Trapezoid outline](./src/ch02/challenges/08/): Renders the outline of a trapezoid using `LINE_LOOP` rendering mode.
 - [Car](./src/ch02/challenges/11/): Renders a Nissan car using JSON data as the input data.
+
+### Chapter 3
+
+- [Goraud Shading with Phong Lights](./src/ch03/01/): Renders an sphere while applying Goraud Shading in combination with the Phong Light Model.
+- [Goraud Shading with Lambert Lights](./src/ch03/03/): Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model.
+- [Phong Shading](./src/ch03/04/): Renders an sphere while applying Phong Shading.
+
+#### Challenges
+
+- [Moving Light](./src/ch03/challenges/02/):
+
+
+---
+
+## Reference code
+
+Assets: https://github.com/PacktPublishing/Real-Time-3D-Graphics-with-WebGL-2
