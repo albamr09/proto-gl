@@ -7,6 +7,8 @@ import {
   createProgram,
   getGLContext,
 } from "../../utils/web-gl.js";
+import { setupStyles } from "../../utils/gui/styles.js";
+import { createDescriptionPanel } from "../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -95,6 +97,11 @@ const draw = () => {
 
 /** Initialize application */
 const init = () => {
+  // Setup GUI
+  setupStyles();
+  createDescriptionPanel("Renders a square using Vertex Array Objects (VAO)");
+  
+  // Setup canvas
   const canvas = configureCanvas();
   autoResizeCanvas(canvas);
   gl = getGLContext();

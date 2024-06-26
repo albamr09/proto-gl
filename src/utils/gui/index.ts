@@ -1,4 +1,3 @@
-import { setupStyles } from "./styles.js";
 
 const CONTROL_CONTAINER_ID = "control-container";
 
@@ -10,7 +9,6 @@ export const initGUI = () => {
 
   // Append the container to the body of the document
   document.body.appendChild(controlContainer);
-  setupStyles();
 };
 
 export const createSelectorForm = ({
@@ -209,3 +207,42 @@ export const createSliderInputForm = ({
   // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
   document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
 };
+
+export const createDescriptionPanel = (description: string) => {
+  // Create panel container
+  const panel = document.createElement('div');
+  panel.id = 'collapsiblePanel';
+
+  // Create title bar
+  const titleBar = document.createElement('div');
+  titleBar.className = 'title';
+  titleBar.innerHTML = 'Description';
+
+  // Create caret icon
+  const caret = document.createElement('span');
+  caret.className = 'caret';
+  titleBar.appendChild(caret);
+
+  // Create content area
+  const content = document.createElement('div');
+  content.className = 'content';
+  content.innerHTML = description;
+
+  // Append title bar and content to panel
+  panel.appendChild(titleBar);
+  panel.appendChild(content);
+
+  // Append panel to body
+  document.body.appendChild(panel);
+
+  // Add event listener for collapse/expand functionality
+  titleBar.addEventListener('click', () => {
+    if (content.style.display === 'none' || content.style.display === '') {
+      content.style.display = 'block';
+      caret.classList.add('open');
+    } else {
+      content.style.display = 'none';
+      caret.classList.remove('open');
+    }
+  });
+}

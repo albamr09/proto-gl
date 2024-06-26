@@ -2,12 +2,18 @@ import { vertexShaderSource } from "./vs.glsl.js";
 import { fragmentShaderSource } from "./fs.glsl.js";
 
 import {
+  autoResizeCanvas,
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../../utils/web-gl.js";
+} from "../../utils/web-gl.js";
 
-import { initGUI, createSelectorForm } from "../../../utils/gui/index.js";
+import {
+  initGUI,
+  createSelectorForm,
+  createDescriptionPanel,
+} from "../../utils/gui/index.js";
+import { setupStyles } from "../../utils/gui/styles.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -111,8 +117,7 @@ const drawBasedOnRenderingMode = () => {
       break;
     }
     case "LINE_LOOP": {
-      // Simply put all the vertices
-      indices = [0, 2, 4, 3, 1];
+      indices = [2, 3, 4, 1, 0];
       gl.bufferData(
         gl.ELEMENT_ARRAY_BUFFER,
         new Uint16Array(indices),
@@ -198,8 +203,17 @@ const initControls = () => {
 
 /** Initialize application */
 const init = () => {
-  configureCanvas();
+  // Setup GUI
+  setupStyles();
+  createDescriptionPanel(
+    "Showcases the different rendering modes when using drawElements: TRIANGLES, LINES, POINTS, LINE_LOOP, LINE_STRIP, TRIANGLE_STRIP, TRIANGLE_FAN"
+  );
+
+  // Setup canvas
+  const canvas = configureCanvas();
+  autoResizeCanvas(canvas);
   gl = getGLContext();
+
   // Set the clear color to be black
   gl.clearColor(0, 0, 0, 1);
 
@@ -224,3 +238,6 @@ const render = () => {
 };
 // Call init once the document has loaded
 window.onload = init;
+
+// Make it a module
+export {};

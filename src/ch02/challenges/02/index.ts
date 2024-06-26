@@ -1,11 +1,13 @@
 import { vertexShaderSource } from "./vs.glsl.js";
 import { fragmentShaderSource } from "./fs.glsl.js";
+
 import {
-  autoResizeCanvas,
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../utils/web-gl.js";
+} from "../../../utils/web-gl.js";
+import { setupStyles } from "../../../utils/gui/styles.js";
+import { createDescriptionPanel } from "../../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -13,26 +15,31 @@ let gl: WebGL2RenderingContext,
   indicesBuffer: WebGLBuffer | null,
   indices: number[];
 
-/** Draws square on center of clipspace x in (-1, 1), y in (-1, 1)
- *  0->(-0.5, 0.5)  3->(0.5, 0.5)
- *      +-------------+
- *      |           / |
- *      |        /    |
- *      |     /       |
- *      | /           |
- *      +-------------+
- *  1->(-0.5, -0.5)  2->(0.5, -0.5)
+/** Draws pentagon on center of clipspace x in (-1, 1), y in (-1, 1)
+ *                            +     4->(0, 0.5)
+ *                          /   \
+ *                        /       \
+ *                      /           \
+ *  0->(-0.4, 0.3)     +------+------+ 3->(0.4, 0.3)
+ *                     |           / |
+ *                     |        /    |
+ *                     |     /       |
+ *                     | /           |
+ *                     +-------------+
+ *                  1->(-0.25, -0.3)  2->(0.25, -0.3)
  *
  */
-const initSquareBuffer = () => {
+const initBuffer = () => {
   // Define vertices for position on space: the depth (z) is not important for now
-  const vertices = [-0.5, 0.5, 0, -0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0];
+  const vertices = [
+    -0.4, 0.3, 0, -0.25, -0.3, 0, 0.25, -0.3, 0, 0.4, 0.3, 0, 0, 0.5, 0,
+  ];
 
   // Define indices for identifying triangles that make up the geometry
   // Using counter-clock wise order
   // First triangle is made up from the vertices 0, 1, and 2, the second triangle
   // is made up of vertices 1, 2 and 3
-  indices = [0, 1, 3, 1, 2, 3];
+  indices = [0, 1, 3, 1, 2, 3, 4, 0, 3];
 
   // Set up VBO
   verticesBuffer = gl.createBuffer();
@@ -84,23 +91,22 @@ const draw = () => {
 
 /** Initialize application */
 const init = () => {
-  const canvas = configureCanvas();
-  autoResizeCanvas(canvas);
-  gl = getGLContext();
+  // Setup GUI
+  setupStyles();
+  createDescriptionPanel("Renders a pentagon on the canvas.");
 
+  // Setup canvas
+  configureCanvas();
+  gl = getGLContext();
   // Set the clear color to be black
   gl.clearColor(0, 0, 0, 1);
 
   // Init the program with the necessary shaders
   program = createProgram(gl, vertexShaderSource, fragmentShaderSource);
-
-  // Create our square!
-  initSquareBuffer();
+  // Populate buffers with data (vertices, indices)
+  initBuffer();
   // Now draw
   draw();
 };
 // Call init once the document has loaded
 window.onload = init;
-
-// Make it a module
-export {};

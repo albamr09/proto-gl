@@ -8,6 +8,8 @@ import {
   createProgram,
   getGLContext,
 } from "../../../utils/web-gl.js";
+import { setupStyles } from "../../../utils/gui/styles.js";
+import { createDescriptionPanel } from "../../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -144,6 +146,11 @@ const draw = () => {
 
 /** Initialize application */
 const init = async () => {
+  // Setup GUI
+  setupStyles();
+  createDescriptionPanel("Renders a Nissan car using JSON data as the input data.");
+
+  // Setup canvas
   configureCanvas();
   gl = getGLContext();
   // Set the clear color to be black

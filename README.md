@@ -51,3 +51,22 @@ You can now easily navigate through the folders of this project, that contains a
 ## Source code
 
 Assets: https://github.com/PacktPublishing/Real-Time-3D-Graphics-with-WebGL-2
+
+## Code
+
+### Chapter 2
+
+- [Square](./src/ch02/01/): Renders a simple square
+- [Square VAO](./src/ch02/04/): Renders a simple square using Vertex Attribute Objects (VAO)
+- [Rendering modes](./src/ch02/05/): Showcases how to use different rendering modes with `drawElements`.
+- [Getting Info](./src/ch02/09/): Shows how to obtain various information about VBOs and IBOs.
+- [JSON Data](./src/ch02/10/): Shows how to obtain work with JSON data that defines objects.
+
+#### Challenges
+
+- [Pentagon](./src/ch02/challenges/02/): Renders a pentagon
+- [Square](./src/ch02/challenges/03/): Renders a square using `drawElements`
+- [Trapezoid](./src/ch02/challenges/06/): Renders a trapezoid using `TRIANGLES` mode.
+- [M](./src/ch02/challenges/07/): Renders a M using `LINES` mode.
+- [Trapezoid outline](./src/ch02/challenges/08/): Renders the outline of a trapezoid using `LINE_LOOP` rendering mode.
+- [Car](./src/ch02/challenges/11/): Renders a Nissan car using JSON data as the input data.

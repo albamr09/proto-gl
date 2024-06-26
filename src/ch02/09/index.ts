@@ -9,6 +9,8 @@ import {
   createProgram,
   getGLContext,
 } from "../../utils/web-gl.js";
+import { setupStyles } from "../../utils/gui/styles.js";
+import { createDescriptionPanel } from "../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -157,6 +159,13 @@ const updateInfo = () => {
 
 /** Initialize application */
 const init = () => {
+  // Setup GUI
+  setupStyles();
+  createDescriptionPanel(
+    "Shows a panel with information about a vertex buffer object (VBO) and a index buffer object (IBO)"
+  );
+
+  // Setup canvas
   const canvas = configureCanvas();
   autoResizeCanvas(canvas);
   gl = getGLContext();

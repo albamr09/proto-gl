@@ -7,7 +7,8 @@ import {
   getGLContext,
 } from "../../../utils/web-gl.js";
 
-import { initGUI, createSelectorForm } from "../../../utils/gui/index.js";
+import { initGUI, createSelectorForm, createDescriptionPanel } from "../../../utils/gui/index.js";
+import { setupStyles } from "../../../utils/gui/styles.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -196,6 +197,11 @@ const initControls = () => {
 
 /** Initialize application */
 const init = () => {
+  // Setup style
+  setupStyles();
+  createDescriptionPanel("Renders a trapezoid using TRIANGLES mode");
+
+  // Init canvas
   configureCanvas();
   gl = getGLContext();
   // Set the clear color to be black
