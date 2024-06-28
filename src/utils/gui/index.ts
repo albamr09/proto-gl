@@ -80,10 +80,12 @@ export const createSelectorForm = ({
 export const createColorInputForm = ({
   label,
   value,
+  onInit = () => {},
   onChange,
 }: {
   label: string;
   value: string;
+  onInit?: (v: string) => void;
   onChange: (v: string) => void;
 }) => {
   // Create a div container
@@ -110,6 +112,7 @@ export const createColorInputForm = ({
   // Set the initial value of the color input
   if (value) {
     colorInput.value = value;
+    onInit(value);
   }
 
   // Add an event listener for the "input" event on the color input
