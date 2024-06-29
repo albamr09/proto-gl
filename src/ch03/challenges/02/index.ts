@@ -4,25 +4,25 @@ import {
   createProgram,
   getGLContext,
   clearScene,
-} from "../../utils/web-gl.js";
+} from "../../../utils/web-gl.js";
 import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
-import { vertices, indices } from "../data/data.js";
+import { vertices, indices } from "../../data/data.js";
 import {
   createColorInputForm,
   createDescriptionPanel,
   createSliderInputForm,
   initController,
   initGUI,
-} from "../../utils/gui/index.js";
+} from "../../../utils/gui/index.js";
 import {
   denormalizeColor,
   hexToRgb,
   normalizeColor,
   rgbToHex,
-} from "../../utils/colors.js";
-import { calculateNormals } from "../../utils/math/3d.js";
-import { Matrix4 } from "../../utils/math/matrix.js";
+} from "../../../utils/colors.js";
+import { calculateNormals } from "../../../utils/math/3d.js";
+import { Matrix4 } from "../../../utils/math/matrix.js";
 
 type ProgramAttributes = {
   aPosition: number;
@@ -272,7 +272,7 @@ const init = () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model"
+    "Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model. In addition the sphere is animated to rotate on the Y axis."
   );
 
   // Setup canvas
