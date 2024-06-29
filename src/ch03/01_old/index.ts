@@ -106,7 +106,7 @@ const initBuffers = () => {
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
   // Enable vertices attribute array, and make it point to the buffer that is currently bound
   gl.enableVertexAttribArray(program.aVertexPosition);
-  // MDefine structure
+  // Define structure
   gl.vertexAttribPointer(program.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
 
   // Add normals to VAO

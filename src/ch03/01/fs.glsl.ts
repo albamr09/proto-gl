@@ -1,12 +1,13 @@
 const fragmentShaderSource = `#version 300 es
 precision mediump float;
 
-uniform vec3 uMaterialDiffuse;
+// Varying
+in vec4 vertexColor;
 
 out vec4 fragColor;
 
 void main () {
-  fragColor = vec4(uMaterialDiffuse, 1.0);
+  fragColor = vertexColor;
 }
 `;
 

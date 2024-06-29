@@ -8,10 +8,11 @@ enum PROGRAM_TYPE {
  */
 export const configureCanvas = () => {
   const canvas = document.getElementById("webgl-canvas") as HTMLCanvasElement;
+  const size = Math.min(window.innerWidth, window.innerHeight);
 
-  // Set the canvas to the size of the screen
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  // Set the canvas to be a square
+  canvas.width = size;
+  canvas.height = size;
   return canvas;
 };
 
@@ -117,8 +118,9 @@ export const clearScene = (gl: WebGL2RenderingContext) => {
 export const autoResizeCanvas = (canvas: HTMLCanvasElement)  => {
 
   const expandFullScreen = () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const size = Math.min(window.innerWidth, window.innerHeight);
+    canvas.width = size;
+    canvas.height = size;
   };
 
   expandFullScreen();

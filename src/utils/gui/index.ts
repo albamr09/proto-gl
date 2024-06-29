@@ -138,6 +138,7 @@ export const createSliderInputForm = ({
   min,
   max,
   step,
+  onInit = () => {},
   onChange,
 }: {
   label: string;
@@ -145,6 +146,7 @@ export const createSliderInputForm = ({
   min: number;
   max: number;
   step: number;
+  onInit?: (v: number) => void;
   onChange: (v: number) => void;
 }) => {
   // Create a div container
@@ -169,7 +171,8 @@ export const createSliderInputForm = ({
   textInput.classList.add("numeric-input");
 
   // Set the initial value of the text input
-  if (value) {
+  if (value !== undefined && value !== null) {
+    onInit(value);
     textInput.value = value.toString();
   }
 
@@ -235,6 +238,9 @@ export const createDescriptionPanel = (description: string) => {
   const content = document.createElement('div');
   content.className = 'content';
   content.innerHTML = description;
+  // Make dialog open by default
+  content.style.display = 'block';
+  caret.classList.add('open');
 
   // Append title bar and content to panel
   panel.appendChild(titleBar);
