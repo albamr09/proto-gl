@@ -22,6 +22,7 @@ import {
   rgbToHex,
 } from "../../utils/colors.js";
 import { calculateNormals } from "../../utils/math/3d.js";
+import { Matrix4 } from "../../utils/math/matrix.js";
 
 type ProgramAttributes = {
   aPosition: number;
@@ -32,6 +33,10 @@ type ProgramUniforms = {
   uLightColor: WebGLUniformLocation | null;
   uMaterialColor: WebGLUniformLocation | null;
   uLightDirection: WebGLUniformLocation | null;
+  // Transformation matrices (not really needed, just here to show case)
+  uProjectionMatrix: WebGLUniformLocation | null;
+  uModelViewMatrix: WebGLUniformLocation | null;
+  uNormalMatrix: WebGLUniformLocation | null;
 };
 
 type ExtendedWebGLProgram = WebGLProgram & ProgramAttributes & ProgramUniforms;
@@ -47,7 +52,10 @@ let gl: WebGL2RenderingContext,
 // Control vars
 let sphereColor = [0.5, 0.8, 0.1],
   lightColor = [1, 1, 1],
-  lightDirection = [0, -1, -1];
+  lightDirection = [0, -1, -1],
+  projectionMatrix = Matrix4.identity(),
+  modelViewMatrix = Matrix4.identity(),
+  normalMatrix = Matrix4.identity();
 
 /**
  *   Compiles the vertex and fragment shader to create the program
@@ -67,6 +75,33 @@ const initProgram = () => {
   program.uMaterialColor = gl.getUniformLocation(program, "uMaterialColor");
   program.uLightColor = gl.getUniformLocation(program, "uLightColor");
   program.uLightDirection = gl.getUniformLocation(program, "uLightDirection");
+  program.uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
+  program.uProjectionMatrix = gl.getUniformLocation(
+    program,
+    "uProjectionMatrix"
+  );
+  program.uNormalMatrix = gl.getUniformLocation(program, "uNormalMatrix");
+};
+
+/**
+ * Sets up all transformation matrices
+ */
+const initWorld = () => {
+  gl.uniformMatrix4fv(
+    program.uModelViewMatrix,
+    false,
+    modelViewMatrix.toFloatArray()
+  );
+  gl.uniformMatrix4fv(
+    program.uProjectionMatrix,
+    false,
+    projectionMatrix.toFloatArray()
+  );
+  gl.uniformMatrix4fv(
+    program.uNormalMatrix,
+    false,
+    normalMatrix.toFloatArray()
+  );
 };
 
 /**
@@ -245,6 +280,7 @@ const init = () => {
   // Setup web gl and data
   gl = getGLContext();
   initProgram();
+  initWorld();
   initData();
 
   // Loop
