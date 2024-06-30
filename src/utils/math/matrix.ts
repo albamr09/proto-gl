@@ -13,6 +13,15 @@ export class Matrix4 {
     this.r4 = r4;
   }
 
+  static identity() {
+    return new Matrix4(
+      new Vector([1.0, 0.0, 0.0, 0.0]),
+      new Vector([0.0, 1.0, 0.0, 0.0]),
+      new Vector([0.0, 0.0, 1.0, 0.0]),
+      new Vector([0.0, 0.0, 0.0, 1.0])
+    );
+  }
+
   toFloatArray() {
     return new Float32Array([
       ...this.r1.toArray(),
@@ -22,12 +31,22 @@ export class Matrix4 {
     ]);
   }
 
-  static identity() {
-    return new Matrix4(
-      new Vector([1.0, 0.0, 0.0, 0.0]),
-      new Vector([0.0, 1.0, 0.0, 0.0]),
-      new Vector([0.0, 0.0, 1.0, 0.0]),
-      new Vector([0.0, 0.0, 0.0, 1.0])
-    );
+  translate(offset: Vector) {
+    if (offset.dim() != this.r1.dim()) {
+      throw Error("Translate offset has incompatible dimensionality");
+    }
+
+    this.r4.set(0, offset.at(0));
+    this.r4.set(1, offset.at(1));
+    this.r4.set(2, offset.at(2));
+    this.r4.set(3, offset.at(3));
+  }
+  
+  transpose() {
+
+  }
+
+  inverse() {
+
   }
 }

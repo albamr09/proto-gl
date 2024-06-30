@@ -99,6 +99,9 @@ const initWorld = () => {
     false,
     projectionMatrix.toFloatArray()
   );
+
+  // Obtain transformation matrix to apply to normal vectors
+  // Reference: https://paroj.github.io/gltut/Illumination/Tut09%20Normal%20Transformation.html
   gl.uniformMatrix4fv(
     program.uNormalMatrix,
     false,

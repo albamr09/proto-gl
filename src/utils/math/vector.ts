@@ -13,6 +13,10 @@ export class Vector {
     return this.elements[idx];
   }
 
+  set(idx: number, value: number) {
+    return this.elements[idx] = value;
+  }
+
   dim() {
     return this.elements.length;
   }
