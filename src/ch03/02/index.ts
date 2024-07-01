@@ -4,25 +4,26 @@ import {
   createProgram,
   getGLContext,
   clearScene,
-} from "../../../utils/web-gl.js";
+} from "../../utils/web-gl.js";
 import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
-import { vertices, indices } from "../../data/data.js";
+import { vertices, indices } from "../data/data.js";
 import {
   createColorInputForm,
   createDescriptionPanel,
-  createSliderInputForm,
+  createVector3dSliders,
   initController,
   initGUI,
-} from "../../../utils/gui/index.js";
+} from "../../utils/gui/index.js";
 import {
   denormalizeColor,
   hexToRgb,
   normalizeColor,
   rgbToHex,
-} from "../../../utils/colors.js";
-import { calculateNormals } from "../../../utils/math/3d.js";
-import { Matrix4 } from "../../../utils/math/matrix.js";
+} from "../../utils/colors.js";
+import { calculateNormals } from "../../utils/math/3d.js";
+import { Matrix3, Matrix4 } from "../../utils/math/matrix.js";
+import { Vector } from "../../utils/math/vector.js";
 
 type ProgramAttributes = {
   aPosition: number;
@@ -33,7 +34,7 @@ type ProgramUniforms = {
   uLightColor: WebGLUniformLocation | null;
   uMaterialColor: WebGLUniformLocation | null;
   uLightDirection: WebGLUniformLocation | null;
-  // Transformation matrices (not really needed, just here to show case)
+  // Transformation matrices
   uProjectionMatrix: WebGLUniformLocation | null;
   uModelViewMatrix: WebGLUniformLocation | null;
   uNormalMatrix: WebGLUniformLocation | null;
@@ -53,18 +54,20 @@ let gl: WebGL2RenderingContext,
 let sphereColor = [0.5, 0.8, 0.1],
   lightColor = [1, 1, 1],
   lightDirection = [0, 0, 1],
+  modelTranslation = [0, 0, 0],
   projectionMatrix = Matrix4.identity(),
   modelViewMatrix = Matrix4.identity(),
   normalMatrix = Matrix4.identity();
 
-const MAX_VALUE = 5;
+const MAX_LIGHT_TRANSLATION_VALUE = 5;
+const MAX_MODELS_TRANSLATION_VALUE = 2;
 
 /**
  *   Compiles the vertex and fragment shader to create the program
  */
 const initProgram = () => {
   // Black clear color
-  gl.clearColor(0, 0, 0, 1);
+  gl.clearColor(0.5, 0.5, 0.5, 1);
   gl.enable(gl.DEPTH_TEST);
   program = createProgram(
     gl,
@@ -88,7 +91,11 @@ const initProgram = () => {
 /**
  * Sets up all transformation matrices
  */
-const initWorld = () => {
+const updateWorld = () => {
+  // Translate model view matrix
+  modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
+
+  // Define data
   gl.uniformMatrix4fv(
     program.uModelViewMatrix,
     false,
@@ -99,6 +106,8 @@ const initWorld = () => {
     false,
     projectionMatrix.toFloatArray()
   );
+
+  modelViewMatrix.inverse();
 
   // Obtain transformation matrix to apply to normal vectors
   // Reference: https://paroj.github.io/gltut/Illumination/Tut09%20Normal%20Transformation.html
@@ -197,73 +206,34 @@ const initControls = () => {
       gl.uniform3fv(program.uLightColor, normalizeColor(hexToRgb(v)));
     },
   });
-  createSliderInputForm({
-    label: "Translate X",
-    value: lightDirection[0],
-    min: -MAX_VALUE,
-    max: MAX_VALUE,
+  createVector3dSliders({
+    labels: ["Light X Translate", "Light Y Translate", "Light Z Translate"],
+    value: lightDirection,
+    min: -MAX_LIGHT_TRANSLATION_VALUE,
+    max: MAX_LIGHT_TRANSLATION_VALUE,
     step: -0.1,
     onInit: (v) => {
-      lightDirection[0] = v;
-      gl.uniform3fv(program.uLightDirection, [
-        lightDirection[0],
-        lightDirection[1],
-        lightDirection[2],
-      ]);
+      lightDirection = v;
+      gl.uniform3fv(program.uLightDirection, lightDirection);
     },
     onChange: (v) => {
-      lightDirection[0] = v;
-      gl.uniform3fv(program.uLightDirection, [
-        -lightDirection[0],
-        -lightDirection[1],
-        lightDirection[2],
-      ]);
+      lightDirection = v;
+      gl.uniform3fv(program.uLightDirection, lightDirection);
     },
   });
-  createSliderInputForm({
-    label: "Translate Y",
-    value: lightDirection[1],
-    min: -MAX_VALUE,
-    max: MAX_VALUE,
+  createVector3dSliders({
+    labels: ["Model X Translate", "Model Y Translate", "Model Z Translate"],
+    value: [0, 0, 0],
+    min: -MAX_MODELS_TRANSLATION_VALUE,
+    max: MAX_MODELS_TRANSLATION_VALUE,
     step: -0.1,
     onInit: (v) => {
-      lightDirection[1] = v;
-      gl.uniform3fv(program.uLightDirection, [
-        lightDirection[0],
-        lightDirection[1],
-        lightDirection[2],
-      ]);
+      modelTranslation = v;
+      updateWorld();
     },
     onChange: (v) => {
-      lightDirection[1] = v;
-      gl.uniform3fv(program.uLightDirection, [
-        lightDirection[0],
-        lightDirection[1],
-        lightDirection[2],
-      ]);
-    },
-  });
-  createSliderInputForm({
-    label: "Translate Z",
-    value: lightDirection[2],
-    min: -MAX_VALUE,
-    max: MAX_VALUE,
-    step: -0.1,
-    onInit: (v) => {
-      lightDirection[2] = v;
-      gl.uniform3fv(program.uLightDirection, [
-        lightDirection[0],
-        lightDirection[1],
-        lightDirection[2],
-      ]);
-    },
-    onChange: (v) => {
-      lightDirection[2] = v;
-      gl.uniform3fv(program.uLightDirection, [
-        lightDirection[0],
-        lightDirection[1],
-        lightDirection[2],
-      ]);
+      modelTranslation = v;
+      updateWorld();
     },
   });
 };
@@ -275,7 +245,7 @@ const init = () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model. In addition the sphere is animated to rotate on the Y axis."
+    "Challenge: Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model. In addition the sphere is animated to rotate on the Y axis."
   );
 
   // Setup canvas
@@ -285,7 +255,6 @@ const init = () => {
   // Setup web gl and data
   gl = getGLContext();
   initProgram();
-  initWorld();
   initData();
 
   // Loop

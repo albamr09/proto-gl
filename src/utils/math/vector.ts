@@ -5,6 +5,10 @@ export class Vector {
     this.elements = elements;
   }
 
+  static copy(v: Vector) {
+    return new Vector([...v.toArray()]);
+  }
+
   toArray() {
     return this.elements;
   }
@@ -14,7 +18,7 @@ export class Vector {
   }
 
   set(idx: number, value: number) {
-    return this.elements[idx] = value;
+    return (this.elements[idx] = value);
   }
 
   dim() {

@@ -4,7 +4,7 @@ const CONTROL_CONTAINER_ID = "control-container";
 
 export const initGUI = () => {
   setupStyles();
-}
+};
 
 export const initController = () => {
   const controlContainer = document.createElement("div");
@@ -219,28 +219,68 @@ export const createSliderInputForm = ({
   document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
 };
 
+/**
+ * Creates one slider per element on the 3d vector
+ */
+export const createVector3dSliders = ({
+  labels,
+  value,
+  min,
+  max,
+  step,
+  onInit = () => {},
+  onChange,
+}: {
+  labels: string[];
+  value: number[];
+  min: number;
+  max: number;
+  step: number;
+  onInit?: (v: number[]) => void;
+  onChange: (v: number[]) => void;
+}) => {
+  let _value = value;
+  value.forEach((v, idx) => {
+    createSliderInputForm({
+      label: labels[idx],
+      value: v,
+      min,
+      max,
+      step,
+      onInit: (v) => {
+        _value[idx] = v;
+        onInit(_value);
+      },
+      onChange: (v) => {
+        _value[idx] = v;
+        onChange(_value);
+      },
+    });
+  });
+};
+
 export const createDescriptionPanel = (description: string) => {
   // Create panel container
-  const panel = document.createElement('div');
-  panel.id = 'collapsiblePanel';
+  const panel = document.createElement("div");
+  panel.id = "collapsiblePanel";
 
   // Create title bar
-  const titleBar = document.createElement('div');
-  titleBar.className = 'title';
-  titleBar.innerHTML = 'Description';
+  const titleBar = document.createElement("div");
+  titleBar.className = "title";
+  titleBar.innerHTML = "Description";
 
   // Create caret icon
-  const caret = document.createElement('span');
-  caret.className = 'caret';
+  const caret = document.createElement("span");
+  caret.className = "caret";
   titleBar.appendChild(caret);
 
   // Create content area
-  const content = document.createElement('div');
-  content.className = 'content';
+  const content = document.createElement("div");
+  content.className = "content";
   content.innerHTML = description;
   // Make dialog open by default
-  content.style.display = 'block';
-  caret.classList.add('open');
+  content.style.display = "block";
+  caret.classList.add("open");
 
   // Append title bar and content to panel
   panel.appendChild(titleBar);
@@ -250,13 +290,13 @@ export const createDescriptionPanel = (description: string) => {
   document.body.appendChild(panel);
 
   // Add event listener for collapse/expand functionality
-  titleBar.addEventListener('click', () => {
-    if (content.style.display === 'none' || content.style.display === '') {
-      content.style.display = 'block';
-      caret.classList.add('open');
+  titleBar.addEventListener("click", () => {
+    if (content.style.display === "none" || content.style.display === "") {
+      content.style.display = "block";
+      caret.classList.add("open");
     } else {
-      content.style.display = 'none';
-      caret.classList.remove('open');
+      content.style.display = "none";
+      caret.classList.remove("open");
     }
   });
-}
+};
