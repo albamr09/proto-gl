@@ -18,7 +18,8 @@ out vec4 vertexColor;
 void main(void) {
   // Calculate the normal vector after transformation
   vec3 N = normalize(vec3(uNormalMatrix * vec4(aNormal, 1.0)));
-  vec3 L = normalize(uLightDirection);
+  // Apply model transformation to light
+  vec3 L = normalize(vec3(uModelViewMatrix * vec4(uLightDirection, 0.0)));
   vertexColor = vec4(uLightColor * uMaterialColor * dot(N, -L), 1.0);
   gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
 }

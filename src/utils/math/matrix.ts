@@ -53,10 +53,10 @@ class Matrix {
       });
   }
 
-  scalarMultiply(x: number){
+  scalarMultiply(out: Matrix, x: number){
     for (let i = 0; i < this.dimension(); i++) {
       for (let j = 0; j < this.dimension(); j++) {
-        this.set(i, j, this.at(i, j) * x);
+        out.set(i, j, this.at(i, j) * x);
       }
     }
   }
@@ -80,7 +80,7 @@ class Matrix {
   }
 
   // Reference: https://semath.info/src/inverse-cofactor-ex4.html
-  inverse() {
+  inverse(out: Matrix) {
     const determinant = this.det();
     if (determinant == 0) {
       throw Error("Cannot compute inverse of defficient matrix");
@@ -91,18 +91,30 @@ class Matrix {
         // Obtain adjugate
         const A_ij = Math.pow(-1, i + j) * this.submatrix(i, j).det();
         // Update result matrix
-        this.set(i, j, A_ij);
+        out.set(i, j, A_ij);
       }
     }
-    this.scalarMultiply(1/determinant);
+    this.scalarMultiply(out, 1/determinant);
   }
   
   // Returns the transposed version of the matrix
-  transpose() {
-    this.setColumn(0, this.row(0));
-    this.setColumn(1, this.row(1));
-    this.setColumn(2, this.row(2));
-    this.setColumn(3, this.row(3));
+  transpose(out: Matrix) {
+    out.setColumn(0, this.row(0));
+    out.setColumn(1, this.row(1));
+    out.setColumn(2, this.row(2));
+    out.setColumn(3, this.row(3));
+  }
+
+  multiply(out: Matrix, m: Matrix) {
+    if (this.dimension() != m.dimension()) {
+      throw Error("Matrices cannot be multiplied as they do not have compatible dimensions.");
+    }
+
+    for (let i = 0; i < this.dimension(); i++) {
+      for (let j = 0; j < this.dimension(); j++) {
+        out.set(i, j, this.at(i, j) * m.at(i, j));
+      }
+    }
   }
 }
 
@@ -139,14 +151,69 @@ export class Matrix4 extends Matrix {
 
   // Return a matrix that translates the matrix with and offset given by the vector [x, y, z]
   // Reference: https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
-  translate(offset: Vector) {
+  translate(out: Matrix4, offset: Vector) {
     if (offset.dim() != 3) {
       throw Error("Translate offset has incompatible dimensionality");
     }
 
-    this.set(3, 0, offset.at(0));
-    this.set(3, 1, offset.at(1));
-    this.set(3, 2, offset.at(2));
+    out.set(3, 0, offset.at(0));
+    out.set(3, 1, offset.at(1));
+    out.set(3, 2, offset.at(2));
+  }
+
+  rotateXDeg(out: Matrix4, angle: number) {
+    const rad = angle * Math.PI / 180.0;
+    this.rotateX(out, rad);
+  }
+
+  rotateYDeg(out: Matrix4, angle: number) {
+    const rad = angle * Math.PI / 180.0;
+    this.rotateY(out, rad);
+  }
+
+  rotateZDeg(out: Matrix4, angle: number) {
+    const rad = angle * Math.PI / 180.0;
+    this.rotateZ(out, rad);
+  }
+
+  rotateX(out: Matrix4, angle: number) {
+    // Rotation matrix for rotation on X
+    const rX = new Matrix4([
+      new Vector([1, 0, 0, 0]),
+      new Vector([0, Math.cos(angle), -Math.sin(angle), 0]),
+      new Vector([0, Math.sin(angle), Math.cos(angle), 0]),
+      new Vector([0, 0, 0, 1])
+    ]);
+    out = rX; 
+    // TODO: review this
+    //this.multiply(out, rX);
+  }
+
+  rotateY(out: Matrix4, angle: number) {
+    // Rotation matrix for rotation on Y
+    const rY = new Matrix4([
+      new Vector([Math.cos(angle), 0, Math.sin(angle), 0]),
+      new Vector([0, 1, 0, 0]),
+      new Vector([-Math.sin(angle), 0, Math.cos(angle), 0]),
+      new Vector([0, 0, 0, 1]),
+    ]);
+    // TODO: review this
+    return rY;
+    //this.multiply(out, rY);
+  }
+
+  rotateZ(out: Matrix4, angle: number) {
+    // Rotation matrix for rotation on Z
+    const rZ = new Matrix4([
+      new Vector([Math.cos(angle), -Math.sin(angle), 0, 0]),
+      new Vector([Math.sin(angle), Math.cos(angle), 0, 0]),
+      new Vector([0, 0, 1, 0]),
+      new Vector([0, 0, 0, 1]),
+    ]);
+
+    // TODO: review this
+    out = rZ;
+    //this.multiply(out, rZ);
   }
 
   submatrix(i: number, j: number) {

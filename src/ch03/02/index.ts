@@ -53,13 +53,12 @@ let gl: WebGL2RenderingContext,
 // Control vars
 let sphereColor = [0.5, 0.8, 0.1],
   lightColor = [1, 1, 1],
-  lightDirection = [0, 0, 1],
+  lightDirection = [0, -1, -1],
   modelTranslation = [0, 0, 0],
   projectionMatrix = Matrix4.identity(),
   modelViewMatrix = Matrix4.identity();
 
 const MAX_LIGHT_TRANSLATION_VALUE = 5;
-const MAX_MODELS_TRANSLATION_VALUE = 2;
 
 /**
  *   Compiles the vertex and fragment shader to create the program
@@ -92,7 +91,8 @@ const initProgram = () => {
  */
 const updateWorld = () => {
   // Translate model view matrix
-  modelViewMatrix.translate(new Vector(modelTranslation));
+  modelViewMatrix.translate(modelViewMatrix,  new Vector(modelTranslation));
+  modelViewMatrix = modelViewMatrix.rotateY(modelViewMatrix, Math.PI / 2);
   const normalMatrix = computeNormalMatrix(modelViewMatrix);
 
   // Define data
@@ -171,11 +171,16 @@ const draw = () => {
   gl.bindVertexArray(null);
 };
 
+const animateRotation = () => {
+}
+
 /**
  * Rendering loop
  */
 const render = () => {
   requestAnimationFrame(render);
+  animateRotation();
+  updateWorld();
   draw();
 };
 
@@ -214,21 +219,6 @@ const initControls = () => {
     onChange: (v) => {
       lightDirection = v;
       gl.uniform3fv(program.uLightDirection, lightDirection);
-    },
-  });
-  createVector3dSliders({
-    labels: ["Model X Translate", "Model Y Translate", "Model Z Translate"],
-    value: [0, 0, 0],
-    min: -MAX_MODELS_TRANSLATION_VALUE,
-    max: MAX_MODELS_TRANSLATION_VALUE,
-    step: -0.1,
-    onInit: (v) => {
-      modelTranslation = v;
-      updateWorld();
-    },
-    onChange: (v) => {
-      modelTranslation = v;
-      updateWorld();
     },
   });
 };
