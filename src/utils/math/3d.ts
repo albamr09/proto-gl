@@ -1,3 +1,4 @@
+import {Matrix4} from "./matrix.js";
 import { Vector } from "./vector.js";
 
 /**
@@ -79,3 +80,15 @@ export const calculateNormals = (
   // Normalize vectors
   return normals.map((n) => n.normalize().toArray()).flat();
 };
+
+/*
+* Obtain transformation matrix to apply to normal vectors given the model view matrix. 
+* Reference: https://paroj.github.io/gltut/Illumination/Tut09%20Normal%20Transformation.html
+*/
+
+export const computeNormalMatrix = (m: Matrix4) => {
+  const normalMatrix = Matrix4.copy(m);
+  normalMatrix.inverse()
+  normalMatrix.transpose()
+  return normalMatrix;
+}

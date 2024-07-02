@@ -53,6 +53,14 @@ class Matrix {
       });
   }
 
+  scalarMultiply(x: number){
+    for (let i = 0; i < this.dimension(); i++) {
+      for (let j = 0; j < this.dimension(); j++) {
+        this.set(i, j, this.at(i, j) * x);
+      }
+    }
+  }
+
   submatrix(_i: number, _j: number) {
     return new Matrix();
   }
@@ -69,6 +77,32 @@ class Matrix {
       // Sum the cofactor multiplied by a(i, j) to the result
       return acc + this.at(i, j) * cofactor;
     }, 0);
+  }
+
+  // Reference: https://semath.info/src/inverse-cofactor-ex4.html
+  inverse() {
+    const determinant = this.det();
+    if (determinant == 0) {
+      throw Error("Cannot compute inverse of defficient matrix");
+    }
+
+    for (let i = 0; i < this.dimension(); i++) {
+      for (let j = 0; j < this.dimension(); j++) {
+        // Obtain adjugate
+        const A_ij = Math.pow(-1, i + j) * this.submatrix(i, j).det();
+        // Update result matrix
+        this.set(i, j, A_ij);
+      }
+    }
+    this.scalarMultiply(1/determinant);
+  }
+  
+  // Returns the transposed version of the matrix
+  transpose() {
+    this.setColumn(0, this.row(0));
+    this.setColumn(1, this.row(1));
+    this.setColumn(2, this.row(2));
+    this.setColumn(3, this.row(3));
   }
 }
 
@@ -110,42 +144,13 @@ export class Matrix4 extends Matrix {
       throw Error("Translate offset has incompatible dimensionality");
     }
 
-    const _copy = Matrix4.copy(this);
-    _copy.set(3, 0, offset.at(0));
-    _copy.set(3, 1, offset.at(1));
-    _copy.set(3, 2, offset.at(2));
-    return _copy;
+    this.set(3, 0, offset.at(0));
+    this.set(3, 1, offset.at(1));
+    this.set(3, 2, offset.at(2));
   }
 
   submatrix(i: number, j: number) {
     return new Matrix3(this.filterRowAndCol(i, j));
-  }
-
-  // Returns the transposed version of the matrix
-  // TODO: try to generalize for any nxn matrix
-  transpose() {
-    const _copy = Matrix4.copy(this);
-    _copy.setColumn(0, this.row(0));
-    _copy.setColumn(1, this.row(1));
-    _copy.setColumn(2, this.row(2));
-    _copy.setColumn(3, this.row(3));
-    return _copy;
-  }
-
-  // Reference: https://semath.info/src/inverse-cofactor-ex4.html
-  inverse() {
-    const _copy = Matrix4.copy(this);
-    // TODO: check det > 0
-    for (let i = 0; i < this.dimension(); i++) {
-      for (let j = 0; j < this.dimension(); j++) {
-        // Obtain adjugate
-        const A_ij = Math.pow(-1, i + j) * this.submatrix(i, j).det();
-        // Update result matrix
-        _copy.set(i, j, A_ij);
-      }
-    }
-    // TODO multiply by 1/|A|
-    return _copy;
   }
 }
 

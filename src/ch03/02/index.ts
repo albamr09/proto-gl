@@ -21,8 +21,8 @@ import {
   normalizeColor,
   rgbToHex,
 } from "../../utils/colors.js";
-import { calculateNormals } from "../../utils/math/3d.js";
-import { Matrix3, Matrix4 } from "../../utils/math/matrix.js";
+import { calculateNormals, computeNormalMatrix } from "../../utils/math/3d.js";
+import { Matrix4 } from "../../utils/math/matrix.js";
 import { Vector } from "../../utils/math/vector.js";
 
 type ProgramAttributes = {
@@ -56,8 +56,7 @@ let sphereColor = [0.5, 0.8, 0.1],
   lightDirection = [0, 0, 1],
   modelTranslation = [0, 0, 0],
   projectionMatrix = Matrix4.identity(),
-  modelViewMatrix = Matrix4.identity(),
-  normalMatrix = Matrix4.identity();
+  modelViewMatrix = Matrix4.identity();
 
 const MAX_LIGHT_TRANSLATION_VALUE = 5;
 const MAX_MODELS_TRANSLATION_VALUE = 2;
@@ -93,7 +92,8 @@ const initProgram = () => {
  */
 const updateWorld = () => {
   // Translate model view matrix
-  modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
+  modelViewMatrix.translate(new Vector(modelTranslation));
+  const normalMatrix = computeNormalMatrix(modelViewMatrix);
 
   // Define data
   gl.uniformMatrix4fv(
@@ -106,11 +106,6 @@ const updateWorld = () => {
     false,
     projectionMatrix.toFloatArray()
   );
-
-  modelViewMatrix.inverse();
-
-  // Obtain transformation matrix to apply to normal vectors
-  // Reference: https://paroj.github.io/gltut/Illumination/Tut09%20Normal%20Transformation.html
   gl.uniformMatrix4fv(
     program.uNormalMatrix,
     false,
