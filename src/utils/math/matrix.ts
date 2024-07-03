@@ -19,6 +19,10 @@ class Matrix {
     return this.matrix[i];
   }
 
+  col(j: number) {
+    return new Vector(this.matrix.map(row => row.at(j)));
+  }
+
   set(i: number, j: number, value: number) {
     this.row(i).set(j, value);
   }
@@ -105,14 +109,10 @@ class Matrix {
     out.setColumn(3, this.row(3));
   }
 
-  multiply(out: Matrix, m: Matrix) {
-    if (this.dimension() != m.dimension()) {
-      throw Error("Matrices cannot be multiplied as they do not have compatible dimensions.");
-    }
-
+  multiply(out: Matrix4, m: Matrix4) {
     for (let i = 0; i < this.dimension(); i++) {
       for (let j = 0; j < this.dimension(); j++) {
-        out.set(i, j, this.at(i, j) * m.at(i, j));
+        out.set(i, j, this.row(i).dot(m.col(j)))
       }
     }
   }
@@ -161,59 +161,37 @@ export class Matrix4 extends Matrix {
     out.set(3, 2, offset.at(2));
   }
 
-  rotateXDeg(out: Matrix4, angle: number) {
+  rotateDeg(out: Matrix4, angle: number, axis: Vector) {
     const rad = angle * Math.PI / 180.0;
-    this.rotateX(out, rad);
+    this.rotate(out, rad, axis);
   }
 
-  rotateYDeg(out: Matrix4, angle: number) {
-    const rad = angle * Math.PI / 180.0;
-    this.rotateY(out, rad);
-  }
-
-  rotateZDeg(out: Matrix4, angle: number) {
-    const rad = angle * Math.PI / 180.0;
-    this.rotateZ(out, rad);
-  }
-
-  rotateX(out: Matrix4, angle: number) {
-    // Rotation matrix for rotation on X
-    const rX = new Matrix4([
-      new Vector([1, 0, 0, 0]),
-      new Vector([0, Math.cos(angle), -Math.sin(angle), 0]),
-      new Vector([0, Math.sin(angle), Math.cos(angle), 0]),
+  rotate(out: Matrix4, angle: number, axis: Vector) {
+    let [x, y, z] = [axis.at(0), axis.at(1), axis.at(2)];
+    let len = Math.hypot(x, y, z);
+    
+    if (len < Number.EPSILON) {
+      throw new Error("Axis vector length is too small");
+    }
+    
+    len = 1 / len;
+    x *= len;
+    y *= len;
+    z *= len;
+    
+    const s = Math.sin(angle);
+    const c = Math.cos(angle);
+    const t = 1 - c;
+    
+    // Construct the rotation matrix
+    const r = new Matrix4([
+      new Vector([x * x * t + c, y * x * t + z * s, z * x * t - y * s, 0]),
+      new Vector([x * y * t - z * s, y * y * t + c, z * y * t + x * s, 0]),
+      new Vector([x * z * t + y * s, y * z * t - x * s, z * z * t + c, 0]),
       new Vector([0, 0, 0, 1])
     ]);
-    out = rX; 
-    // TODO: review this
-    //this.multiply(out, rX);
-  }
 
-  rotateY(out: Matrix4, angle: number) {
-    // Rotation matrix for rotation on Y
-    const rY = new Matrix4([
-      new Vector([Math.cos(angle), 0, Math.sin(angle), 0]),
-      new Vector([0, 1, 0, 0]),
-      new Vector([-Math.sin(angle), 0, Math.cos(angle), 0]),
-      new Vector([0, 0, 0, 1]),
-    ]);
-    // TODO: review this
-    return rY;
-    //this.multiply(out, rY);
-  }
-
-  rotateZ(out: Matrix4, angle: number) {
-    // Rotation matrix for rotation on Z
-    const rZ = new Matrix4([
-      new Vector([Math.cos(angle), -Math.sin(angle), 0, 0]),
-      new Vector([Math.sin(angle), Math.cos(angle), 0, 0]),
-      new Vector([0, 0, 1, 0]),
-      new Vector([0, 0, 0, 1]),
-    ]);
-
-    // TODO: review this
-    out = rZ;
-    //this.multiply(out, rZ);
+    this.multiply(out, r);
   }
 
   submatrix(i: number, j: number) {

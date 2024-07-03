@@ -24,6 +24,7 @@ import {
 import { calculateNormals, computeNormalMatrix } from "../../utils/math/3d.js";
 import { Matrix4 } from "../../utils/math/matrix.js";
 import { Vector } from "../../utils/math/vector.js";
+import { mat4 } from "../../lib/gl-matrix/esm/index.js";
 
 type ProgramAttributes = {
   aPosition: number;
@@ -55,8 +56,10 @@ let sphereColor = [0.5, 0.8, 0.1],
   lightColor = [1, 1, 1],
   lightDirection = [0, -1, -1],
   modelTranslation = [0, 0, 0],
+  angle = 0,
   projectionMatrix = Matrix4.identity(),
   modelViewMatrix = Matrix4.identity();
+  // modelViewMatrix = mat4.create();
 
 const MAX_LIGHT_TRANSLATION_VALUE = 5;
 
@@ -91,14 +94,31 @@ const initProgram = () => {
  */
 const updateWorld = () => {
   // Translate model view matrix
+  // modelViewMatrix = Matrix4.identity();
   modelViewMatrix.translate(modelViewMatrix,  new Vector(modelTranslation));
-  modelViewMatrix = modelViewMatrix.rotateY(modelViewMatrix, Math.PI / 2);
-  const normalMatrix = computeNormalMatrix(modelViewMatrix);
+  modelViewMatrix.rotate(modelViewMatrix, Math.PI / 20, new Vector([0, 1, 0]));
+  //const normalMatrix = computeNormalMatrix(modelViewMatrix);
+  // const normalMatrix = Matrix4.identity();
+  // const modelViewMatrix = mat4.create();
+  // mat4.rotate(modelViewMatrix, modelViewMatrix, Math.PI / 200, [0, 1, 0])
+
+  // let normalMatrix = new Matrix4([
+  //   new Vector([modelViewMatrix[0], modelViewMatrix[1], modelViewMatrix[2], modelViewMatrix[3]]),
+  //   new Vector([modelViewMatrix[4], modelViewMatrix[5], modelViewMatrix[6], modelViewMatrix[7]]),
+  //   new Vector([modelViewMatrix[8], modelViewMatrix[9], modelViewMatrix[10], modelViewMatrix[11]]),
+  //   new Vector([modelViewMatrix[12], modelViewMatrix[13], modelViewMatrix[14], modelViewMatrix[15]]),
+  // ])
+  // normalMatrix = computeNormalMatrix(normalMatrix);
+  // const normalMatrix = mat4.create();
+  // mat4.copy(normalMatrix, modelViewMatrix);
+  // mat4.invert(normalMatrix, normalMatrix);
+  // mat4.transpose(normalMatrix, normalMatrix);
 
   // Define data
   gl.uniformMatrix4fv(
     program.uModelViewMatrix,
     false,
+    // modelViewMatrix
     modelViewMatrix.toFloatArray()
   );
   gl.uniformMatrix4fv(
@@ -109,7 +129,8 @@ const updateWorld = () => {
   gl.uniformMatrix4fv(
     program.uNormalMatrix,
     false,
-    normalMatrix.toFloatArray()
+    // normalMatrix,
+    Matrix4.identity().toFloatArray()
   );
 };
 
@@ -167,19 +188,21 @@ const draw = () => {
   gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
   // Unbind
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
   gl.bindVertexArray(null);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
 
-const animateRotation = () => {
+const animateRotation = (time: number) => {
+  angle = time / 2000.0;
 }
 
 /**
  * Rendering loop
  */
-const render = () => {
+const render = (time: number) => {
   requestAnimationFrame(render);
-  animateRotation();
+  animateRotation(time);
   updateWorld();
   draw();
 };
@@ -243,7 +266,7 @@ const init = () => {
   initData();
 
   // Loop
-  render();
+  render(0);
 
   // Form for controls
   initControls();

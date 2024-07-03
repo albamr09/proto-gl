@@ -11,6 +11,7 @@
     "minify": "find ./build -name \"*.js\" -exec sh -c 'terser \"$1\" -o \"${1%.js}.js\"' _ {} \\;",
     "build": "rm -rf build && tsc && yarn minify && yarn copy-files",
     "serve": "cd build && serve",
-    "start": "rm -rf build && yarn copy-files && tsc -w"
+    "start": "rm -rf build && yarn copy-files && tsc -w",
+    "test": "jest"
   }
 }

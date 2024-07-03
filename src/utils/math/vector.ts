@@ -60,4 +60,15 @@ export class Vector {
       this.at(0) * v.at(1) - this.at(1) * v.at(0),
     ]);
   }
+
+  dot(v: Vector) {
+    if (this.dim() != v.dim()) {
+      throw new Error("Cannot compute dot product between vectors of different dimensions");
+    }
+
+    return this.elements.reduce((sum, _, idx) => {
+      return sum + (this.at(idx) * v.at(idx));
+    }, 0)
+
+  }
 }
