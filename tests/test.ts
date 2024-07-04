@@ -11,7 +11,11 @@ class Test {
     const areEqual = JSON.stringify(actual) === JSON.stringify(expected);
 
     if (!areEqual) {
-      console.error(`${cross} ${message} Failed\nExpected:\n ${JSON.stringify(expected)}\nGot:\n ${JSON.stringify(actual)}`);
+      console.error(
+        `${cross} ${message} Failed\nExpected:\n ${JSON.stringify(
+          expected
+        )}\nGot:\n ${JSON.stringify(actual)}`
+      );
     } else {
       console.log(`${checkmark} ${message} Passed`);
     }
@@ -19,4 +23,3 @@ class Test {
 }
 
 export default Test;
-

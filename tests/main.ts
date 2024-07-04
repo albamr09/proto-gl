@@ -1,5 +1,5 @@
 import { readdir } from "fs/promises";
-import {join} from "path";
+import { join } from "path";
 import { promisify } from "util";
 import { exec } from "child_process";
 
@@ -23,7 +23,11 @@ async function traverseAndExecute(dir: string): Promise<void> {
 
     if (entry.isDirectory()) {
       await traverseAndExecute(fullPath);
-    } else if (entry.isFile() && fullPath.endsWith(".js") && entry.name !== "main.js") {
+    } else if (
+      entry.isFile() &&
+      fullPath.endsWith(".js") &&
+      entry.name !== "main.js"
+    ) {
       await executeNodeOnJsFile(fullPath);
     }
   }
@@ -31,6 +35,6 @@ async function traverseAndExecute(dir: string): Promise<void> {
 
 const executeAllTests = () => {
   traverseAndExecute("./tests/");
-}
+};
 
 executeAllTests();

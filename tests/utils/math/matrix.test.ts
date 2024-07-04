@@ -1,9 +1,8 @@
-import {Matrix4} from "../../../src/utils/math/matrix.js";
-import {Vector} from "../../../src/utils/math/vector.js";
+import { Matrix4 } from "../../../src/utils/math/matrix.js";
+import { Vector } from "../../../src/utils/math/vector.js";
 import Test from "../../test.js";
 
 class Matrix4Test extends Test {
-
   static testIdentityMatrix() {
     const identity = Matrix4.identity();
     const expected = new Matrix4([
@@ -12,7 +11,7 @@ class Matrix4Test extends Test {
       new Vector([0.0, 0.0, 1.0, 0.0]),
       new Vector([0.0, 0.0, 0.0, 1.0]),
     ]);
-    this.assertEqual(identity, expected, 'Identity Matrix Test');
+    this.assertEqual(identity, expected, "Identity Matrix Test");
   }
 
   static testMatrixMultiplication() {
@@ -44,7 +43,7 @@ class Matrix4Test extends Test {
       new Vector([560, 502, 444, 386]),
     ]);
 
-    this.assertEqual(out, expected, 'Matrix Multiplication Test');
+    this.assertEqual(out, expected, "Matrix Multiplication Test");
   }
 
   static testTranslation() {
@@ -61,7 +60,7 @@ class Matrix4Test extends Test {
       new Vector([1.0, 2.0, 3.0, 1.0]),
     ]);
 
-    this.assertEqual(out, expected, 'Translation Test');
+    this.assertEqual(out, expected, "Translation Test");
   }
 
   static testRotation() {
@@ -79,7 +78,7 @@ class Matrix4Test extends Test {
       new Vector([0, 0, 0, 1]),
     ]);
 
-    this.assertEqual(out, expected, 'Rotation Test');
+    this.assertEqual(out, expected, "Rotation Test");
   }
 
   static runAllTests() {

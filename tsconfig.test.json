@@ -13,7 +13,5 @@
     "strictNullChecks": true,
     "skipLibCheck": true
   },
-  "exclude": [
-    "./build/**"
-  ]
+  "exclude": ["./build/**"]
 }
