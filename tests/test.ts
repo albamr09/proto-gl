@@ -20,13 +20,13 @@ class Expectation<T> {
 
   toBe(expected: T) {
     if (this.value !== expected) {
-      throw new AssertionError(`Expected:\n${this.value}\nGot:\n${expected}`);
+      throw new AssertionError(`Expected:\n${expected}\nGot:\n${this.value}`);
     }
   }
 
   toDeepEqual(expected: T) {
     if (JSON.stringify(this.value) !== JSON.stringify(expected)) {
-      throw new AssertionError(`Expected:\n${JSON.stringify(this.value)}\nGot:\n${JSON.stringify(expected)}`);
+      throw new AssertionError(`Expected:\n${JSON.stringify(expected)}\nGot:\n${JSON.stringify(this.value)}`);
     }
   }
 }
@@ -51,10 +51,10 @@ class TestSuite {
     this.tests.forEach(({ name, fn }) => {
       try {
         fn();
-        console.log(`${checkmark} ${name} Passed`);
+        console.log(`${checkmark} ${name}`);
       } catch (e) {
         if (e instanceof AssertionError) {
-          console.error(`${cross} ${name} Failed`);
+          console.error(`${cross} ${name}`);
           console.error(e.message);
         } else {
           console.error(`Could no execute test ${name}`);

@@ -1,5 +1,5 @@
 import { Vector } from "../../../src/utils/math/vector.js";
-import {describe, it, expect} from "../../test.js";
+import { describe, it, expect } from "../../test.js";
 
 describe("Vector", () => {
   it("should create a vector", () => {
@@ -56,5 +56,13 @@ describe("Vector", () => {
     const cross = v1.cross(v2);
     const expected = new Vector([0, 0, 1]);
     expect(cross.toArray()).toDeepEqual(expected.toArray());
+  });
+
+  it("should calculate the dot product correctly", () => {
+    const v1 = new Vector([1, 2, 3]);
+    const v2 = new Vector([4, 5, 6]);
+    const expected = 32;
+    const dotProduct = v1.dot(v2);
+    expect(dotProduct).toBe(expected);
   });
 });
