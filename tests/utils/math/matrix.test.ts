@@ -1,17 +1,8 @@
-import {Matrix4} from "../../../utils/math/matrix.js";
-import {Vector} from "../../../utils/math/vector.js";
+import {Matrix4} from "../../../src/utils/math/matrix.js";
+import {Vector} from "../../../src/utils/math/vector.js";
+import Test from "../../test.js";
 
-class Matrix4Test {
-  constructor() {}
-
-  static assertEqual<T>(actual: T, expected: T, message: string) {
-    const areEqual = JSON.stringify(actual) === JSON.stringify(expected);
-    if (!areEqual) {
-      throw new Error(`${message} Expected: ${expected}, but got: ${actual}`);
-    } else {
-      console.log(`${message} Passed`);
-    }
-  }
+class Matrix4Test extends Test {
 
   static testIdentityMatrix() {
     const identity = Matrix4.identity();

@@ -1,6 +1,8 @@
 {
+  "type": "module",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^20.14.9",
     "copyfiles": "^2.4.1",
     "serve": "^14.2.1",
     "terser": "^5.21.0",
@@ -12,6 +14,6 @@
     "build": "rm -rf build && tsc && yarn minify && yarn copy-files",
     "serve": "cd build && serve",
     "start": "rm -rf build && yarn copy-files && tsc -w",
-    "test": "jest"
+    "test": "tsc -p tsconfig.test.json && cd .test && node tests/main.js && cd .. && rm -rf .test"
   }
 }

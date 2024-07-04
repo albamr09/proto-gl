@@ -36,7 +36,7 @@ export const compileShader = (
   type: PROGRAM_TYPE,
   source: string
 ) => {
-  let shader;
+  let shader: WebGLShader | null;
   if (type === PROGRAM_TYPE.VERTEX) {
     shader = gl.createShader(gl.VERTEX_SHADER);
   } else {
