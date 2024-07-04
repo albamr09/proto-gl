@@ -4,22 +4,79 @@ const reset = "\x1b[0m";
 const checkmark = `${green}\u2714${reset}`; // ✓
 const cross = `${red}\u2716${reset}`; // ✖
 
-class Test {
-  constructor() {}
+class AssertionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AssertionError";
+  }
+}
 
-  static assertEqual<T>(actual: T, expected: T, message: string) {
-    const areEqual = JSON.stringify(actual) === JSON.stringify(expected);
+class Expectation<T> {
+  private value: T;
 
-    if (!areEqual) {
-      console.error(
-        `${cross} ${message} Failed\nExpected:\n ${JSON.stringify(
-          expected
-        )}\nGot:\n ${JSON.stringify(actual)}`
-      );
-    } else {
-      console.log(`${checkmark} ${message} Passed`);
+  constructor(value: T) {
+    this.value = value;
+  }
+
+  toBe(expected: T) {
+    if (this.value !== expected) {
+      throw new AssertionError(`Expected:\n${this.value}\nGot:\n${expected}`);
+    }
+  }
+
+  toDeepEqual(expected: T) {
+    if (JSON.stringify(this.value) !== JSON.stringify(expected)) {
+      throw new AssertionError(`Expected:\n${JSON.stringify(this.value)}\nGot:\n${JSON.stringify(expected)}`);
     }
   }
 }
 
-export default Test;
+type TestFn = () => void;
+
+class TestSuite {
+  name: string;
+  tests: Array<{ name: string; fn: TestFn }>;
+
+  constructor(name: string) {
+    this.name = name;
+    this.tests = [];
+  }
+
+  addTest(name: string, fn: TestFn) {
+    this.tests.push({ name, fn });
+  }
+
+  run() {
+    console.log(`Running Test Suite: ${this.name}`);
+    this.tests.forEach(({ name, fn }) => {
+      try {
+        fn();
+        console.log(`${checkmark} ${name} Passed`);
+      } catch (e) {
+        if (e instanceof AssertionError) {
+          console.error(`${cross} ${name} Failed`);
+          console.error(e.message);
+        } else {
+          console.error(`Could no execute test ${name}`);
+          console.log(e);
+        }
+      }
+    });
+  }
+}
+
+let suite: TestSuite;
+
+export function describe(name: string, fn: () => void) {
+  suite = new TestSuite(name);
+  fn();
+  suite.run();
+}
+
+export function it(name: string, fn: TestFn) {
+  suite.addTest(name, fn);
+}
+
+export function expect<T>(value: T): Expectation<T> {
+  return new Expectation(value);
+}

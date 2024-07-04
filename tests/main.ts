@@ -25,8 +25,7 @@ async function traverseAndExecute(dir: string): Promise<void> {
       await traverseAndExecute(fullPath);
     } else if (
       entry.isFile() &&
-      fullPath.endsWith(".js") &&
-      entry.name !== "main.js"
+      fullPath.endsWith(".test.js")
     ) {
       await executeNodeOnJsFile(fullPath);
     }

@@ -48,6 +48,14 @@ Without custom configuration, the server will commonly run on port $3000$. To pr
 
 You can now easily navigate through the folders of this project, that contains all the examples from the book.
 
+### Testing
+
+In order to run the unit test, execute the following:
+
+```bash
+yarn test
+```
+
 ## Code
 
 ### Chapter 1
