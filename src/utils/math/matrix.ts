@@ -1,18 +1,18 @@
-import {Vector} from './vector.js';
+import { Vector } from "./vector.js";
 
 export class Matrix {
   public matrix: Vector[];
 
   constructor(data: number[][]) {
-    this.matrix = data.map(row => new Vector(row));
+    this.matrix = data.map((row) => new Vector(row));
   }
 
   static identity(n: number) {
-    const data = [...Array(n).keys()].map(i => {
-      const row = Array.from({length: n}, () => 0);
+    const data = [...Array(n).keys()].map((i) => {
+      const row = Array.from({ length: n }, () => 0);
       row[i] = 1;
       return row;
-    })
+    });
     if (n == 4) {
       return new Matrix4(data);
     } else if (n == 3) {
@@ -25,7 +25,7 @@ export class Matrix {
   }
 
   static copy(m: Matrix) {
-    const data = m.matrix.map(r => [...r.elements]);
+    const data = m.matrix.map((r) => [...r.elements]);
     if (m.dimension() == 4) {
       return new Matrix4(data);
     } else if (m.dimension() == 3) {
@@ -38,13 +38,13 @@ export class Matrix {
 
   copy(): Matrix {
     if (this instanceof Matrix4) {
-      return new Matrix4(this.matrix.map(r => [...r.elements]));
+      return new Matrix4(this.matrix.map((r) => [...r.elements]));
     } else if (this instanceof Matrix3) {
-      return new Matrix3(this.matrix.map(r => [...r.elements]));
+      return new Matrix3(this.matrix.map((r) => [...r.elements]));
     } else if (this instanceof Matrix2) {
-      return new Matrix3(this.matrix.map(r => [...r.elements]));
+      return new Matrix3(this.matrix.map((r) => [...r.elements]));
     }
-    return new Matrix(this.matrix.map(r => [...r.elements]));
+    return new Matrix(this.matrix.map((r) => [...r.elements]));
   }
 
   dimension() {
@@ -52,7 +52,7 @@ export class Matrix {
   }
 
   elements() {
-    return this.matrix.map(row => row.elements);
+    return this.matrix.map((row) => row.elements);
   }
 
   at(i: number, j: number) {
@@ -64,7 +64,7 @@ export class Matrix {
   }
 
   col(j: number) {
-    return new Vector(this.matrix.map(row => row.at(j)));
+    return new Vector(this.matrix.map((row) => row.at(j)));
   }
 
   set(i: number, j: number, value: number) {
@@ -87,17 +87,18 @@ export class Matrix {
 
   filterRowAndCol(i: number, j: number) {
     if (i < 0 || i > this.dimension() || j < 0 || j > this.dimension()) {
-      throw Error('Row idx or column idx not present on matrix');
+      throw Error("Row idx or column idx not present on matrix");
     }
     return this.matrix
-        .filter(
-            (_, rowIdx) =>
-                // Filters out row with idx = i
-            rowIdx != i)
-        .map((row) => {
-          // Filters out columns with idx = j
-          return row.toArray().filter((_, idx) => idx != j);
-        });
+      .filter(
+        (_, rowIdx) =>
+          // Filters out row with idx = i
+          rowIdx != i
+      )
+      .map((row) => {
+        // Filters out columns with idx = j
+        return row.toArray().filter((_, idx) => idx != j);
+      });
   }
 
   scalarMultiply(x: number) {
@@ -133,7 +134,7 @@ export class Matrix {
     const _copy = this.copy();
     const determinant = this.det();
     if (determinant == 0) {
-      throw Error('Cannot compute inverse of defficient matrix');
+      throw Error("Cannot compute inverse of defficient matrix");
     }
 
     for (let i = 0; i < this.dimension(); i++) {
@@ -175,7 +176,7 @@ export class Matrix {
 export class Matrix4 extends Matrix {
   constructor(data: number[][]) {
     if (data.some((r) => r.length != 4)) {
-      throw Error('Invalid dimension on input data');
+      throw Error("Invalid dimension on input data");
     }
     super(data);
   }
@@ -194,7 +195,7 @@ export class Matrix4 extends Matrix {
   translate(offset: Vector) {
     const _copy = this.copy();
     if (offset.dim() != 3) {
-      throw Error('Translate offset has incompatible dimensionality');
+      throw Error("Translate offset has incompatible dimensionality");
     }
 
     _copy.set(3, 0, offset.at(0));
@@ -205,7 +206,7 @@ export class Matrix4 extends Matrix {
   }
 
   rotateDeg(angle: number, axis: Vector) {
-    const rad = angle * Math.PI / 180.0;
+    const rad = (angle * Math.PI) / 180.0;
     return this.rotate(rad, axis);
   }
 
@@ -214,7 +215,7 @@ export class Matrix4 extends Matrix {
     let len = Math.hypot(x, y, z);
 
     if (len < Number.EPSILON) {
-      throw new Error('Axis vector length is too small');
+      throw new Error("Axis vector length is too small");
     }
 
     len = 1 / len;
@@ -230,7 +231,8 @@ export class Matrix4 extends Matrix {
     const r = new Matrix4([
       [x * x * t + c, y * x * t + z * s, z * x * t - y * s, 0],
       [x * y * t - z * s, y * y * t + c, z * y * t + x * s, 0],
-      [x * z * t + y * s, y * z * t - x * s, z * z * t + c, 0], [0, 0, 0, 1]
+      [x * z * t + y * s, y * z * t - x * s, z * z * t + c, 0],
+      [0, 0, 0, 1],
     ]);
 
     return this.multiply(r);
@@ -244,7 +246,7 @@ export class Matrix4 extends Matrix {
 export class Matrix3 extends Matrix {
   constructor(data: number[][]) {
     if (data.some((r) => r.length != 3)) {
-      throw Error('Invalid dimension on input data');
+      throw Error("Invalid dimension on input data");
     }
     super(data);
   }
@@ -265,7 +267,7 @@ export class Matrix3 extends Matrix {
 export class Matrix2 extends Matrix {
   constructor(data: number[][]) {
     if (data.some((r) => r.length != 2)) {
-      throw Error('Invalid dimension on input data');
+      throw Error("Invalid dimension on input data");
     }
     super(data);
   }

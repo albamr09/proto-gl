@@ -109,11 +109,7 @@ const updateWorld = () => {
     false,
     projectionMatrix.toFloatArray()
   );
-  gl.uniformMatrix4fv(
-    program.uNormalMatrix,
-    false,
-    normalMatrix,
-  );
+  gl.uniformMatrix4fv(program.uNormalMatrix, false, normalMatrix);
 };
 
 /**
@@ -177,7 +173,7 @@ const draw = () => {
 
 const animateRotation = (time: number) => {
   angle = time / 20.0;
-}
+};
 
 /**
  * Rendering loop

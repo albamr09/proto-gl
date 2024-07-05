@@ -63,11 +63,13 @@ export class Vector {
 
   dot(v: Vector) {
     if (this.dim() != v.dim()) {
-      throw new Error("Cannot compute dot product between vectors of different dimensions");
+      throw new Error(
+        "Cannot compute dot product between vectors of different dimensions"
+      );
     }
 
     return this.elements.reduce((sum, _, idx) => {
-      return sum + (this.at(idx) * v.at(idx));
-    }, 0)
+      return sum + this.at(idx) * v.at(idx);
+    }, 0);
   }
 }
