@@ -69,6 +69,5 @@ export class Vector {
     return this.elements.reduce((sum, _, idx) => {
       return sum + (this.at(idx) * v.at(idx));
     }, 0)
-
   }
 }

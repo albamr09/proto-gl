@@ -87,8 +87,6 @@ export const calculateNormals = (
 */
 
 export const computeNormalMatrix = (m: Matrix4) => {
-  const normalMatrix = Matrix4.copy(m);
-  normalMatrix.inverse(normalMatrix)
-  normalMatrix.transpose(normalMatrix)
-  return normalMatrix;
+  const normalMatrix = m.inverse();
+  return normalMatrix.transpose();
 }

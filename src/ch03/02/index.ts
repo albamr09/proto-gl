@@ -24,7 +24,6 @@ import {
 import { calculateNormals, computeNormalMatrix } from "../../utils/math/3d.js";
 import { Matrix4 } from "../../utils/math/matrix.js";
 import { Vector } from "../../utils/math/vector.js";
-import { mat4 } from "../../lib/gl-matrix/esm/index.js";
 
 type ProgramAttributes = {
   aPosition: number;
@@ -59,7 +58,6 @@ let sphereColor = [0.5, 0.8, 0.1],
   angle = 0,
   projectionMatrix = Matrix4.identity(),
   modelViewMatrix = Matrix4.identity();
-  // modelViewMatrix = mat4.create();
 
 const MAX_LIGHT_TRANSLATION_VALUE = 5;
 
@@ -94,25 +92,10 @@ const initProgram = () => {
  */
 const updateWorld = () => {
   // Translate model view matrix
-  // modelViewMatrix = Matrix4.identity();
-  modelViewMatrix.translate(modelViewMatrix,  new Vector(modelTranslation));
-  modelViewMatrix.rotate(modelViewMatrix, Math.PI / 20, new Vector([0, 1, 0]));
-  //const normalMatrix = computeNormalMatrix(modelViewMatrix);
-  // const normalMatrix = Matrix4.identity();
-  // const modelViewMatrix = mat4.create();
-  // mat4.rotate(modelViewMatrix, modelViewMatrix, Math.PI / 200, [0, 1, 0])
-
-  // let normalMatrix = new Matrix4([
-  //   new Vector([modelViewMatrix[0], modelViewMatrix[1], modelViewMatrix[2], modelViewMatrix[3]]),
-  //   new Vector([modelViewMatrix[4], modelViewMatrix[5], modelViewMatrix[6], modelViewMatrix[7]]),
-  //   new Vector([modelViewMatrix[8], modelViewMatrix[9], modelViewMatrix[10], modelViewMatrix[11]]),
-  //   new Vector([modelViewMatrix[12], modelViewMatrix[13], modelViewMatrix[14], modelViewMatrix[15]]),
-  // ])
-  // normalMatrix = computeNormalMatrix(normalMatrix);
-  // const normalMatrix = mat4.create();
-  // mat4.copy(normalMatrix, modelViewMatrix);
-  // mat4.invert(normalMatrix, normalMatrix);
-  // mat4.transpose(normalMatrix, normalMatrix);
+  modelViewMatrix = Matrix4.identity();
+  modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
+  modelViewMatrix = modelViewMatrix.rotateDeg(angle, new Vector([0, 1, 0]));
+  const normalMatrix = computeNormalMatrix(modelViewMatrix).toFloatArray();
 
   // Define data
   gl.uniformMatrix4fv(
@@ -129,8 +112,7 @@ const updateWorld = () => {
   gl.uniformMatrix4fv(
     program.uNormalMatrix,
     false,
-    // normalMatrix,
-    Matrix4.identity().toFloatArray()
+    normalMatrix,
   );
 };
 
@@ -194,7 +176,7 @@ const draw = () => {
 };
 
 const animateRotation = (time: number) => {
-  angle = time / 2000.0;
+  angle = time / 20.0;
 }
 
 /**
