@@ -205,37 +205,64 @@ export class Matrix4 extends Matrix {
     return _copy as Matrix4;
   }
 
+  /**
+  * Rotates a matrix on the given axis by the given angle (in degreee)
+  * For more information see rotate funcion.
+  **/
   rotateDeg(angle: number, axis: Vector) {
     const rad = (angle * Math.PI) / 180.0;
     return this.rotate(rad, axis);
   }
 
+  /** Rotates a matrix on 3d space on the given axes by the given angle (in radians).
+    * Reference: https://mathworld.wolfram.com/RotationMatrix.html
+    * In this reference they use 3d rotation matrices, we use 4d rotation matrices
+    * to take intro account translation (stored on the las row)
+  */
   rotate(angle: number, axis: Vector) {
     let [x, y, z] = [axis.at(0), axis.at(1), axis.at(2)];
-    let len = Math.hypot(x, y, z);
-
-    if (len < Number.EPSILON) {
-      throw new Error("Axis vector length is too small");
-    }
-
-    len = 1 / len;
-    x *= len;
-    y *= len;
-    z *= len;
 
     const s = Math.sin(angle);
     const c = Math.cos(angle);
-    const t = 1 - c;
 
-    // Construct the rotation matrix
-    const r = new Matrix4([
-      [x * x * t + c, y * x * t + z * s, z * x * t - y * s, 0],
-      [x * y * t - z * s, y * y * t + c, z * y * t + x * s, 0],
-      [x * z * t + y * s, y * z * t - x * s, z * z * t + c, 0],
-      [0, 0, 0, 1],
+    // Rotation on axis X
+    const rotationMatrixX = new Matrix4([
+      [1, 0, 0, 0],
+      [0, c, -s, 0],
+      [0, s, c, 0],
+      [0, 0, 0, 1]
+    ]);
+    
+    // Rotation on axis Y
+    const rotationMatrixY = new Matrix4([
+      [c, 0, s, 0],
+      [0, 1, 0, 0],
+      [-s, 0, c, 0],
+      [0, 0, 0, 1]
+    ]);
+    
+    // Rotation on axis Z
+    const rotationMatrixZ = new Matrix4([
+      [c, -s, 0, 0],
+      [s, c, 0, 0],
+      [0, 0, 1, 0],
+      [0, 0, 0, 1]
     ]);
 
-    return this.multiply(r);
+    let result = this as Matrix4;
+
+    // Combine rotations based on axis
+    if (x == 1) {
+      result = result.multiply(rotationMatrixX);
+    }
+    if (y == 1) {
+      result = result.multiply(rotationMatrixY);
+    }
+    if (z == 1) {
+      result = result.multiply(rotationMatrixZ);
+    }
+
+    return result;
   }
 
   submatrix(i: number, j: number) {
