@@ -93,8 +93,8 @@ const initProgram = () => {
 const updateWorld = () => {
   // Translate model view matrix
   modelViewMatrix = Matrix4.identity();
-  modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
   modelViewMatrix = modelViewMatrix.rotateDeg(angle, new Vector([0, 1, 0]));
+  modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
   const normalMatrix = computeNormalMatrix(modelViewMatrix).toFloatArray();
 
   // Define data
