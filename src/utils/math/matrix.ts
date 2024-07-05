@@ -92,13 +92,15 @@ class Matrix {
 
     for (let i = 0; i < this.dimension(); i++) {
       for (let j = 0; j < this.dimension(); j++) {
-        // Obtain adjugate
-        const A_ij = Math.pow(-1, i + j) * this.submatrix(i, j).det();
+        // Obtain minor
+        const M_ji = this.submatrix(j, i).det();
+        // Obtain cofactor
+        const A_ij = Math.pow(-1, i + j) * M_ji;
         // Update result matrix
         out.set(i, j, A_ij);
       }
     }
-    this.scalarMultiply(out, 1/determinant);
+    out.scalarMultiply(out, 1.0 / determinant);
   }
   
   // Returns the transposed version of the matrix
