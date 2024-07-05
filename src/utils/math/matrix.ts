@@ -228,23 +228,23 @@ export class Matrix4 extends Matrix {
     // Rotation on axis X
     const rotationMatrixX = new Matrix4([
       [1, 0, 0, 0],
-      [0, c, -s, 0],
-      [0, s, c, 0],
+      [0, c, s, 0],
+      [0, -s, c, 0],
       [0, 0, 0, 1]
     ]);
     
     // Rotation on axis Y
     const rotationMatrixY = new Matrix4([
-      [c, 0, s, 0],
+      [c, 0, -s, 0],
       [0, 1, 0, 0],
-      [-s, 0, c, 0],
+      [s, 0, c, 0],
       [0, 0, 0, 1]
     ]);
     
     // Rotation on axis Z
     const rotationMatrixZ = new Matrix4([
-      [c, -s, 0, 0],
-      [s, c, 0, 0],
+      [c, s, 0, 0],
+      [-s, c, 0, 0],
       [0, 0, 1, 0],
       [0, 0, 0, 1]
     ]);
