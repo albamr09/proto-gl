@@ -1,14 +1,14 @@
 import { vertexShaderSource } from "./vs.glsl.js";
 import { fragmentShaderSource } from "./fs.glsl.js";
 
-import { mat4 } from "../../../lib/gl-matrix/esm/index.js";
+import { mat4 } from "../../lib/gl-matrix/esm/index.js";
 
 import {
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../../utils/web-gl.js";
-import { initGUI, createDescriptionPanel } from "../../../utils/gui/index.js";
+} from "../../utils/web-gl.js";
+import { initGUI, createDescriptionPanel } from "../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,

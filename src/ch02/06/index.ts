@@ -5,14 +5,14 @@ import {
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../../utils/web-gl.js";
+} from "../../utils/web-gl.js";
 
 import {
   initGUI,
   initController,
   createSelectorForm,
   createDescriptionPanel,
-} from "../../../utils/gui/index.js";
+} from "../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -203,7 +203,7 @@ const initControls = () => {
 const init = () => {
   // Setup style
   initGUI();
-  createDescriptionPanel("Renders a trapezoid using TRIANGLES mode");
+  createDescriptionPanel("Challenge: Renders a trapezoid using TRIANGLES mode");
 
   // Init canvas
   configureCanvas();

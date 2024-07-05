@@ -5,14 +5,14 @@ import {
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../../utils/web-gl.js";
+} from "../../utils/web-gl.js";
 
 import {
   initGUI,
   initController,
   createSelectorForm,
   createDescriptionPanel,
-} from "../../../utils/gui/index.js";
+} from "../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -206,7 +206,7 @@ const init = () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Renders the outline of a trapezoid using LINE_LOOP rendering mode"
+    "Challenge: Renders the outline of a trapezoid using LINE_LOOP rendering mode"
   );
   // Setup canvas
   configureCanvas();

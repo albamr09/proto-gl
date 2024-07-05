@@ -5,58 +5,53 @@ import {
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../../utils/web-gl.js";
-import { initGUI, createDescriptionPanel } from "../../../utils/gui/index.js";
+} from "../../utils/web-gl.js";
+import { initGUI, createDescriptionPanel } from "../../utils/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
   verticesBuffer: WebGLBuffer | null,
   indicesBuffer: WebGLBuffer | null,
-  indices: number[];
+  vertices: number[];
 
-/** Draws pentagon on center of clipspace x in (-1, 1), y in (-1, 1)
- *                            +     4->(0, 0.5)
- *                          /   \
- *                        /       \
- *                      /           \
- *  0->(-0.4, 0.3)     +------+------+ 3->(0.4, 0.3)
- *                     |           / |
- *                     |        /    |
- *                     |     /       |
- *                     | /           |
- *                     +-------------+
- *                  1->(-0.25, -0.3)  2->(0.25, -0.3)
+/** Draws square on center of clipspace x in (-1, 1), y in (-1, 1)
+ *  0->(-0.5, 0.5)  3->(0.5, 0.5)
+ *      +-------------+
+ *      |           / |
+ *      |        /    |
+ *      |     /       |
+ *      | /           |
+ *      +-------------+
+ *  1->(-0.5, -0.5)  2->(0.5, -0.5)
  *
  */
 const initBuffer = () => {
   // Define vertices for position on space: the depth (z) is not important for now
-  const vertices = [
-    -0.4, 0.3, 0, -0.25, -0.3, 0, 0.25, -0.3, 0, 0.4, 0.3, 0, 0, 0.5, 0,
+  // Note that because we are using drawArrays some vertices will be duplicated
+  vertices = [
+    // First triangle
+    // 0
+    -0.5, 0.5, 0,
+    // 1
+    -0.5, -0.5, 0,
+    // 3
+    0.5, 0.5, 0,
+    // Second triangle
+    // 1
+    -0.5, -0.5, 0,
+    // 2
+    0.5, -0.5, 0,
+    // 3
+    0.5, 0.5, 0,
   ];
-
-  // Define indices for identifying triangles that make up the geometry
-  // Using counter-clock wise order
-  // First triangle is made up from the vertices 0, 1, and 2, the second triangle
-  // is made up of vertices 1, 2 and 3
-  indices = [0, 1, 3, 1, 2, 3, 4, 0, 3];
 
   // Set up VBO
   verticesBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-  // Set up IBO
-  indicesBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
-  gl.bufferData(
-    gl.ELEMENT_ARRAY_BUFFER,
-    new Uint16Array(indices),
-    gl.STATIC_DRAW
-  );
-
   // Unbind buffers
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
 
 /**
@@ -81,18 +76,17 @@ const draw = () => {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
 
   // Draw to the scene using triangle primitives
-  gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+  gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 3);
 
   // Unbind buffers
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
 
-/** Initialize application */
 const init = () => {
-  // Setup GUI
+  // Setup gui
   initGUI();
-  createDescriptionPanel("Renders a pentagon on the canvas.");
+  createDescriptionPanel("Challenge: Renders a square using drawElements");
 
   // Setup canvas
   configureCanvas();
@@ -102,10 +96,12 @@ const init = () => {
 
   // Init the program with the necessary shaders
   program = createProgram(gl, vertexShaderSource, fragmentShaderSource);
-  // Populate buffers with data (vertices, indices)
+
+  // Setup vertices and indices
   initBuffer();
-  // Now draw
+  // Show stuff on screen
   draw();
 };
+
 // Call init once the document has loaded
 window.onload = init;
