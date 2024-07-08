@@ -86,7 +86,7 @@ export const calculateNormals = (
 * Reference: https://paroj.github.io/gltut/Illumination/Tut09%20Normal%20Transformation.html
 */
 
-export const computeNormalMatrix = (m: Matrix4) => {
+export const computeNormalMatrix = (m: Matrix4): Matrix4 => {
   const normalMatrix = m.inverse();
-  return normalMatrix.transpose();
+  return normalMatrix.transpose() as Matrix4;
 }
