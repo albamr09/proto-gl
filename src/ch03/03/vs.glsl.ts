@@ -52,6 +52,6 @@ void main(void) {
   vVertexColor = vec4(Ia + Id + Is, 1.0);
   gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
 }
-`
+`;
 
 export default vertexShaderSource;

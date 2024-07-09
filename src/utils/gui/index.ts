@@ -27,9 +27,9 @@ export const createNumericInput = ({
 }: {
   label: string;
   value: number;
-  min: number,
-  max: number,
-  step: number,
+  min: number;
+  max: number;
+  step: number;
   onInit?: (v: number) => void;
   onChange: (v: number) => void;
 }) => {
@@ -51,12 +51,11 @@ export const createNumericInput = ({
   // Create a select element
   const numericInput = document.createElement("input");
   numericInput.setAttribute("id", "userInput");
-  numericInput.setAttribute("type", "numeric");
+  numericInput.setAttribute("type", "number");
   numericInput.setAttribute("name", "userInput");
   numericInput.setAttribute("min", min.toString()); // Minimum value
   numericInput.setAttribute("max", max.toString()); // Maximum value
   numericInput.setAttribute("step", step.toString()); // Step value
-
 
   // Set the initial value of the select element
   if (value) {
@@ -72,6 +71,11 @@ export const createNumericInput = ({
   // Append the label, select to the form
   form.appendChild(labelElement);
   form.appendChild(numericInput);
+
+  // Avoid reload on submit
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+  });
 
   // Append the form to the container
   formContainer.appendChild(form);
