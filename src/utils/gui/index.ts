@@ -16,6 +16,70 @@ export const initController = () => {
   document.body.appendChild(controlContainer);
 };
 
+export const createNumericInput = ({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onInit = () => {},
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number,
+  max: number,
+  step: number,
+  onInit?: (v: number) => void;
+  onChange: (v: number) => void;
+}) => {
+  // Create a div container
+  const formContainer = document.createElement("div");
+  formContainer.classList.add("controller-element");
+
+  // Create the form element
+  const form = document.createElement("form");
+  form.classList.add("form-container");
+
+  // Create a label for the input
+  const labelElement = document.createElement("label");
+  labelElement.setAttribute("for", "userInput");
+  const labelSpan = document.createElement("span");
+  labelSpan.innerHTML = label;
+  labelElement.appendChild(labelSpan);
+
+  // Create a select element
+  const numericInput = document.createElement("input");
+  numericInput.setAttribute("id", "userInput");
+  numericInput.setAttribute("type", "numeric");
+  numericInput.setAttribute("name", "userInput");
+  numericInput.setAttribute("min", min.toString()); // Minimum value
+  numericInput.setAttribute("max", max.toString()); // Maximum value
+  numericInput.setAttribute("step", step.toString()); // Step value
+
+
+  // Set the initial value of the select element
+  if (value) {
+    numericInput.value = value.toString();
+    onInit(value);
+  }
+
+  // Add an event listener for the "change" event on the select element
+  numericInput.addEventListener("change", function () {
+    onChange(parseFloat(numericInput.value));
+  });
+
+  // Append the label, select to the form
+  form.appendChild(labelElement);
+  form.appendChild(numericInput);
+
+  // Append the form to the container
+  formContainer.appendChild(form);
+
+  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
+  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+};
+
 export const createSelectorForm = ({
   label,
   value,

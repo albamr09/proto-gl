@@ -1,4 +1,4 @@
-import {createColorInputForm, createDescriptionPanel, createVector3dSliders, initController, initGUI} from "../../utils/gui/index.js";
+import {createColorInputForm, createDescriptionPanel, createNumericInput, createVector3dSliders, initController, initGUI} from "../../utils/gui/index.js";
 import {getGLContext, configureCanvas, autoResizeCanvas, clearScene, createProgram} from "../../utils/web-gl.js";
 import {vertices, indices} from "../data/data.js"
 import vertexShaderSource from "./vs.glsl.js";
@@ -14,8 +14,13 @@ type ProgramAttributes = {
 }
 
 type ProgramUnforms = {
-  uMaterialColor: WebGLUniformLocation | null;
+  uMaterialDiffuseColor: WebGLUniformLocation | null;
+  uMaterialAmbientColor: WebGLUniformLocation | null;
+  uMaterialSpecularColor: WebGLUniformLocation | null;
   uLightDiffuseColor: WebGLUniformLocation | null;
+  uLightAmbientColor: WebGLUniformLocation | null;
+  uLightSpecularColor: WebGLUniformLocation | null;
+  uShininnessFactor: WebGLUniformLocation | null;
   uLightDirection: WebGLUniformLocation | null;
   // Transformation matrices
   uModelViewMatrix: WebGLUniformLocation | null;
@@ -27,7 +32,7 @@ type ExtendedWebGLProgram = ProgramAttributes & ProgramUnforms & WebGLProgram;
 
 let gl: WebGL2RenderingContext, verticesBuffer: WebGLBuffer | null, indicesBuffer: WebGLBuffer | null, normalsBuffer: WebGLBuffer | null, sphereVAO: WebGLVertexArrayObject | null, program: ExtendedWebGLProgram;
 
-let materialColor = [0.5, 0.2, 0], lightDiffuseColor = [1.0, 1.0, 1.0], lightDirection = [0, 0, 0];
+let materialDiffuseColor = [0.5, 0.2, 0], lightDiffuseColor = [1.0, 1.0, 1.0], lightDirection = [0, 0, 0], lightAmbientColor = [1.0, 1.0, 1.0], materialAmbientColor = [0.5, 0.2, 0], lightSpecularColor = [1.0, 1.0, 1.0], materialSpecularColor = [0.5, 0.4, 0.3], shinninessFactor = 5;
 let modelViewMatrix = Matrix4.identity(),
   normalMatrix = Matrix4.identity(),
   projectionMatrix = Matrix4.identity();
@@ -38,8 +43,13 @@ const initProgram = () => {
   program = createProgram(gl, vertexShaderSource, fragmentShaderSource) as ExtendedWebGLProgram;
   program.aPosition = gl.getAttribLocation(program, "aPosition");
   program.aNormal = gl.getAttribLocation(program, "aNormal");
-  program.uMaterialColor = gl.getUniformLocation(program, "uMaterialColor");
+  program.uMaterialDiffuseColor = gl.getUniformLocation(program, "uMaterialDiffuseColor");
+  program.uMaterialAmbientColor = gl.getUniformLocation(program, "uMaterialAmbientColor");
+  program.uMaterialSpecularColor = gl.getUniformLocation(program, "uMaterialSpecularColor");
   program.uLightDiffuseColor = gl.getUniformLocation(program, "uLightDiffuseColor");
+  program.uLightAmbientColor = gl.getUniformLocation(program, "uLightAmbientColor");
+  program.uLightSpecularColor = gl.getUniformLocation(program, "uLightSpecularColor");
+  program.uShininnessFactor = gl.getUniformLocation(program, "uShininnessFactor");
   program.uLightDirection = gl.getUniformLocation(program, "uLightDirection");
   program.uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
   program.uProjectionMatrix = gl.getUniformLocation(program, "uProjectionMatrix");
@@ -63,8 +73,8 @@ const initBuffers = () => {
   gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
   // Bind with VAO
-  // gl.enableVertexAttribArray(program.aNormal);
-  // gl.vertexAttribPointer(program.aNormal, 3, gl.FLOAT, false, 0, 0)
+  gl.enableVertexAttribArray(program.aNormal);
+  gl.vertexAttribPointer(program.aNormal, 3, gl.FLOAT, false, 0, 0)
   
   // Indices
   indicesBuffer = gl.createBuffer();
@@ -106,23 +116,76 @@ const render = () => {
 const initControls = () => {
   initController();
   createColorInputForm({
-    label: "Sphere Color",
-    value: rgbToHex(denormalizeColor(materialColor)),
+    label: "Material Diffuse Color",
+    value: rgbToHex(denormalizeColor(materialDiffuseColor)),
     onInit: (v) => {
-      gl.uniform3fv(program.uMaterialColor, normalizeColor(hexToRgb(v)));
+      gl.uniform3fv(program.uMaterialDiffuseColor, normalizeColor(hexToRgb(v)));
     },
     onChange: (v) => {
-      gl.uniform3fv(program.uMaterialColor, normalizeColor(hexToRgb(v)));
+      gl.uniform3fv(program.uMaterialDiffuseColor, normalizeColor(hexToRgb(v)));
     }
   })
   createColorInputForm({
-    label: "Light Color",
+    label: "Material Ambient Color",
+    value: rgbToHex(denormalizeColor(materialAmbientColor)),
+    onInit: (v) => {
+      gl.uniform3fv(program.uMaterialAmbientColor, normalizeColor(hexToRgb(v)));
+    },
+    onChange: (v) => {
+      gl.uniform3fv(program.uMaterialAmbientColor, normalizeColor(hexToRgb(v)));
+    }
+  });
+  createColorInputForm({
+    label: "Material Specular Color",
+    value: rgbToHex(denormalizeColor(materialSpecularColor)),
+    onInit: (v) => {
+      gl.uniform3fv(program.uMaterialSpecularColor, normalizeColor(hexToRgb(v)));
+    },
+    onChange: (v) => {
+      gl.uniform3fv(program.uMaterialSpecularColor, normalizeColor(hexToRgb(v)));
+    }
+  });
+  createColorInputForm({
+    label: "Light Diffuse Color",
     value: rgbToHex(denormalizeColor(lightDiffuseColor)),
     onInit: (v) => {
       gl.uniform3fv(program.uLightDiffuseColor, normalizeColor(hexToRgb(v)));
     },
     onChange: (v) => {
       gl.uniform3fv(program.uLightDiffuseColor, normalizeColor(hexToRgb(v)));
+    }
+  });
+  createColorInputForm({
+    label: "Light Ambient Color",
+    value: rgbToHex(denormalizeColor(lightAmbientColor)),
+    onInit: (v) => {
+      gl.uniform3fv(program.uLightAmbientColor, normalizeColor(hexToRgb(v)));
+    },
+    onChange: (v) => {
+      gl.uniform3fv(program.uLightAmbientColor, normalizeColor(hexToRgb(v)));
+    }
+  });
+  createColorInputForm({
+    label: "Light Specular Color",
+    value: rgbToHex(denormalizeColor(lightSpecularColor)),
+    onInit: (v) => {
+      gl.uniform3fv(program.uLightSpecularColor, normalizeColor(hexToRgb(v)));
+    },
+    onChange: (v) => {
+      gl.uniform3fv(program.uLightSpecularColor, normalizeColor(hexToRgb(v)));
+    }
+  });
+  createNumericInput({
+    label: "Shininess Factor",
+    value: shinninessFactor,
+    min: 0,
+    max: 50,
+    step: 0.1,
+    onInit: (v) => {
+      gl.uniform1f(program.uShininnessFactor, v);
+    },
+    onChange: (v) => {
+      gl.uniform1f(program.uShininnessFactor, v);
     }
   });
   createVector3dSliders({
