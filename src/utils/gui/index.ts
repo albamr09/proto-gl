@@ -261,7 +261,7 @@ export const createSliderInputForm = ({
   sliderInput.setAttribute("name", "userInput");
   sliderInput.setAttribute("min", min.toString()); // Minimum value
   sliderInput.setAttribute("max", max.toString()); // Maximum value
-  sliderInput.setAttribute("step", step.toString()); // Step value
+  sliderInput.setAttribute("step", `${step}`); // Step value
 
   // Set the initial value of the slider input
   if (value) {

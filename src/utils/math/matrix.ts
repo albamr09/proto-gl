@@ -1,3 +1,4 @@
+import {Angle} from "./angle.js";
 import { Vector } from "./vector.js";
 
 export class Matrix {
@@ -210,8 +211,7 @@ export class Matrix4 extends Matrix {
   * For more information see rotate funcion.
   **/
   rotateDeg(angle: number, axis: Vector) {
-    const rad = (angle * Math.PI) / 180.0;
-    return this.rotate(rad, axis);
+    return this.rotate(Angle.toRadians(angle), axis);
   }
 
   /** Rotates a matrix on 3d space on the given axes by the given angle (in radians).
@@ -263,6 +263,27 @@ export class Matrix4 extends Matrix {
     }
 
     return result;
+  }
+  
+  /** 
+ * Create a perspective projection matrix using a field-of-view and an aspect ratio.
+ * @param fovy   Number The angle between the upper and lower sides of the viewing frustum.
+ * @param aspect Number The aspect ratio of the viewing window. (width/height).
+ * @param near   Number Distance to the near clipping plane along the -Z axis.
+ * @param far    Number Distance to the far clipping plane along the -Z axis.
+ */
+  static perspective(fovy: number, aspect: number, near: number, far: number) {
+
+    const rad = Angle.toRadians(fovy);
+    const f = 1.0 / Math.tan(rad / 2);
+    const nf = 1.0 / (near - far);
+
+    return new Matrix4([
+      [f / aspect, 0, 0, 0],
+      [0, f, 0, 0],
+      [0, 0, (far + near) * nf, -1],
+      [0, 0, 2 * far * near * nf, 0],
+    ]);
   }
 
   submatrix(i: number, j: number) {

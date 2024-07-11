@@ -16,15 +16,16 @@ import {
 import { vertices, indices } from "../data/data.js";
 import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
-import { calculateNormals } from "../../utils/math.js";
 import {
   denormalizeColor,
   hexToRgb,
   normalizeColor,
   rgbToHex,
+  rgbToRgba,
 } from "../../utils/colors.js";
 import { Matrix4 } from "../../utils/math/matrix.js";
-import { computeNormalMatrix } from "../../utils/math/3d.js";
+import { calculateNormals, computeNormalMatrix } from "../../utils/math/3d.js";
+import {Vector} from "../../utils/math/vector.js";
 
 type ProgramAttributes = {
   aPosition: number;
@@ -55,14 +56,14 @@ let gl: WebGL2RenderingContext,
   sphereVAO: WebGLVertexArrayObject | null,
   program: ExtendedWebGLProgram;
 
-let materialDiffuseColor = [0.5, 0.2, 0],
-  lightDiffuseColor = [1.0, 1.0, 1.0],
-  lightDirection = [-0.25, -0.5, 0.5],
-  lightAmbientColor = [1.0, 1.0, 1.0],
-  materialAmbientColor = [0.5, 0.2, 0],
-  lightSpecularColor = [0, 0, 0],
-  materialSpecularColor = [0.5, 0.4, 0.3],
-  shinninessFactor = 5;
+let materialDiffuseColor = [46 / 256, 99 / 256, 191 / 256, 1],
+  lightDiffuseColor = [1.0, 1.0, 1.0, 1],
+  lightDirection = [-0.25, -0.25, -0.25],
+  lightAmbientColor = [0.03, 0.03, 0.03, 1],
+  materialAmbientColor = [1, 1, 1, 1],
+  lightSpecularColor = [1, 1, 1, 1],
+  materialSpecularColor = [1, 1, 1, 1],
+  shinninessFactor = 10;
 let modelViewMatrix = Matrix4.identity(),
   normalMatrix = Matrix4.identity(),
   projectionMatrix = Matrix4.identity();
@@ -126,7 +127,7 @@ const initBuffers = () => {
   gl.vertexAttribPointer(program.aPosition, 3, gl.FLOAT, false, 0, 0);
 
   // Normals
-  const normals = calculateNormals(vertices, indices);
+  const normals = calculateNormals(vertices, indices, 3);
   normalsBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
@@ -150,7 +151,13 @@ const initBuffers = () => {
 };
 
 const synchWorld = () => {
+  modelViewMatrix = modelViewMatrix.translate(new Vector([0, 0, -1.5]));
   normalMatrix = computeNormalMatrix(modelViewMatrix);
+  projectionMatrix = Matrix4.perspective(
+    45,
+    gl.canvas.width / gl.canvas.height,
+    0.1,
+    10000);
   gl.uniformMatrix4fv(
     program.uModelViewMatrix,
     false,
@@ -166,7 +173,6 @@ const synchWorld = () => {
     false,
     projectionMatrix.toFloatArray()
   );
-  // TODO: add perspective
 };
 
 const draw = () => {
@@ -194,35 +200,35 @@ const initControls = () => {
     label: "Material Diffuse Color",
     value: rgbToHex(denormalizeColor(materialDiffuseColor)),
     onInit: (v) => {
-      gl.uniform3fv(program.uMaterialDiffuseColor, normalizeColor(hexToRgb(v)));
+      gl.uniform4fv(program.uMaterialDiffuseColor, rgbToRgba(normalizeColor(hexToRgb(v))));
     },
     onChange: (v) => {
-      gl.uniform3fv(program.uMaterialDiffuseColor, normalizeColor(hexToRgb(v)));
+      gl.uniform4fv(program.uMaterialDiffuseColor, rgbToRgba(normalizeColor(hexToRgb(v))));
     },
   });
   createColorInputForm({
     label: "Material Ambient Color",
     value: rgbToHex(denormalizeColor(materialAmbientColor)),
     onInit: (v) => {
-      gl.uniform3fv(program.uMaterialAmbientColor, normalizeColor(hexToRgb(v)));
+      gl.uniform4fv(program.uMaterialAmbientColor, rgbToRgba(normalizeColor(hexToRgb(v))));
     },
     onChange: (v) => {
-      gl.uniform3fv(program.uMaterialAmbientColor, normalizeColor(hexToRgb(v)));
+      gl.uniform4fv(program.uMaterialAmbientColor, rgbToRgba(normalizeColor(hexToRgb(v))));
     },
   });
   createColorInputForm({
     label: "Material Specular Color",
     value: rgbToHex(denormalizeColor(materialSpecularColor)),
     onInit: (v) => {
-      gl.uniform3fv(
+      gl.uniform4fv(
         program.uMaterialSpecularColor,
-        normalizeColor(hexToRgb(v))
+        rgbToRgba(normalizeColor(hexToRgb(v)))
       );
     },
     onChange: (v) => {
       gl.uniform3fv(
         program.uMaterialSpecularColor,
-        normalizeColor(hexToRgb(v))
+        rgbToRgba(normalizeColor(hexToRgb(v)))
       );
     },
   });
@@ -230,30 +236,30 @@ const initControls = () => {
     label: "Light Diffuse Color",
     value: rgbToHex(denormalizeColor(lightDiffuseColor)),
     onInit: (v) => {
-      gl.uniform3fv(program.uLightDiffuseColor, normalizeColor(hexToRgb(v)));
+      gl.uniform4fv(program.uLightDiffuseColor, rgbToRgba(normalizeColor(hexToRgb(v))));
     },
     onChange: (v) => {
-      gl.uniform3fv(program.uLightDiffuseColor, normalizeColor(hexToRgb(v)));
+      gl.uniform4fv(program.uLightDiffuseColor, rgbToRgba(normalizeColor(hexToRgb(v))));
     },
   });
   createColorInputForm({
     label: "Light Ambient Color",
     value: rgbToHex(denormalizeColor(lightAmbientColor)),
     onInit: (v) => {
-      gl.uniform3fv(program.uLightAmbientColor, normalizeColor(hexToRgb(v)));
+      gl.uniform4fv(program.uLightAmbientColor, rgbToRgba(normalizeColor(hexToRgb(v))));
     },
     onChange: (v) => {
-      gl.uniform3fv(program.uLightAmbientColor, normalizeColor(hexToRgb(v)));
+      gl.uniform4fv(program.uLightAmbientColor, rgbToRgba(normalizeColor(hexToRgb(v))));
     },
   });
   createColorInputForm({
     label: "Light Specular Color",
     value: rgbToHex(denormalizeColor(lightSpecularColor)),
     onInit: (v) => {
-      gl.uniform3fv(program.uLightSpecularColor, normalizeColor(hexToRgb(v)));
+      gl.uniform4fv(program.uLightSpecularColor, rgbToRgba(normalizeColor(hexToRgb(v))));
     },
     onChange: (v) => {
-      gl.uniform3fv(program.uLightSpecularColor, normalizeColor(hexToRgb(v)));
+      gl.uniform4fv(program.uLightSpecularColor, rgbToRgba(normalizeColor(hexToRgb(v))));
     },
   });
   createNumericInput({

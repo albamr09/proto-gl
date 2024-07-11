@@ -43,3 +43,7 @@ export const denormalizeColor = (color: number[]) => {
 export const normalizeColor = (color: number[]) => {
   return color.map((c) => c / 255);
 };
+
+export const rgbToRgba = (color: number[], opacity = 1) => {
+  return [...color.slice(0, 3), opacity];
+};
