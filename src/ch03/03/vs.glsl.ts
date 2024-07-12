@@ -42,7 +42,7 @@ void main(void) {
   
   // Specular
   vec4 Is = vec4(0.0, 0.0, 0.0, 1.0);
-  // Only perform 
+  // Only compute diffuse and specular lights if surface faces the light 
   if (lambertCoefficient > 0.0) {
     Id = uLightDiffuseColor * uMaterialDiffuseColor * lambertCoefficient;
     // Camera vector: vector from vertex to camera (origin 0, 0, 0)
@@ -50,8 +50,8 @@ void main(void) {
     vec3 E = normalize(eyeVec);
     // Reflected light direction on the surface (given by its normal vector)
     vec3 R = reflect(L, N);
-    // Note that we only retrieve positive values for the dot product: 
-    // https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/03.html#Lights-Goraud%20Shading%20in%20Practice-With%20Phong%20Reflection%20Model-Vertex%20Shader
+    // Note that we only retrieve positive values for the dot product
+    // https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/03.html#Lights-Goraud%20Shading%20in%20Practice-With%20Phong%20Reflection%20Model-Vertex%20Shader-Light%20Reflection
     float specular = pow(max(dot(R, E), 0.0), uShininnessFactor);
     Is = uLightSpecularColor * uMaterialSpecularColor * specular;
   }
