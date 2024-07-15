@@ -17,7 +17,7 @@ void main(void) {
     // Position on world
     vec4 vertex = uModelViewMatrix * vec4(aPosition, 1.0);
     vNormal = normalize(vec3(uNormalMatrix * vec4(aNormal, 1.0)));
-    vLighDirection = normalize(vec3(uModelViewMatrix * vec4(uLightDirection, 1.0)));
+    vLighDirection = normalize(uLightDirection);
     // Camera vector: vector from vertex to camera (origin 0, 0, 0)
     vEyeVector = normalize(-vec3(vertex.xyz));
     gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);

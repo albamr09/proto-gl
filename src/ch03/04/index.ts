@@ -59,15 +59,15 @@ let modelViewMatrix = Matrix4.identity(),
   normalMatrix = Matrix4.identity();
 
 let modelTranslation = [0, 0, -1.5];
-let materialAmbientColor = [0.0, 0.5, 0.5],
-  materialDiffuseColor = [0.0, 0.0, 0.0],
+let materialAmbientColor = [1.0, 1.0, 1.0],
+  materialDiffuseColor = [0.18, 0.40, 0.75],
   materialSpecularColor = [1.0, 1.0, 1.0];
-let lightAmbientColor = [1.0, 1.0, 1.0],
+let lightAmbientColor = [0.03, 0.03, 0.03],
   lightDiffuseColor = [1.0, 1.0, 1.0],
   lightSpecularColor = [1.0, 1.0, 1.0],
   lighDirection = [-0.25, -0.25, -0.25];
 
-let shininess = 5.0;
+let shininess = 10.0;
 
 const initProgram = () => {
   gl.clearColor(0.5, 0.5, 0.5, 1);

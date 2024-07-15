@@ -66,30 +66,23 @@ yarn test
 ### Chapter 2
 
 - [Square](./src/ch02/01/): Renders a simple square
+- [Pentagon](./src/ch02/02/): Renders a pentagon
+- [Square](./src/ch02/03/): Renders a square using `drawElements`.
 - [Square VAO](./src/ch02/04/): Renders a simple square using Vertex Attribute Objects (VAO)
 - [Rendering modes](./src/ch02/05/): Showcases how to use different rendering modes with `drawElements`.
+- [Trapezoid](./src/ch02/06/): Renders a trapezoid using `TRIANGLES` mode.
+- [M](./src/ch02/07/): Renders a M using `LINES` mode.
+- [Trapezoid outline](./src/ch02/08/): Renders the outline of a trapezoid using `LINE_LOOP` rendering mode.
 - [Getting Info](./src/ch02/09/): Shows how to obtain various information about VBOs and IBOs.
 - [JSON Data](./src/ch02/10/): Shows how to obtain work with JSON data that defines objects.
-
-#### Challenges
-
-- [Pentagon](./src/ch02/challenges/02/): Renders a pentagon
-- [Square](./src/ch02/challenges/03/): Renders a square using `drawElements`
-- [Trapezoid](./src/ch02/challenges/06/): Renders a trapezoid using `TRIANGLES` mode.
-- [M](./src/ch02/challenges/07/): Renders a M using `LINES` mode.
-- [Trapezoid outline](./src/ch02/challenges/08/): Renders the outline of a trapezoid using `LINE_LOOP` rendering mode.
-- [Car](./src/ch02/challenges/11/): Renders a Nissan car using JSON data as the input data.
+- [Car](./src/ch02/11/): Renders a Nissan car using JSON data as the input data.
 
 ### Chapter 3
 
 - [Goraud Shading with Phong Lights](./src/ch03/01/): Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model.
+- [Goraud Shading with Phong Lights](./src/ch03/02/): Modifies the previous example to animate the ligth.
 - [Goraud Shading with Lambert Lights](./src/ch03/03/): Renders an sphere while applying Goraud Shading in combination with the Phong Light Model.
-- [Phong Shading](./src/ch03/04/): Renders an sphere while applying Phong Shading.
-
-#### Challenges
-
-- [Moving Light](./src/ch03/challenges/02/): Animates the light source when using the Lambert Light Model.
-
+- [Phong Shading](./src/ch03/04/): Renders an sphere while applying Phong Shading and the Phong Light Model.
 
 ---
 
