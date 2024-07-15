@@ -7,6 +7,7 @@ import {
 import {
   createColorInputForm,
   createDescriptionPanel,
+  createSliderInputForm,
   createVector3dSliders,
   initController,
   initGUI,
@@ -38,6 +39,7 @@ type ProgramUniforms = {
   uLightDiffuseColor: WebGLUniformLocation | null;
   uLightSpecularColor: WebGLUniformLocation | null;
   uLightDirection: WebGLUniformLocation | null;
+  uShininess: WebGLUniformLocation | null;
 };
 
 type ProgramAttributes = {
@@ -59,11 +61,13 @@ let modelViewMatrix = Matrix4.identity(),
 let modelTranslation = [0, 0, -1.5];
 let materialAmbientColor = [0.0, 0.5, 0.5],
   materialDiffuseColor = [0.0, 0.0, 0.0],
-  materialSpecularColor = [0.0, 0.0, 0.0];
+  materialSpecularColor = [1.0, 1.0, 1.0];
 let lightAmbientColor = [1.0, 1.0, 1.0],
   lightDiffuseColor = [1.0, 1.0, 1.0],
   lightSpecularColor = [1.0, 1.0, 1.0],
   lighDirection = [-0.25, -0.25, -0.25];
+
+let shininess = 5.0;
 
 const initProgram = () => {
   gl.clearColor(0.5, 0.5, 0.5, 1);
@@ -74,7 +78,7 @@ const initProgram = () => {
     fragmentShaderSource
   ) as ExtendedProgram;
   program.aPosition = gl.getAttribLocation(program, "aPosition");
-  //   program.aNormal = gl.getAttribLocation(program, "aNormal");
+  program.aNormal = gl.getAttribLocation(program, "aNormal");
   program.uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
   program.uProjectionMatrix = gl.getUniformLocation(
     program,
@@ -106,6 +110,7 @@ const initProgram = () => {
     "uLightSpecularColor"
   );
   program.uLightDirection = gl.getUniformLocation(program, "uLightDirection");
+  program.uShininess = gl.getUniformLocation(program, "uShininess");
 };
 
 const initBuffers = () => {
@@ -125,8 +130,8 @@ const initBuffers = () => {
   normalsBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-  //   gl.vertexAttribPointer(program.aNormal, 3, gl.FLOAT, false, 0, 0);
-  //   gl.enableVertexAttribArray(program.aNormal);
+  gl.vertexAttribPointer(program.aNormal, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(program.aNormal);
 
   // Indices
   indicesBuffer = gl.createBuffer();
@@ -301,12 +306,25 @@ const initControls = () => {
       gl.uniform3fv(program.uLightDirection, v);
     },
   });
+  createSliderInputForm({
+    label: "Shininess",
+    value: shininess,
+    min: 0.1,
+    max: 50,
+    step: 0.1,
+    onInit: (v) => {
+      gl.uniform1f(program.uShininess, v);
+    },
+    onChange: (v) => {
+      gl.uniform1f(program.uShininess, v);
+    },
+  })
 };
 
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "Render lights using Phong Shading alongside the Phong Light Model"
+    "Render lights using Phong Shading alongside the Phong Light Model. The lights are computed on the fragment shader summing up ambient lights, diffuse lights and specular lights."
   );
 
   // Setup
