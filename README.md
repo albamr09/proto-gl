@@ -79,10 +79,11 @@ yarn test
 
 ### Chapter 3
 
-- [Goraud Shading with Phong Lights](./src/ch03/01/): Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model.
-- [Goraud Shading with Phong Lights](./src/ch03/02/): Modifies the previous example to animate the ligth.
-- [Goraud Shading with Lambert Lights](./src/ch03/03/): Renders an sphere while applying Goraud Shading in combination with the Phong Light Model.
-- [Phong Shading](./src/ch03/04/): Renders an sphere while applying Phong Shading and the Phong Light Model.
+- [Goraud Shading with Goraud Lights](./src/ch03/01/): Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model.
+- [Goraud Shading with Goraud Lights](./src/ch03/02/): Modifies the previous example to animate the ligth.
+- [Goraud Shading with Phong Lights](./src/ch03/03/): Renders an sphere while applying Goraud Shading in combination with the Phong Light Model.
+- [Phong Shading with Phong Lights](./src/ch03/04/): Renders an sphere while applying Phong Shading and the Phong Light Model.
+- [Moving lights with Goraud Shading and Goraud Lights](./src/ch03/05/): Renders a wall while applying Goraud Shading and the Lambert Light Model, while also allowing you to move the light direction.
 
 ---
 
