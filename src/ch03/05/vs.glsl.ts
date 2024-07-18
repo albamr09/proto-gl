@@ -26,6 +26,6 @@ void main(void) {
 
   gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
 }
-`
+`;
 
 export default vertexShaderSource;

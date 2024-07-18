@@ -9,6 +9,6 @@ out vec4 fragColor;
 void main(void) {
   fragColor = vVertexColor;
 }
-`
+`;
 
 export default fragmentShaderSource;

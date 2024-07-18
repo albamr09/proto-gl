@@ -60,7 +60,7 @@ let modelViewMatrix = Matrix4.identity(),
 
 let modelTranslation = [0, 0, -1.5];
 let materialAmbientColor = [1.0, 1.0, 1.0],
-  materialDiffuseColor = [0.18, 0.40, 0.75],
+  materialDiffuseColor = [0.18, 0.4, 0.75],
   materialSpecularColor = [1.0, 1.0, 1.0];
 let lightAmbientColor = [0.03, 0.03, 0.03],
   lightDiffuseColor = [1.0, 1.0, 1.0],
@@ -318,7 +318,7 @@ const initControls = () => {
     onChange: (v) => {
       gl.uniform1f(program.uShininess, v);
     },
-  })
+  });
 };
 
 const init = () => {
