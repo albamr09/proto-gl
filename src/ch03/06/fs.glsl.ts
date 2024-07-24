@@ -8,6 +8,7 @@ uniform vec4 uMaterialAmbientColor;
 uniform vec4 uLightDiffuseColor;
 uniform vec4 uLightAmbientColor;
 uniform vec4 uLightSpecularColor;
+uniform float uShininess;
 
 in vec3 vNormal;
 in vec3 vLightRay;
@@ -16,8 +17,23 @@ in vec3 vEyeVector;
 out vec4 fragColor;
 
 void main(void) {
+  vec3 L = normalize(vLightRay);
+  vec3 N = normalize(vNormal);
+
   vec4 Ia = uMaterialAmbientColor * uLightAmbientColor;
-  fragColor = vec4(Ia.xyz, 1.0);
+  vec4 Id = vec4(0.0, 0.0, 0.0, 1.0);
+  vec4 Is = vec4(0.0, 0.0, 0.0, 1.0);
+  float lambertTerm = dot(N, -L);
+
+  if (lambertTerm > 0.0) {
+    Id = uLightDiffuseColor * uMaterialDiffuseColor * lambertTerm;
+    vec3 E = normalize(vEyeVector);
+    vec3 R = reflect(L, N);
+    float specular = pow(max(dot(R, E), 0.0), uShininess);
+    Is = uLightSpecularColor * uMaterialSpecularColor * specular;
+  }
+
+  fragColor = vec4(vec3(Ia + Id + Is), 1.0);
 }
 `;
 
