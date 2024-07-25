@@ -194,16 +194,16 @@ export class Matrix4 extends Matrix {
   // vector [x, y, z] Reference:
   // https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
   translate(offset: Vector) {
-    const _copy = this.copy();
+    const translationMatrix = Matrix4.identity();
     if (offset.dim() != 3) {
       throw Error("Translate offset has incompatible dimensionality");
     }
 
-    _copy.set(3, 0, offset.at(0));
-    _copy.set(3, 1, offset.at(1));
-    _copy.set(3, 2, offset.at(2));
+    translationMatrix.set(3, 0, offset.at(0));
+    translationMatrix.set(3, 1, offset.at(1));
+    translationMatrix.set(3, 2, offset.at(2));
 
-    return _copy as Matrix4;
+    return translationMatrix.multiply(this);
   }
 
   /**

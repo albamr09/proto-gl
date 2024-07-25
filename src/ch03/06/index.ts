@@ -1,3 +1,4 @@
+import { mat4 } from "../../lib/gl-matrix/esm/index.js";
 import { loadData } from "../../utils/files.js";
 import {
   createNumericInput,
@@ -5,6 +6,7 @@ import {
   createDescriptionPanel,
   initController,
   initGUI,
+  createSliderInputForm,
 } from "../../utils/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../utils/math/3d.js";
 import { Matrix4 } from "../../utils/math/matrix.js";
@@ -54,9 +56,11 @@ type DataObject = {
 let gl: WebGL2RenderingContext;
 let program: ExtendedProgram;
 let objects: DataObject[] = [];
-let modelViewTranslation = [0, -30, -54.2];
+let modelViewTranslation = [0, 0, -54.2];
 let lightPosition = [4.5, 3, 15],
-  shininess = 200;
+  shininess = 200,
+  angle = 0,
+  lastTime = 0;
 
 const setupData = (data: DataObject, id: string) => {
   const vao = gl.createVertexArray();
@@ -197,19 +201,19 @@ const addLightUniforms = () => {
 const synchWorld = (isLight = false) => {
   const { width, height } = gl.canvas;
 
+  const projectionMatrix = Matrix4.perspective(45, width / height, 0.1, 10000);
   let modelViewMatrix = Matrix4.identity().translate(
     new Vector(modelViewTranslation)
   );
   modelViewMatrix = modelViewMatrix.rotateDeg(30, new Vector([1, 0, 0]));
-  modelViewMatrix = modelViewMatrix.rotateDeg(10, new Vector([0, 1, 0]));
+  modelViewMatrix = modelViewMatrix.rotateDeg(angle, new Vector([0, 1, 0]));
   // If object is the light, we update its position
   if (isLight) {
     const lightPosition =
       program.uLightPosition && gl.getUniform(program, program.uLightPosition);
-    modelViewMatrix = modelViewMatrix.translate(new Vector([...lightPosition]));
+    modelViewMatrix = modelViewMatrix.translate(new Vector(lightPosition));
   }
   const normalMatrix = computeNormalMatrix(modelViewMatrix);
-  const projectionMatrix = Matrix4.perspective(45, width / height, 0.1, 10000);
 
   gl.uniformMatrix4fv(
     program.uModelViewMatrix,
@@ -228,8 +232,18 @@ const synchWorld = (isLight = false) => {
   );
 };
 
+const animateAngle = () => {
+  const timeNow = new Date().getTime();
+  if (lastTime) {
+    const elapsed = timeNow - lastTime;
+    angle += (90 * elapsed) / 10000.0;
+  }
+  lastTime = timeNow;
+};
+
 const render = () => {
   requestAnimationFrame(render);
+  animateAngle();
   addLightUniforms();
   draw();
 };
@@ -255,17 +269,17 @@ const initGUIControl = () => {
       gl.uniform1f(program.uShininess, v);
     },
   });
-  createVector3dSliders({
-    labels: ["Translate X", "Translate Y", "Translate Z"],
-    value: modelViewTranslation,
+  createSliderInputForm({
+    label: "Translate Z",
+    value: modelViewTranslation[2],
     min: -200,
-    max: 50,
+    max: 200,
     step: 1,
     onInit: (v) => {
-      modelViewTranslation = v;
+      modelViewTranslation[2] = v;
     },
     onChange: (v) => {
-      modelViewTranslation = v;
+      modelViewTranslation[2] = v;
     },
   });
   createVector3dSliders({
