@@ -1,4 +1,4 @@
-import {Angle} from "./angle.js";
+import { Angle } from "./angle.js";
 import { Vector } from "./vector.js";
 
 export class Matrix {
@@ -207,18 +207,18 @@ export class Matrix4 extends Matrix {
   }
 
   /**
-  * Rotates a matrix on the given axis by the given angle (in degreee)
-  * For more information see rotate funcion.
-  **/
+   * Rotates a matrix on the given axis by the given angle (in degreee)
+   * For more information see rotate funcion.
+   **/
   rotateDeg(angle: number, axis: Vector) {
     return this.rotate(Angle.toRadians(angle), axis);
   }
 
   /** Rotates a matrix on 3d space on the given axes by the given angle (in radians).
-    * Reference: https://mathworld.wolfram.com/RotationMatrix.html
-    * In this reference they use 3d rotation matrices, we use 4d rotation matrices
-    * to take intro account translation (stored on the las row)
-  */
+   * Reference: https://mathworld.wolfram.com/RotationMatrix.html
+   * In this reference they use 3d rotation matrices, we use 4d rotation matrices
+   * to take intro account translation (stored on the las row)
+   */
   rotate(angle: number, axis: Vector) {
     let [x, y, z] = [axis.at(0), axis.at(1), axis.at(2)];
 
@@ -230,50 +230,49 @@ export class Matrix4 extends Matrix {
       [1, 0, 0, 0],
       [0, c, s, 0],
       [0, -s, c, 0],
-      [0, 0, 0, 1]
+      [0, 0, 0, 1],
     ]);
-    
+
     // Rotation on axis Y
     const rotationMatrixY = new Matrix4([
       [c, 0, -s, 0],
       [0, 1, 0, 0],
       [s, 0, c, 0],
-      [0, 0, 0, 1]
+      [0, 0, 0, 1],
     ]);
-    
+
     // Rotation on axis Z
     const rotationMatrixZ = new Matrix4([
       [c, s, 0, 0],
       [-s, c, 0, 0],
       [0, 0, 1, 0],
-      [0, 0, 0, 1]
+      [0, 0, 0, 1],
     ]);
 
     let result = this as Matrix4;
 
     // Combine rotations based on axis
     if (x == 1) {
-      result = result.multiply(rotationMatrixX);
+      result = rotationMatrixX.multiply(result);
     }
     if (y == 1) {
-      result = result.multiply(rotationMatrixY);
+      result = rotationMatrixY.multiply(result);
     }
     if (z == 1) {
-      result = result.multiply(rotationMatrixZ);
+      result = rotationMatrixZ.multiply(result);
     }
 
     return result;
   }
-  
-  /** 
- * Create a perspective projection matrix using a field-of-view and an aspect ratio.
- * @param fovy   Number The angle between the upper and lower sides of the viewing frustum.
- * @param aspect Number The aspect ratio of the viewing window. (width/height).
- * @param near   Number Distance to the near clipping plane along the -Z axis.
- * @param far    Number Distance to the far clipping plane along the -Z axis.
- */
-  static perspective(fovy: number, aspect: number, near: number, far: number) {
 
+  /**
+   * Create a perspective projection matrix using a field-of-view and an aspect ratio.
+   * @param fovy   Number The angle between the upper and lower sides of the viewing frustum.
+   * @param aspect Number The aspect ratio of the viewing window. (width/height).
+   * @param near   Number Distance to the near clipping plane along the -Z axis.
+   * @param far    Number Distance to the far clipping plane along the -Z axis.
+   */
+  static perspective(fovy: number, aspect: number, near: number, far: number) {
     const rad = Angle.toRadians(fovy);
     const f = 1.0 / Math.tan(rad / 2);
     const nf = 1.0 / (near - far);

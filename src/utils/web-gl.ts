@@ -105,18 +105,17 @@ export const createProgram = (
  */
 export const clearScene = (gl: WebGL2RenderingContext) => {
   // Clear the scene
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 };
 
 /**
- * Makes sure the canvas occupies the whole screen even when the screen 
+ * Makes sure the canvas occupies the whole screen even when the screen
  * resizes
- * @param canvas 
+ * @param canvas
  */
 
-export const autoResizeCanvas = (canvas: HTMLCanvasElement)  => {
-
+export const autoResizeCanvas = (canvas: HTMLCanvasElement) => {
   const expandFullScreen = () => {
     const size = Math.min(window.innerWidth, window.innerHeight);
     canvas.width = size;
@@ -125,5 +124,5 @@ export const autoResizeCanvas = (canvas: HTMLCanvasElement)  => {
 
   expandFullScreen();
 
-  window.addEventListener('resize', expandFullScreen);
+  window.addEventListener("resize", expandFullScreen);
 };
