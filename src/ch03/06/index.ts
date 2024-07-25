@@ -1,4 +1,3 @@
-import { mat4 } from "../../lib/gl-matrix/esm/index.js";
 import { loadData } from "../../utils/files.js";
 import {
   createNumericInput,
@@ -56,9 +55,9 @@ type DataObject = {
 let gl: WebGL2RenderingContext;
 let program: ExtendedProgram;
 let objects: DataObject[] = [];
-let modelViewTranslation = [0, 0, -54.2];
+let modelViewTranslation = [0, 0, -90];
 let lightPosition = [4.5, 3, 15],
-  shininess = 200,
+  shininess = 20,
   angle = 0,
   lastTime = 0;
 
