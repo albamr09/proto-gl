@@ -1,6 +1,5 @@
 import { vertexShaderSource } from "./vs.glsl.js";
 import { fragmentShaderSource } from "./fs.glsl.js";
-import { mat4 } from "../../lib/gl-matrix/esm/index.js";
 
 import {
   autoResizeCanvas,
@@ -10,20 +9,20 @@ import {
   getGLContext,
 } from "../../utils/web-gl.js";
 import { initGUI, createDescriptionPanel } from "../../utils/gui/index.js";
+import { Matrix4 } from "../../utils/math/matrix.js";
+import { Vector } from "../../utils/math/vector.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
   vertexVAO: WebGLVertexArrayObject | null,
   indicesBuffer: WebGLBuffer | null,
   indices: number[];
-let projectionMatrix = mat4.create(),
-  modelViewMatrix = mat4.create();
 
 /**
  * Obtains vertices and indices from a JSON file and creates
  * the buffers from this data.
  */
-const load = (path: string) => {
+const load = async (path: string) => {
   return fetch(path)
     .then((res) => res.json())
     .then((data) => {
@@ -78,22 +77,25 @@ const load = (path: string) => {
 const draw = () => {
   clearScene(gl);
 
-  // We will discuss these operations in later chapters
-  mat4.perspective(
-    projectionMatrix,
-    45 * (Math.PI / 180),
+  const projectionMatrix = Matrix4.perspective(
+    45,
     gl.canvas.width / gl.canvas.height,
     0.1,
     10000
   );
-  mat4.identity(modelViewMatrix);
-  mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -5]);
+
+  let modelViewMatrix = Matrix4.identity();
+  modelViewMatrix = modelViewMatrix.translate(new Vector([0, 0, -5]));
 
   // Obtain uniforms
   const uProjectionMatrix = gl.getUniformLocation(program, "uProjectionMatrix");
   const uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
-  gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
-  gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+  gl.uniformMatrix4fv(
+    uProjectionMatrix,
+    false,
+    projectionMatrix.toFloatArray()
+  );
+  gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix.toFloatArray());
 
   // Bind VAO
   gl.bindVertexArray(vertexVAO);
@@ -116,7 +118,7 @@ const init = async () => {
   // Setup canvas
   const canvas = configureCanvas();
   autoResizeCanvas(canvas);
-  
+
   gl = getGLContext();
   // Set the clear color to be black
   gl.clearColor(0, 0, 0, 1);

@@ -1,14 +1,14 @@
 import { vertexShaderSource } from "./vs.glsl.js";
 import { fragmentShaderSource } from "./fs.glsl.js";
 
-import { mat4 } from "../../lib/gl-matrix/esm/index.js";
-
 import {
   configureCanvas,
   createProgram,
   getGLContext,
 } from "../../utils/web-gl.js";
 import { initGUI, createDescriptionPanel } from "../../utils/gui/index.js";
+import { Matrix4 } from "../../utils/math/matrix.js";
+import { Vector } from "../../utils/math/vector.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -22,8 +22,6 @@ let parts: {
   vertices: number[];
   indices: number[];
 }[] = [];
-let projectionMatrix = mat4.create(),
-  modelViewMatrix = mat4.create();
 
 /**
  * Obtains vertices and indices from a JSON file and creates
@@ -98,34 +96,27 @@ const draw = () => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  // We will cover these operations in later chapters
-  mat4.perspective(
-    projectionMatrix,
-    45 * (Math.PI / 180),
+  const projectionMatrix = Matrix4.perspective(
+    45,
     gl.canvas.width / gl.canvas.height,
-    10,
+    0.1,
     10000
   );
-  mat4.identity(modelViewMatrix);
-  mat4.translate(modelViewMatrix, modelViewMatrix, [-10, 0, -100]);
-  mat4.rotate(
-    modelViewMatrix,
-    modelViewMatrix,
-    (30 * Math.PI) / 180,
-    [1, 0, 0]
-  );
-  mat4.rotate(
-    modelViewMatrix,
-    modelViewMatrix,
-    (30 * Math.PI) / 180,
-    [0, 1, 0]
-  );
+
+  let modelViewMatrix = Matrix4.identity();
+  modelViewMatrix = modelViewMatrix.translate(new Vector([-10, 0, -100]));
+  modelViewMatrix = modelViewMatrix.rotateDeg(30, new Vector([1, 0, 0]));
+  modelViewMatrix = modelViewMatrix.rotateDeg(30, new Vector([0, 1, 0]));
 
   // Obtain uniforms
   const uProjectionMatrix = gl.getUniformLocation(program, "uProjectionMatrix");
   const uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
-  gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
-  gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+  gl.uniformMatrix4fv(
+    uProjectionMatrix,
+    false,
+    projectionMatrix.toFloatArray()
+  );
+  gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix.toFloatArray());
 
   // Iterate over every part inside of the `parts` array
   parts.forEach((part) => {
@@ -147,7 +138,9 @@ const draw = () => {
 const init = async () => {
   // Setup GUI
   initGUI();
-  createDescriptionPanel("Renders a Nissan car using JSON data as the input data.");
+  createDescriptionPanel(
+    "Renders a Nissan car using JSON data as the input data."
+  );
 
   // Setup canvas
   configureCanvas();
