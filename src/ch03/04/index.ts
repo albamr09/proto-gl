@@ -149,6 +149,7 @@ const initBuffers = () => {
 };
 
 const synchWorld = () => {
+  modelViewMatrix = Matrix4.identity();
   modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
   normalMatrix = computeNormalMatrix(modelViewMatrix);
   projectionMatrix = Matrix4.perspective(

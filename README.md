@@ -84,6 +84,7 @@ yarn test
 - [Goraud Shading with Phong Lights](./src/ch03/03/): Renders an sphere while applying Goraud Shading in combination with the Phong Light Model.
 - [Phong Shading with Phong Lights](./src/ch03/04/): Renders an sphere while applying Phong Shading and the Phong Light Model.
 - [Moving lights with Goraud Shading and Goraud Lights](./src/ch03/05/): Renders a wall while applying Goraud Shading and the Lambert Light Model, while also allowing you to move the light direction.
+- [Positional Lighting with Phong Lights](./src/ch03/06/): Renders a moving scene that is iluminated by a single positional light using the Phong Shading model alongside the Phong Light model.
 
 ---
 

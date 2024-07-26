@@ -156,6 +156,7 @@ const draw = () => {
 const synchWorld = () => {
   const { width, height } = gl.canvas;
 
+  modelViewMatrix = Matrix4.identity();
   modelViewMatrix = modelViewMatrix.translate(new Vector(modelViewTranslation));
   projectionMatrix = Matrix4.perspective(45, width / height, 0.1, 10000);
   normalMatrix = computeNormalMatrix(modelViewMatrix);
