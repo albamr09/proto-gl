@@ -131,7 +131,6 @@ const initBuffer = (data: DataObject) => {
   gl.vertexAttribPointer(program.aPosition, 3, gl.FLOAT, false, 0, 0);
 
   // Normals
-  // const normals = calculateNormals(vertices, indices, 3);
   const normals = calculateNormals(vertices, indices, 3);
   const normalsBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
