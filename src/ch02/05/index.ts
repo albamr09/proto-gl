@@ -6,14 +6,14 @@ import {
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../utils/web-gl.js";
+} from "../../lib/web-gl.js";
 
 import {
   initGUI,
   initController,
   createSelectorForm,
   createDescriptionPanel,
-} from "../../utils/gui/index.js";
+} from "../../lib/gui/index.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,

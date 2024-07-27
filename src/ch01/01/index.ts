@@ -1,12 +1,14 @@
 "use strict";
 
-import { createDescriptionPanel } from "../../utils/gui/index.js";
-import { initGUI } from "../../utils/gui/index.js";
+import { createDescriptionPanel } from "../../lib/gui/index.js";
+import { initGUI } from "../../lib/gui/index.js";
 
 const init = () => {
   // Setup GUI
   initGUI();
-  createDescriptionPanel("Simply creates a WebGL canvas if possible, else shows an alert.");
+  createDescriptionPanel(
+    "Simply creates a WebGL canvas if possible, else shows an alert."
+  );
 
   // Init canvas
   const canvas = document.getElementById("webgl-canvas") as HTMLCanvasElement;

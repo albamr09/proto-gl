@@ -7,10 +7,10 @@ import {
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../utils/web-gl.js";
-import { initGUI, createDescriptionPanel } from "../../utils/gui/index.js";
-import { Matrix4 } from "../../utils/math/matrix.js";
-import { Vector } from "../../utils/math/vector.js";
+} from "../../lib/web-gl.js";
+import { initGUI, createDescriptionPanel } from "../../lib/gui/index.js";
+import { Matrix4 } from "../../lib/math/matrix.js";
+import { Vector } from "../../lib/math/vector.js";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,

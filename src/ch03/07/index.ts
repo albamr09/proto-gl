@@ -3,8 +3,8 @@ import {
   hexToRgb,
   normalizeColor,
   rgbToHex,
-} from "../../utils/colors.js";
-import { loadData } from "../../utils/files.js";
+} from "../../lib/colors.js";
+import { loadData } from "../../lib/files.js";
 import {
   createColorInputForm,
   createDescriptionPanel,
@@ -12,17 +12,17 @@ import {
   createVector3dSliders,
   initController,
   initGUI,
-} from "../../utils/gui/index.js";
-import { calculateNormals, computeNormalMatrix } from "../../utils/math/3d.js";
-import { Matrix4 } from "../../utils/math/matrix.js";
-import { Vector } from "../../utils/math/vector.js";
+} from "../../lib/gui/index.js";
+import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
+import { Matrix4 } from "../../lib/math/matrix.js";
+import { Vector } from "../../lib/math/vector.js";
 import {
   getGLContext,
   configureCanvas,
   autoResizeCanvas,
   createProgram,
   clearScene,
-} from "../../utils/web-gl.js";
+} from "../../lib/web-gl.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 

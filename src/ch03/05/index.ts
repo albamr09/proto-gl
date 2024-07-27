@@ -1,17 +1,17 @@
-import { createDescriptionPanel, initGUI } from "../../utils/gui/index.js";
+import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
 import {
   autoResizeCanvas,
   clearScene,
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../utils/web-gl.js";
+} from "../../lib/web-gl.js";
 import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
-import { calculateNormals, computeNormalMatrix } from "../../utils/math/3d.js";
-import { Matrix4 } from "../../utils/math/matrix.js";
-import { Vector } from "../../utils/math/vector.js";
-import {Angle} from "../../utils/math/angle.js";
+import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
+import { Matrix4 } from "../../lib/math/matrix.js";
+import { Vector } from "../../lib/math/vector.js";
+import { Angle } from "../../lib/math/angle.js";
 
 type ProgramAttributes = {
   aPosition: number;

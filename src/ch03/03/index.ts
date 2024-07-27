@@ -5,14 +5,14 @@ import {
   createVector3dSliders,
   initController,
   initGUI,
-} from "../../utils/gui/index.js";
+} from "../../lib/gui/index.js";
 import {
   getGLContext,
   configureCanvas,
   autoResizeCanvas,
   clearScene,
   createProgram,
-} from "../../utils/web-gl.js";
+} from "../../lib/web-gl.js";
 import { vertices, indices } from "../data/data.js";
 import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
@@ -22,10 +22,10 @@ import {
   normalizeColor,
   rgbToHex,
   rgbToRgba,
-} from "../../utils/colors.js";
-import { Matrix4 } from "../../utils/math/matrix.js";
-import { calculateNormals, computeNormalMatrix } from "../../utils/math/3d.js";
-import {Vector} from "../../utils/math/vector.js";
+} from "../../lib/colors.js";
+import { Matrix4 } from "../../lib/math/matrix.js";
+import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
+import { Vector } from "../../lib/math/vector.js";
 
 type ProgramAttributes = {
   aPosition: number;
@@ -158,7 +158,8 @@ const synchWorld = () => {
     45,
     gl.canvas.width / gl.canvas.height,
     0.1,
-    10000);
+    10000
+  );
   gl.uniformMatrix4fv(
     program.uModelViewMatrix,
     false,
@@ -201,20 +202,32 @@ const initControls = () => {
     label: "Material Diffuse Color",
     value: rgbToHex(denormalizeColor(materialDiffuseColor)),
     onInit: (v) => {
-      gl.uniform4fv(program.uMaterialDiffuseColor, rgbToRgba(normalizeColor(hexToRgb(v))));
+      gl.uniform4fv(
+        program.uMaterialDiffuseColor,
+        rgbToRgba(normalizeColor(hexToRgb(v)))
+      );
     },
     onChange: (v) => {
-      gl.uniform4fv(program.uMaterialDiffuseColor, rgbToRgba(normalizeColor(hexToRgb(v))));
+      gl.uniform4fv(
+        program.uMaterialDiffuseColor,
+        rgbToRgba(normalizeColor(hexToRgb(v)))
+      );
     },
   });
   createColorInputForm({
     label: "Material Ambient Color",
     value: rgbToHex(denormalizeColor(materialAmbientColor)),
     onInit: (v) => {
-      gl.uniform4fv(program.uMaterialAmbientColor, rgbToRgba(normalizeColor(hexToRgb(v))));
+      gl.uniform4fv(
+        program.uMaterialAmbientColor,
+        rgbToRgba(normalizeColor(hexToRgb(v)))
+      );
     },
     onChange: (v) => {
-      gl.uniform4fv(program.uMaterialAmbientColor, rgbToRgba(normalizeColor(hexToRgb(v))));
+      gl.uniform4fv(
+        program.uMaterialAmbientColor,
+        rgbToRgba(normalizeColor(hexToRgb(v)))
+      );
     },
   });
   createColorInputForm({
@@ -237,30 +250,48 @@ const initControls = () => {
     label: "Light Diffuse Color",
     value: rgbToHex(denormalizeColor(lightDiffuseColor)),
     onInit: (v) => {
-      gl.uniform4fv(program.uLightDiffuseColor, rgbToRgba(normalizeColor(hexToRgb(v))));
+      gl.uniform4fv(
+        program.uLightDiffuseColor,
+        rgbToRgba(normalizeColor(hexToRgb(v)))
+      );
     },
     onChange: (v) => {
-      gl.uniform4fv(program.uLightDiffuseColor, rgbToRgba(normalizeColor(hexToRgb(v))));
+      gl.uniform4fv(
+        program.uLightDiffuseColor,
+        rgbToRgba(normalizeColor(hexToRgb(v)))
+      );
     },
   });
   createColorInputForm({
     label: "Light Ambient Color",
     value: rgbToHex(denormalizeColor(lightAmbientColor)),
     onInit: (v) => {
-      gl.uniform4fv(program.uLightAmbientColor, rgbToRgba(normalizeColor(hexToRgb(v))));
+      gl.uniform4fv(
+        program.uLightAmbientColor,
+        rgbToRgba(normalizeColor(hexToRgb(v)))
+      );
     },
     onChange: (v) => {
-      gl.uniform4fv(program.uLightAmbientColor, rgbToRgba(normalizeColor(hexToRgb(v))));
+      gl.uniform4fv(
+        program.uLightAmbientColor,
+        rgbToRgba(normalizeColor(hexToRgb(v)))
+      );
     },
   });
   createColorInputForm({
     label: "Light Specular Color",
     value: rgbToHex(denormalizeColor(lightSpecularColor)),
     onInit: (v) => {
-      gl.uniform4fv(program.uLightSpecularColor, rgbToRgba(normalizeColor(hexToRgb(v))));
+      gl.uniform4fv(
+        program.uLightSpecularColor,
+        rgbToRgba(normalizeColor(hexToRgb(v)))
+      );
     },
     onChange: (v) => {
-      gl.uniform4fv(program.uLightSpecularColor, rgbToRgba(normalizeColor(hexToRgb(v))));
+      gl.uniform4fv(
+        program.uLightSpecularColor,
+        rgbToRgba(normalizeColor(hexToRgb(v)))
+      );
     },
   });
   createNumericInput({
