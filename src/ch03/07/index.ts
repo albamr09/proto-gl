@@ -1,5 +1,18 @@
+import {
+  denormalizeColor,
+  hexToRgb,
+  normalizeColor,
+  rgbToHex,
+} from "../../utils/colors.js";
 import { loadData } from "../../utils/files.js";
-import { createDescriptionPanel, initGUI } from "../../utils/gui/index.js";
+import {
+  createColorInputForm,
+  createDescriptionPanel,
+  createSliderInputForm,
+  createVector3dSliders,
+  initController,
+  initGUI,
+} from "../../utils/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../utils/math/3d.js";
 import { Matrix4 } from "../../utils/math/matrix.js";
 import { Vector } from "../../utils/math/vector.js";
@@ -31,7 +44,7 @@ type ProgramUniforms = {
   uLightDiffuseColor: WebGLUniformLocation | null;
   uLightAmbientColor: WebGLUniformLocation | null;
   uLightSpecularColor: WebGLUniformLocation | null;
-  uLightDirection: WebGLUniformLocation | null;
+  uLightPosition: WebGLUniformLocation | null;
   uShininess: WebGLUniformLocation | null;
 };
 
@@ -51,9 +64,18 @@ type DataObject = {
 let gl: WebGL2RenderingContext;
 let program: ExtendedProgram;
 const objects: DataObject[] = [];
+let lightPosition = [100, 400, 100],
+  lightAmbientColor = [0.1, 0.1, 0.1],
+  lightDiffuseColor = [1.0, 1.0, 1.0],
+  lightSpecularColor = [0.5, 0.5, 0.5];
+let modelTranslation = [-10, 0, -100];
+let angle = 0,
+  lastTime = 0;
 
 const initProgram = () => {
   gl.clearColor(0.5, 0.5, 0.5, 1.0);
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
   program = createProgram(
     gl,
     vertexShaderSource,
@@ -61,7 +83,7 @@ const initProgram = () => {
   ) as ExtendedProgram;
 
   program.aPosition = gl.getAttribLocation(program, "aPosition");
-  // program.aNormal = gl.getAttribLocation(program, "aNormal");
+  program.aNormal = gl.getAttribLocation(program, "aNormal");
   program.uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
   program.uNormalMatrix = gl.getUniformLocation(program, "uNormalMatrix");
   program.uProjectionMatrix = gl.getUniformLocation(
@@ -93,7 +115,7 @@ const initProgram = () => {
     "uLightSpecularColor"
   );
   program.uShininess = gl.getUniformLocation(program, "uShininess");
-  program.uLightDirection = gl.getUniformLocation(program, "uLightDirection");
+  program.uLightPosition = gl.getUniformLocation(program, "uLightPosition");
 };
 
 const initBuffer = (data: DataObject) => {
@@ -109,12 +131,13 @@ const initBuffer = (data: DataObject) => {
   gl.vertexAttribPointer(program.aPosition, 3, gl.FLOAT, false, 0, 0);
 
   // Normals
+  // const normals = calculateNormals(vertices, indices, 3);
   const normals = calculateNormals(vertices, indices, 3);
   const normalsBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-  // gl.enableVertexAttribArray(program.aNormal);
-  // gl.vertexAttribPointer(program.aNormal, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(program.aNormal);
+  gl.vertexAttribPointer(program.aNormal, 3, gl.FLOAT, false, 0, 0);
 
   // Indices
   const indicesBuffer = gl.createBuffer();
@@ -141,24 +164,16 @@ const initData = async () => {
   }
 };
 
-const initLights = () => {
-  gl.uniform3fv(program.uLightDirection, [1.0, 1.0, 1.0]);
-  gl.uniform4fv(program.uLightAmbientColor, [1.0, 1.0, 1.0, 1.0]);
-  gl.uniform4fv(program.uLightDiffuseColor, [1.0, 1.0, 1.0, 1.0]);
-  gl.uniform4fv(program.uLightSpecularColor, [1.0, 1.0, 1.0, 1.0]);
-  gl.uniform1f(program.uShininess, 20);
-};
-
 const synchWorld = () => {
   let modelViewMatrix = Matrix4.identity();
-  modelViewMatrix = modelViewMatrix.translate(new Vector([-10, 0, -100]));
-  modelViewMatrix = modelViewMatrix.rotateDeg(30, new Vector([1, 0, 0]));
-  modelViewMatrix = modelViewMatrix.rotateDeg(30, new Vector([0, 1, 0]));
+  modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
+  modelViewMatrix = modelViewMatrix.rotateDeg(20, new Vector([1, 0, 0]));
+  modelViewMatrix = modelViewMatrix.rotateDeg(angle, new Vector([0, 1, 0]));
   const normalMatrix = computeNormalMatrix(modelViewMatrix);
   const projectionMatrix = Matrix4.perspective(
     45,
     gl.canvas.width / gl.canvas.height,
-    0.1,
+    1,
     10000
   );
 
@@ -180,9 +195,9 @@ const synchWorld = () => {
 };
 
 const setUniforms = (object: DataObject) => {
-  gl.uniform3fv(program.uMaterialDiffuseColor, object.Kd);
-  gl.uniform3fv(program.uMaterialAmbientColor, object.Ka);
-  gl.uniform3fv(program.uMaterialSpecularColor, object.Ks);
+  gl.uniform4fv(program.uMaterialDiffuseColor, [...object.Kd, 1.0]);
+  gl.uniform4fv(program.uMaterialAmbientColor, [...object.Ka, 1.0]);
+  gl.uniform4fv(program.uMaterialSpecularColor, [...object.Ks, 1.0]);
 };
 
 const draw = () => {
@@ -201,6 +216,100 @@ const draw = () => {
   });
 };
 
+const animate = () => {
+  const timeNow = new Date().getTime();
+  if (lastTime) {
+    const elapsed = timeNow - lastTime;
+    angle += (90 * elapsed) / 10000;
+  }
+  lastTime = timeNow;
+};
+
+const render = () => {
+  requestAnimationFrame(render);
+  draw();
+  animate();
+};
+
+const initControls = () => {
+  initController();
+  createColorInputForm({
+    label: "Light Diffuse Color",
+    value: rgbToHex(denormalizeColor(lightDiffuseColor)),
+    onInit: (v) => {
+      lightDiffuseColor = normalizeColor(hexToRgb(v));
+      gl.uniform4fv(program.uLightDiffuseColor, [...lightDiffuseColor, 1.0]);
+    },
+    onChange: (v) => {
+      lightDiffuseColor = normalizeColor(hexToRgb(v));
+      gl.uniform4fv(program.uLightDiffuseColor, [...lightDiffuseColor, 1.0]);
+    },
+  });
+  createColorInputForm({
+    label: "Light Specular Color",
+    value: rgbToHex(denormalizeColor(lightSpecularColor)),
+    onInit: (v) => {
+      lightSpecularColor = normalizeColor(hexToRgb(v));
+      gl.uniform4fv(program.uLightSpecularColor, [...lightSpecularColor, 1.0]);
+    },
+    onChange: (v) => {
+      lightSpecularColor = normalizeColor(hexToRgb(v));
+      gl.uniform4fv(program.uLightSpecularColor, [...lightSpecularColor, 1.0]);
+    },
+  });
+  createColorInputForm({
+    label: "Light Ambient Color",
+    value: rgbToHex(denormalizeColor(lightAmbientColor)),
+    onInit: (v) => {
+      lightAmbientColor = normalizeColor(hexToRgb(v));
+      gl.uniform4fv(program.uLightAmbientColor, [...lightAmbientColor, 1.0]);
+    },
+    onChange: (v) => {
+      lightAmbientColor = normalizeColor(hexToRgb(v));
+      gl.uniform4fv(program.uLightAmbientColor, [...lightAmbientColor, 1.0]);
+    },
+  });
+  createSliderInputForm({
+    label: "Shininess",
+    value: 20,
+    min: 0,
+    max: 100,
+    step: 1,
+    onInit: (v) => {
+      gl.uniform1f(program.uShininess, v);
+    },
+    onChange: (v) => {
+      gl.uniform1f(program.uShininess, v);
+    },
+  });
+  createVector3dSliders({
+    labels: ["Car X", "Car Y", "Car Z"],
+    value: modelTranslation,
+    min: -200,
+    max: 200,
+    step: 1,
+    onInit: (v) => {
+      modelTranslation = v;
+    },
+    onChange: (v) => {
+      modelTranslation = v;
+    },
+  });
+  createVector3dSliders({
+    labels: ["Light X", "Light Y", "Light Z"],
+    value: lightPosition,
+    min: -500,
+    max: 500,
+    step: 1,
+    onInit: (v) => {
+      gl.uniform3fv(program.uLightPosition, v);
+    },
+    onChange: (v) => {
+      gl.uniform3fv(program.uLightPosition, v);
+    },
+  });
+};
+
 const init = async () => {
   initGUI();
   createDescriptionPanel(
@@ -213,8 +322,8 @@ const init = async () => {
 
   initProgram();
   await initData();
-  initLights();
-  draw();
+  initControls();
+  render();
 };
 
 window.onload = init;
