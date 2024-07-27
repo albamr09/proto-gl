@@ -1,5 +1,5 @@
-import { Matrix4 } from "../../../src/utils/math/matrix.js";
-import { Vector } from "../../../src/utils/math/vector.js";
+import { Matrix4 } from "../../../src/lib/math/matrix.js";
+import { Vector } from "../../../src/lib/math/vector.js";
 import { describe, expect, it } from "../../test.js";
 
 describe("Matrix4", () => {

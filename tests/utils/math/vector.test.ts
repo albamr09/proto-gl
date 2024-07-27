@@ -1,4 +1,4 @@
-import { Vector } from "../../../src/utils/math/vector.js";
+import { Vector } from "../../../src/lib/math/vector.js";
 import { describe, it, expect } from "../../test.js";
 
 describe("Vector", () => {

@@ -26,7 +26,11 @@ class Expectation<T> {
 
   toDeepEqual(expected: T) {
     if (JSON.stringify(this.value) !== JSON.stringify(expected)) {
-      throw new AssertionError(`Expected:\n${JSON.stringify(expected)}\nGot:\n${JSON.stringify(this.value)}`);
+      throw new AssertionError(
+        `Expected:\n${JSON.stringify(expected)}\nGot:\n${JSON.stringify(
+          this.value
+        )}`
+      );
     }
   }
 }
