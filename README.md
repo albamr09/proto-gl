@@ -58,12 +58,12 @@ yarn test
 
 ## Code
 
-### Chapter 1
+### Chapter 1: Getting Started
 
 - [Canvas](./src/ch01/01/): Creates a canvas
 - [Colorful Canvas](./src/ch01/01/): Creates a canvas that changes its background color.
 
-### Chapter 2
+### Chapter 2: Rendering
 
 - [Square](./src/ch02/01/): Renders a simple square
 - [Pentagon](./src/ch02/02/): Renders a pentagon
@@ -77,7 +77,7 @@ yarn test
 - [JSON Data](./src/ch02/10/): Shows how to obtain work with JSON data that defines objects.
 - [Car](./src/ch02/11/): Renders a Nissan car using JSON data as the input data.
 
-### Chapter 3
+### Chapter 3: Lights
 
 - [Goraud Shading with Goraud Lights](./src/ch03/01/): Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model.
 - [Goraud Shading with Goraud Lights](./src/ch03/02/): Modifies the previous example to animate the ligth.
