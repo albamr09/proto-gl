@@ -175,10 +175,10 @@ const draw = () => {
   objects.forEach((o) => {
     // Material
     addMaterialUniforms(o);
+    // Having to do this here is what causes practically a 90% increase on CPU usage
+    // to avoid this, define an attribute that is the translation vector?
     if (o.id == "light") {
       synchWorld(true);
-    } else {
-      synchWorld();
     }
     gl.bindVertexArray(o.vao);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.ibo);
@@ -244,6 +244,7 @@ const render = () => {
   requestAnimationFrame(render);
   animateAngle();
   addLightUniforms();
+  synchWorld();
   draw();
 };
 
