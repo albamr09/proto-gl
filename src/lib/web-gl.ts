@@ -1,7 +1,4 @@
-enum PROGRAM_TYPE {
-  VERTEX,
-  FRAGMENT,
-}
+import { PROGRAM_TYPE } from "./webgl/program.js";
 
 /**
  * Sets the canvas to be as large as the window that contains it
