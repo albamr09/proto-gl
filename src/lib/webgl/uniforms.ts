@@ -1,5 +1,7 @@
-export const GeneralUniforms = [
+export const transformUniforms = [
   "uModelViewMatrix",
   "uNormalMatrix",
-  "uPorjectionMatrix",
+  "uProjectionMatrix",
 ] as const;
+
+export type TransformUniforms = typeof transformUniforms;

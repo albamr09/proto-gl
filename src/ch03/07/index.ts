@@ -20,35 +20,11 @@ import {
   getGLContext,
   configureCanvas,
   autoResizeCanvas,
-  createProgram,
   clearScene,
 } from "../../lib/web-gl.js";
+import Program from "../../lib/webgl/program.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
-
-type ProgramAttributes = {
-  aPosition: number;
-  aNormal: number;
-};
-
-type ProgramUniforms = {
-  // Transform
-  uModelViewMatrix: WebGLUniformLocation | null;
-  uNormalMatrix: WebGLUniformLocation | null;
-  uProjectionMatrix: WebGLUniformLocation | null;
-  // Materials
-  uMaterialDiffuseColor: WebGLUniformLocation | null;
-  uMaterialAmbientColor: WebGLUniformLocation | null;
-  uMaterialSpecularColor: WebGLUniformLocation | null;
-  // Lights
-  uLightDiffuseColor: WebGLUniformLocation | null;
-  uLightAmbientColor: WebGLUniformLocation | null;
-  uLightSpecularColor: WebGLUniformLocation | null;
-  uLightPosition: WebGLUniformLocation | null;
-  uShininess: WebGLUniformLocation | null;
-};
-
-type ExtendedProgram = WebGLProgram & ProgramAttributes & ProgramUniforms;
 
 type DataObject = {
   indices: number[];
@@ -61,8 +37,20 @@ type DataObject = {
   indicesBuffer: WebGLBuffer | null;
 };
 
+const attributes = ["aPosition", "aNormal"] as const;
+const uniforms = [
+  "uMaterialAmbientColor",
+  "uMaterialDiffuseColor",
+  "uMaterialSpecularColor",
+  "uLightAmbientColor",
+  "uLightDiffuseColor",
+  "uLightSpecularColor",
+  "uShininess",
+  "uLightPosition",
+] as const;
+
 let gl: WebGL2RenderingContext;
-let program: ExtendedProgram;
+let program: Program<typeof attributes, typeof uniforms>;
 const objects: DataObject[] = [];
 let lightPosition = [100, 400, 100],
   lightAmbientColor = [0.1, 0.1, 0.1],
@@ -76,46 +64,13 @@ const initProgram = () => {
   gl.clearColor(0.5, 0.5, 0.5, 1.0);
   gl.enable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LEQUAL);
-  program = createProgram(
+  program = new Program(
     gl,
     vertexShaderSource,
-    fragmentShaderSource
-  ) as ExtendedProgram;
-
-  program.aPosition = gl.getAttribLocation(program, "aPosition");
-  program.aNormal = gl.getAttribLocation(program, "aNormal");
-  program.uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
-  program.uNormalMatrix = gl.getUniformLocation(program, "uNormalMatrix");
-  program.uProjectionMatrix = gl.getUniformLocation(
-    program,
-    "uProjectionMatrix"
+    fragmentShaderSource,
+    attributes,
+    uniforms
   );
-  program.uMaterialAmbientColor = gl.getUniformLocation(
-    program,
-    "uMaterialAmbientColor"
-  );
-  program.uMaterialDiffuseColor = gl.getUniformLocation(
-    program,
-    "uMaterialDiffuseColor"
-  );
-  program.uMaterialSpecularColor = gl.getUniformLocation(
-    program,
-    "uMaterialSpecularColor"
-  );
-  program.uLightAmbientColor = gl.getUniformLocation(
-    program,
-    "uLightAmbientColor"
-  );
-  program.uLightDiffuseColor = gl.getUniformLocation(
-    program,
-    "uLightDiffuseColor"
-  );
-  program.uLightSpecularColor = gl.getUniformLocation(
-    program,
-    "uLightSpecularColor"
-  );
-  program.uShininess = gl.getUniformLocation(program, "uShininess");
-  program.uLightPosition = gl.getUniformLocation(program, "uLightPosition");
 };
 
 const initBuffer = (data: DataObject) => {
@@ -127,16 +82,23 @@ const initBuffer = (data: DataObject) => {
   const verticesBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(program.aPosition);
-  gl.vertexAttribPointer(program.aPosition, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(program.attributes.aPosition);
+  gl.vertexAttribPointer(
+    program.attributes.aPosition,
+    3,
+    gl.FLOAT,
+    false,
+    0,
+    0
+  );
 
   // Normals
   const normals = calculateNormals(vertices, indices, 3);
   const normalsBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(program.aNormal);
-  gl.vertexAttribPointer(program.aNormal, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(program.attributes.aNormal);
+  gl.vertexAttribPointer(program.attributes.aNormal, 3, gl.FLOAT, false, 0, 0);
 
   // Indices
   const indicesBuffer = gl.createBuffer();
@@ -177,26 +139,26 @@ const synchWorld = () => {
   );
 
   gl.uniformMatrix4fv(
-    program.uModelViewMatrix,
+    program.uniforms.uModelViewMatrix,
     false,
     modelViewMatrix.toFloatArray()
   );
   gl.uniformMatrix4fv(
-    program.uNormalMatrix,
+    program.uniforms.uNormalMatrix,
     false,
     normalMatrix.toFloatArray()
   );
   gl.uniformMatrix4fv(
-    program.uProjectionMatrix,
+    program.uniforms.uProjectionMatrix,
     false,
     projectionMatrix.toFloatArray()
   );
 };
 
 const setUniforms = (object: DataObject) => {
-  gl.uniform4fv(program.uMaterialDiffuseColor, [...object.Kd, 1.0]);
-  gl.uniform4fv(program.uMaterialAmbientColor, [...object.Ka, 1.0]);
-  gl.uniform4fv(program.uMaterialSpecularColor, [...object.Ks, 1.0]);
+  gl.uniform4fv(program.uniforms.uMaterialDiffuseColor, [...object.Kd, 1.0]);
+  gl.uniform4fv(program.uniforms.uMaterialAmbientColor, [...object.Ka, 1.0]);
+  gl.uniform4fv(program.uniforms.uMaterialSpecularColor, [...object.Ks, 1.0]);
 };
 
 const draw = () => {
@@ -237,11 +199,17 @@ const initControls = () => {
     value: rgbToHex(denormalizeColor(lightDiffuseColor)),
     onInit: (v) => {
       lightDiffuseColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uLightDiffuseColor, [...lightDiffuseColor, 1.0]);
+      gl.uniform4fv(program.uniforms.uLightDiffuseColor, [
+        ...lightDiffuseColor,
+        1.0,
+      ]);
     },
     onChange: (v) => {
       lightDiffuseColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uLightDiffuseColor, [...lightDiffuseColor, 1.0]);
+      gl.uniform4fv(program.uniforms.uLightDiffuseColor, [
+        ...lightDiffuseColor,
+        1.0,
+      ]);
     },
   });
   createColorInputForm({
@@ -249,11 +217,17 @@ const initControls = () => {
     value: rgbToHex(denormalizeColor(lightSpecularColor)),
     onInit: (v) => {
       lightSpecularColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uLightSpecularColor, [...lightSpecularColor, 1.0]);
+      gl.uniform4fv(program.uniforms.uLightSpecularColor, [
+        ...lightSpecularColor,
+        1.0,
+      ]);
     },
     onChange: (v) => {
       lightSpecularColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uLightSpecularColor, [...lightSpecularColor, 1.0]);
+      gl.uniform4fv(program.uniforms.uLightSpecularColor, [
+        ...lightSpecularColor,
+        1.0,
+      ]);
     },
   });
   createColorInputForm({
@@ -261,11 +235,17 @@ const initControls = () => {
     value: rgbToHex(denormalizeColor(lightAmbientColor)),
     onInit: (v) => {
       lightAmbientColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uLightAmbientColor, [...lightAmbientColor, 1.0]);
+      gl.uniform4fv(program.uniforms.uLightAmbientColor, [
+        ...lightAmbientColor,
+        1.0,
+      ]);
     },
     onChange: (v) => {
       lightAmbientColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uLightAmbientColor, [...lightAmbientColor, 1.0]);
+      gl.uniform4fv(program.uniforms.uLightAmbientColor, [
+        ...lightAmbientColor,
+        1.0,
+      ]);
     },
   });
   createSliderInputForm({
@@ -275,10 +255,10 @@ const initControls = () => {
     max: 100,
     step: 1,
     onInit: (v) => {
-      gl.uniform1f(program.uShininess, v);
+      gl.uniform1f(program.uniforms.uShininess, v);
     },
     onChange: (v) => {
-      gl.uniform1f(program.uShininess, v);
+      gl.uniform1f(program.uniforms.uShininess, v);
     },
   });
   createVector3dSliders({
@@ -301,10 +281,10 @@ const initControls = () => {
     max: 500,
     step: 1,
     onInit: (v) => {
-      gl.uniform3fv(program.uLightPosition, v);
+      gl.uniform3fv(program.uniforms.uLightPosition, v);
     },
     onChange: (v) => {
-      gl.uniform3fv(program.uLightPosition, v);
+      gl.uniform3fv(program.uniforms.uLightPosition, v);
     },
   });
 };

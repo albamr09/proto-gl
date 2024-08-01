@@ -1,18 +1,23 @@
-import { GeneralUniforms } from "./uniforms.js";
+import { TransformUniforms, transformUniforms } from "./uniforms.js";
 
 export enum PROGRAM_TYPE {
   VERTEX,
   FRAGMENT,
 }
 
-class Program<
-  A extends readonly string[],
-  U extends readonly string[] & typeof GeneralUniforms
-> {
+type CombinedUniforms<U extends readonly string[]> = [
+  ...TransformUniforms,
+  ...U
+];
+
+class Program<A extends readonly string[], U extends readonly string[]> {
   private gl: WebGLRenderingContext | WebGL2RenderingContext;
   private _program: WebGLProgram | null;
   public attributes: Record<A[number], number>;
-  public uniforms: Record<U[number], WebGLUniformLocation | null>;
+  public uniforms: Record<
+    CombinedUniforms<U>[number],
+    WebGLUniformLocation | null
+  >;
 
   /**
    * Creates a program that is made up of a vertex shader and a fragment shader
@@ -69,12 +74,12 @@ class Program<
     if (!this._program) {
       return uniforms;
     }
-    for (const name of [...(uniformNames ?? []), ...GeneralUniforms]) {
+    for (const name of [...(uniformNames ?? []), ...transformUniforms]) {
       const location = this.gl.getUniformLocation(this._program, name);
       if (location === -1) {
         throw new Error(`Uniform ${name} not found in the shader program`);
       }
-      uniforms[name as U[number]] = location;
+      uniforms[name as CombinedUniforms<U>[number]] = location;
     }
     return uniforms;
   }
