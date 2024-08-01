@@ -20,12 +20,6 @@ let vao: WebGLVertexArrayObject | null;
 let ibo: WebGLBuffer | null;
 let indices_length: number;
 
-type DataObject = {
-  vertices: number[];
-  indices: number[];
-  diffuse: number[];
-};
-
 const initProgram = () => {
   // Background colors :)
   gl.clearColor(0.9, 0.9, 0.9, 1);
