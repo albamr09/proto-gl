@@ -8,6 +8,7 @@ import {
   getGLContext,
 } from "../../lib/web-gl.js";
 import Program from "../../lib/webgl/program.js";
+import Scene from "../../lib/webgl/scene.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
 
@@ -16,9 +17,7 @@ const uniforms = [] as const;
 
 let gl: WebGL2RenderingContext;
 let program: Program<typeof attributes, typeof uniforms>;
-let vao: WebGLVertexArrayObject | null;
-let ibo: WebGLBuffer | null;
-let indices_length: number;
+let scene: Scene<typeof attributes, typeof uniforms>;
 
 const initProgram = () => {
   // Background colors :)
@@ -35,62 +34,22 @@ const initProgram = () => {
     fragmentShaderSource,
     attributes
   );
+  scene = new Scene(gl, program);
 };
 
 const initBuffers = async () => {
-  const { vertices, indices } = await loadData(
-    "/data/models/geometries/cone3.json"
+  const data = await loadData("/data/models/geometries/cone3.json");
+  scene.addObject(
+    {
+      aPosition: data.vertices as number[],
+      aNormal: calculateNormals(data.vertices, data.indices, 3) as number[],
+    },
+    data.indices
   );
-  vao = gl.createVertexArray();
-  gl.bindVertexArray(vao);
-
-  // Vertices
-  const verticesBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  gl.vertexAttribPointer(
-    program.attributes.aPosition,
-    3,
-    gl.FLOAT,
-    false,
-    0,
-    0
-  );
-  gl.enableVertexAttribArray(program.attributes.aPosition);
-
-  // Normals
-  const normals = calculateNormals(vertices, indices, 3);
-  const normalsBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-  gl.vertexAttribPointer(program.attributes.aNormal, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(program.attributes.aNormal);
-
-  // Indices
-  ibo = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-  gl.bufferData(
-    gl.ELEMENT_ARRAY_BUFFER,
-    new Uint16Array(indices),
-    gl.STATIC_DRAW
-  );
-  indices_length = indices.length;
-
-  // Clean
-  gl.bindVertexArray(null);
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
 
 const draw = () => {
-  clearScene(gl);
-  gl.bindVertexArray(vao);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-
-  gl.drawElements(gl.TRIANGLES, indices_length, gl.UNSIGNED_SHORT, 0);
-
-  gl.bindVertexArray(null);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+  scene.render();
 };
 
 const render = () => {

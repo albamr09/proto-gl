@@ -1,4 +1,7 @@
 const cssCode = `
+body {
+  margin: 0;
+}
 #control-container {
   position: absolute;
   top: 20px;

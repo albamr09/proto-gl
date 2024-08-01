@@ -44,8 +44,18 @@ class Program<A extends readonly string[], U extends readonly string[]> {
     this.uniforms = this._loadUniforms(uniforms);
   }
 
+  /**
+   * Tells WebGL to use this program to render
+   */
   use() {
     this.gl.useProgram(this._program);
+  }
+
+  /**
+   * Returns the location of the attribute
+   */
+  getAttribute(attributeName: A[number]) {
+    return this.attributes[attributeName];
   }
 
   /**
