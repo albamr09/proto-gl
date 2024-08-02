@@ -18,30 +18,43 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
     this.objects = [];
   }
 
-  addObject(attributes: Record<A[number], number[]>, indices: number[]) {
+  addObject(
+    attributes: {
+      [P in A[number]]: {
+        data: number[];
+        size: number;
+        type: GLenum;
+        stride?: number;
+        offset?: number;
+      };
+    },
+    indices: number[]
+  ) {
     const vao = this.gl.createVertexArray();
     this.gl.bindVertexArray(vao);
 
     // Attributes
     for (const attribute of Object.keys(attributes)) {
       const attributeLocation = this.program.getAttribute(attribute);
+      const { data, size, type, stride, offset } =
+        attributes[attribute as A[number]];
       // If attribute location does not exist
       if (attributeLocation < 0) continue;
       const buffer = this.gl.createBuffer();
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
       this.gl.bufferData(
         this.gl.ARRAY_BUFFER,
-        new Float32Array(attributes[attribute as A[number]]),
+        new Float32Array(data),
         this.gl.STATIC_DRAW
       );
       // TODO: this should be configurable :(
       this.gl.vertexAttribPointer(
         attributeLocation,
-        3,
-        this.gl.FLOAT,
+        size,
+        type,
         false,
-        0,
-        0
+        stride ?? 0,
+        offset ?? 0
       );
       this.gl.enableVertexAttribArray(attributeLocation);
     }

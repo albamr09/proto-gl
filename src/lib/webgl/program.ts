@@ -5,19 +5,19 @@ export enum PROGRAM_TYPE {
   FRAGMENT,
 }
 
-type CombinedUniforms<U extends readonly string[]> = [
-  ...TransformUniforms,
-  ...U
-];
+type Uniforms<U extends readonly string[]> = {
+  [P in TransformUniforms[number] | U[number]]: WebGLUniformLocation | null;
+};
+
+type Attributes<A extends readonly string[]> = {
+  [P in A[number]]: number;
+};
 
 class Program<A extends readonly string[], U extends readonly string[]> {
   private gl: WebGLRenderingContext | WebGL2RenderingContext;
   private _program: WebGLProgram | null;
-  public attributes: Record<A[number], number>;
-  public uniforms: Record<
-    CombinedUniforms<U>[number],
-    WebGLUniformLocation | null
-  >;
+  public attributes: Attributes<A>;
+  public uniforms: Uniforms<U>;
 
   /**
    * Creates a program that is made up of a vertex shader and a fragment shader
@@ -59,6 +59,13 @@ class Program<A extends readonly string[], U extends readonly string[]> {
   }
 
   /**
+   * Returns the location of the attribute
+   */
+  getUniform(uniformName: TransformUniforms[number] & U[number]) {
+    return this.uniforms[uniformName];
+  }
+
+  /**
    * Stores the location of each attribute for the program
    **/
   private _loadAttributes(attributeNames?: A) {
@@ -89,7 +96,7 @@ class Program<A extends readonly string[], U extends readonly string[]> {
       if (location === -1) {
         throw new Error(`Uniform ${name} not found in the shader program`);
       }
-      uniforms[name as CombinedUniforms<U>[number]] = location;
+      uniforms[name] = location;
     }
     return uniforms;
   }
