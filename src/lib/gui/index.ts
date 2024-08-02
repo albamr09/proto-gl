@@ -84,16 +84,16 @@ export const createNumericInput = ({
   document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
 };
 
-export const createSelectorForm = ({
+export const createSelectorForm = <T>({
   label,
   value,
   options,
   onChange,
 }: {
   label: string;
-  value: string;
-  options: string[];
-  onChange: (v: string) => void;
+  value: T;
+  options: T[];
+  onChange: (v: T) => void;
 }) => {
   // Create a div container
   const formContainer = document.createElement("div");
@@ -118,20 +118,20 @@ export const createSelectorForm = ({
   // Create and add options to the select element
   for (let i = 0; i < options.length; i++) {
     const option = document.createElement("option");
-    option.value = options[i];
-    option.text = options[i];
+    option.value = `${options[i]}`;
+    option.text = `${options[i]}`;
     select.appendChild(option);
   }
 
   // Set the initial value of the select element
   if (value) {
-    select.value = value;
+    select.value = `${value}`;
   }
 
   // Add an event listener for the "change" event on the select element
   select.addEventListener("change", function () {
     // Call the onChange function with the selected value
-    onChange(select.value);
+    onChange(select.value as T);
   });
 
   // Append the label, select to the form

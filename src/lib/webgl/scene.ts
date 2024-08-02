@@ -94,6 +94,12 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
       this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
     });
   }
+
+  clear = () => {
+    // Clear the scene
+    this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+  };
 }
 
 export default Scene;
