@@ -183,7 +183,10 @@ const draw = () => {
       }
       if (o.uniforms?.uWireFrame) {
         gl.uniform1i(program.uniforms.uWireFrame, o.uniforms?.uWireFrame);
+      } else {
+        gl.uniform1i(program.uniforms.uWireFrame, 0);
       }
+
       gl.bindVertexArray(o.vao);
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.ibo);
 

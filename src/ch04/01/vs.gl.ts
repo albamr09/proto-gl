@@ -21,7 +21,6 @@ uniform bool uWireFrame;
 in vec3 aPosition;
 in vec3 aNormal;
 
-out vec3 vNormal;
 out vec4 vColor;
 
 void main(void) {
