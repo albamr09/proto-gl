@@ -5,8 +5,9 @@ class Floor {
   private lines: number;
   public vertices: number[];
   public indices: number[];
-  private wireframe: boolean;
-  private visible: boolean;
+  public wireframe: boolean;
+  public visible: boolean;
+  public color: number[];
 
   constructor(dimension = 50, lines = 5) {
     this.alias = "floor";
@@ -17,6 +18,7 @@ class Floor {
 
     this.wireframe = true;
     this.visible = true;
+    this.color = [1.0, 1.0, 1.0, 1.0];
 
     this.build(this.dimension, this.lines);
   }

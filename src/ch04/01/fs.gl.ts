@@ -2,12 +2,12 @@ const fragmentShaderSource = `#version 300 es
 
 precision mediump float;
 
-in vec3 vNormal;
+in vec4 vColor;
 
 out vec4 fragColor;
 
 void main(void) {
-  fragColor = vec4(0.6, 0.0, 0.0, 1.0);
+  fragColor = vec4(vColor);
 }
 `;
 

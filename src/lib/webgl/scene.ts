@@ -1,16 +1,19 @@
 import { clearScene } from "../web-gl.js";
 import Program from "./program.js";
 
-type DataObject = {
+type DataObject<U extends readonly string[]> = {
   ibo: WebGLBuffer | null;
   vao: WebGLVertexArrayObject | null;
   len: number;
+  uniforms?: {
+    [P in U[number]]?: any;
+  };
 };
 
 class Scene<A extends readonly string[], U extends readonly string[]> {
   private gl: WebGL2RenderingContext;
   private program: Program<A, U>;
-  private objects: DataObject[];
+  private objects: DataObject<U>[];
 
   constructor(gl: WebGL2RenderingContext, program: Program<A, U>) {
     this.gl = gl;
@@ -18,7 +21,11 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
     this.objects = [];
   }
 
-  addObject(
+  addObject({
+    attributes,
+    indices,
+    uniforms,
+  }: {
     attributes: {
       [P in A[number]]: {
         data: number[];
@@ -27,9 +34,11 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
         stride?: number;
         offset?: number;
       };
-    },
-    indices: number[]
-  ) {
+    };
+    indices: number[];
+    uniforms?: DataObject<U>["uniforms"];
+    wireframe?: boolean;
+  }) {
     const vao = this.gl.createVertexArray();
     this.gl.bindVertexArray(vao);
 
@@ -47,7 +56,6 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
         new Float32Array(data),
         this.gl.STATIC_DRAW
       );
-      // TODO: this should be configurable :(
       this.gl.vertexAttribPointer(
         attributeLocation,
         size,
@@ -74,6 +82,7 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
       vao,
       ibo,
       len,
+      uniforms: { ...uniforms },
     });
 
     // Clean
@@ -82,16 +91,10 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
   }
 
-  render() {
+  render(cb: (o: DataObject<U>) => void = () => {}) {
     clearScene(this.gl);
     this.objects.forEach((o) => {
-      this.gl.bindVertexArray(o.vao);
-      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, o.ibo);
-
-      this.gl.drawElements(this.gl.TRIANGLES, o.len, this.gl.UNSIGNED_SHORT, 0);
-
-      this.gl.bindVertexArray(null);
-      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+      cb(o);
     });
   }
 

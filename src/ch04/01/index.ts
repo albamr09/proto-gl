@@ -27,7 +27,15 @@ enum COORDINATE_SYSTEM {
 }
 
 const attributes = ["aPosition", "aNormal"] as const;
-const uniforms = [] as const;
+const uniforms = [
+  "uLightPosition",
+  "uLightDiffuse",
+  "uLightAmbient",
+  "uMaterialDiffuse",
+  "uMaterialAmbient",
+  "uMaterialSpecular",
+  "uWireFrame",
+] as const;
 
 let gl: WebGL2RenderingContext;
 let program: Program<typeof attributes, typeof uniforms>;
@@ -53,7 +61,8 @@ const initProgram = () => {
     gl,
     vertexShaderSource,
     fragmentShaderSource,
-    attributes
+    attributes,
+    uniforms
   );
   scene = new Scene(gl, program);
 };
@@ -62,9 +71,8 @@ const initData = async () => {
   const data = await loadData("/data/models/geometries/cone3.json");
   const floorModel = new Floor(80, 2);
   const axisModel = new Axis(82);
-  scene.addObject(
-    // Define attributes
-    {
+  scene.addObject({
+    attributes: {
       aPosition: {
         data: data.vertices as number[],
         size: 3,
@@ -76,10 +84,14 @@ const initData = async () => {
         type: gl.FLOAT,
       },
     },
-    data.indices
-  );
-  scene.addObject(
-    {
+    uniforms: {
+      uMaterialDiffuse: data.diffuse,
+      uMaterialAmbient: [0.2, 0.2, 0.2, 1],
+    },
+    indices: data.indices,
+  });
+  scene.addObject({
+    attributes: {
       aPosition: {
         data: floorModel.vertices,
         size: 3,
@@ -91,23 +103,37 @@ const initData = async () => {
         type: gl.FLOAT,
       },
     },
-    floorModel.indices
-  );
-  // scene.addObject(
-  //   {
-  //     aPosition: {
-  //       data: axisModel.vertices,
-  //       size: 3,
-  //       type: gl.FLOAT,
-  //     },
-  //     aNormal: {
-  //       data: calculateNormals(axisModel.vertices, axisModel.indices, 3),
-  //       size: 3,
-  //       type: gl.FLOAT,
-  //     },
-  //   },
-  //   axisModel.indices
-  // );
+    indices: floorModel.indices,
+    uniforms: {
+      uWireFrame: floorModel.wireframe,
+      uMaterialDiffuse: floorModel.color,
+    },
+  });
+  scene.addObject({
+    attributes: {
+      aPosition: {
+        data: axisModel.vertices,
+        size: 3,
+        type: gl.FLOAT,
+      },
+      aNormal: {
+        data: calculateNormals(axisModel.vertices, axisModel.indices, 3),
+        size: 3,
+        type: gl.FLOAT,
+      },
+    },
+    indices: axisModel.indices,
+    uniforms: {
+      uWireFrame: axisModel.wireframe,
+      uMaterialDiffuse: axisModel.color,
+    },
+  });
+};
+
+const initLightUniforms = () => {
+  gl.uniform3fv(program.uniforms.uLightPosition, [0, 120, 120]);
+  gl.uniform4fv(program.uniforms.uLightAmbient, [0.2, 0.2, 0.2, 1]);
+  gl.uniform4fv(program.uniforms.uLightDiffuse, [1, 1, 1, 1]);
 };
 
 const setTransformUniforms = () => {
@@ -142,7 +168,34 @@ const draw = () => {
   scene.clear();
   try {
     setTransformUniforms();
-    scene.render();
+    scene.render((o) => {
+      if (o.uniforms?.uMaterialAmbient) {
+        gl.uniform4fv(
+          program.uniforms.uMaterialAmbient,
+          o.uniforms.uMaterialAmbient
+        );
+      }
+      if (o.uniforms?.uMaterialDiffuse) {
+        gl.uniform4fv(
+          program.uniforms.uMaterialDiffuse,
+          o.uniforms.uMaterialDiffuse
+        );
+      }
+      if (o.uniforms?.uWireFrame) {
+        gl.uniform1i(program.uniforms.uWireFrame, o.uniforms?.uWireFrame);
+      }
+      gl.bindVertexArray(o.vao);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.ibo);
+
+      if (o.uniforms?.uWireFrame) {
+        gl.drawElements(gl.LINES, o.len, gl.UNSIGNED_SHORT, 0);
+      } else {
+        gl.drawElements(gl.TRIANGLES, o.len, gl.UNSIGNED_SHORT, 0);
+      }
+
+      gl.bindVertexArray(null);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    });
   } catch (error) {
     console.error(`Could not render scene ${error}`);
   }
@@ -164,6 +217,7 @@ const init = async () => {
 
   initProgram();
   await initData();
+  initLightUniforms();
   // Lights
   render();
 

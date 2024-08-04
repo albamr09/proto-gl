@@ -4,7 +4,8 @@ class Axis {
   private dimension: number;
   public vertices: number[];
   public indices: number[];
-  private wireframe: boolean;
+  public wireframe: boolean;
+  public color: number[];
 
   constructor(dimension = 10) {
     this.alias = "axis";
@@ -14,6 +15,7 @@ class Axis {
     this.vertices = [];
     this.dimension = dimension;
 
+    this.color = [1.0, 0.0, 0.0, 1.0];
     this.build(this.dimension);
   }
 
