@@ -147,11 +147,19 @@ const setTransformUniforms = () => {
     0.1,
     1000
   );
-  gl.uniformMatrix4fv(
-    program.uniforms.uModelViewMatrix,
-    false,
-    modelViewMatrix.toFloatArray()
-  );
+  if (coordinateSystem == COORDINATE_SYSTEM.WORLD_COORDINATES) {
+    gl.uniformMatrix4fv(
+      program.uniforms.uModelViewMatrix,
+      false,
+      modelViewMatrix.toFloatArray()
+    );
+  } else {
+    gl.uniformMatrix4fv(
+      program.uniforms.uModelViewMatrix,
+      false,
+      cameraMatrix.toFloatArray()
+    );
+  }
   gl.uniformMatrix4fv(
     program.uniforms.uNormalMatrix,
     false,
@@ -204,9 +212,31 @@ const draw = () => {
   }
 };
 
+const updateGUIMatrixValues = () => {
+  const matrix =
+    coordinateSystem === COORDINATE_SYSTEM.WORLD_COORDINATES
+      ? modelViewMatrix
+      : cameraMatrix;
+
+  const matrixTableTitle = document.getElementById("coordinates");
+  if (matrixTableTitle) {
+    matrixTableTitle.innerHTML = coordinateSystem;
+  }
+  matrix
+    .elements()
+    .flat()
+    .forEach((data, i) => {
+      const matrixElement = document.getElementById(`m${i}`);
+      if (matrixElement) {
+        matrixElement.innerText = data.toFixed(1);
+      }
+    });
+};
+
 const render = () => {
   requestAnimationFrame(render);
   draw();
+  updateGUIMatrixValues();
 };
 
 const init = async () => {
@@ -230,6 +260,7 @@ const init = async () => {
     value: coordinateSystem,
     options: Object.values(COORDINATE_SYSTEM),
     onChange(v) {
+      modelTranslation = new Vector(modelTranslation).negate().toArray();
       coordinateSystem = v;
     },
   });

@@ -33,6 +33,11 @@ export class Vector {
     );
   }
 
+  negate() {
+    this.elements = this.elements.map((e) => -e);
+    return this;
+  }
+
   sum(v: Vector) {
     if (this.dim() != v.dim()) {
       throw Error("Cannot sum vectors of different dimensions");
