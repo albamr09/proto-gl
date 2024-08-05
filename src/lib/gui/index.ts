@@ -414,7 +414,7 @@ export const createMatrixElement = (containerId: string, dimension: number) => {
   containerElement.appendChild(matrixElement);
 };
 
-export const updateMatrixElement = (m: number[]) => {
+export const updateMatrixElement = (m: number[] | Float32Array) => {
   m.forEach((data, i) => {
     const matrixElement = document.getElementById(`m${i}`);
     if (matrixElement) {

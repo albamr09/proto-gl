@@ -219,10 +219,10 @@ const draw = () => {
 const updateGUIMatrixValues = () => {
   const matrix =
     coordinateSystem === COORDINATE_SYSTEM.WORLD_COORDINATES
-      ? modelViewMatrix
-      : cameraMatrix;
+      ? modelViewMatrix.toFloatArray()
+      : cameraMatrix.toFloatArray();
 
-  updateMatrixElement(matrix.elements().flat());
+  updateMatrixElement(matrix);
   updatePanelTitle("lower-left-panel", coordinateSystem);
 };
 
@@ -255,7 +255,6 @@ const init = async () => {
     value: coordinateSystem,
     options: Object.values(COORDINATE_SYSTEM),
     onChange(v) {
-      modelTranslation = new Vector(modelTranslation).negate().toArray();
       coordinateSystem = v;
     },
   });
