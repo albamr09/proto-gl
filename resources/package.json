@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "serve": "^14.2.1"
+  },
+  "scripts": {
+    "serve": "serve"
+  }
+}
