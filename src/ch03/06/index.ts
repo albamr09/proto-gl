@@ -1,3 +1,9 @@
+import {
+  denormalizeColor,
+  hexToRgb,
+  normalizeColor,
+  rgbToHex,
+} from "../../lib/colors.js";
 import { loadData } from "../../lib/files.js";
 import {
   createNumericInput,
@@ -6,6 +12,7 @@ import {
   initController,
   initGUI,
   createSliderInputForm,
+  createColorInputForm,
 } from "../../lib/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
@@ -101,19 +108,15 @@ const setupData = (data: DataObject, id: string) => {
   objects.push(data);
 };
 
-const initBuffers = () => {
-  loadData("/data/models/geometries/plane.json").then((data) =>
-    setupData(data, "plane")
-  );
-  loadData("/data/models/geometries/cone2.json").then((data) =>
-    setupData(data, "cone")
-  );
-  loadData("/data/models/geometries/sphere1.json").then((data) =>
-    setupData(data, "sphere")
-  );
-  loadData("/data/models/geometries/sphere3.json").then((data) =>
-    setupData(data, "light")
-  );
+const initBuffers = async () => {
+  let data = await loadData("/data/models/geometries/plane.json");
+  setupData(data, "plane");
+  data = await loadData("/data/models/geometries/cone2.json");
+  setupData(data, "cone");
+  data = await loadData("/data/models/geometries/sphere1.json");
+  setupData(data, "sphere");
+  data = await loadData("/data/models/geometries/sphere3.json");
+  setupData(data, "light");
 };
 
 const initProgram = () => {
@@ -190,13 +193,6 @@ const draw = () => {
   });
 };
 
-const addLightUniforms = () => {
-  gl.uniform3fv(program.uLightPosition, lightPosition);
-  gl.uniform4f(program.uLightAmbientColor, 1, 1, 1, 1);
-  gl.uniform4f(program.uLightAmbientColor, 1, 1, 1, 1);
-  gl.uniform4f(program.uLightSpecularColor, 1, 1, 1, 1);
-};
-
 const synchWorld = (isLight = false) => {
   const { width, height } = gl.canvas;
 
@@ -243,19 +239,47 @@ const animateAngle = () => {
 const render = () => {
   requestAnimationFrame(render);
   animateAngle();
-  addLightUniforms();
   synchWorld();
   draw();
 };
 
 const initLights = () => {
-  gl.uniform4fv(program.uLightAmbientColor, [0.01, 0.01, 0.01, 1]);
-  gl.uniform4fv(program.uLightDiffuseColor, [0.5, 0.5, 0.5, 1]);
-  gl.uniform4fv(program.uMaterialDiffuseColor, [0.1, 0.5, 0.8, 1]);
+  gl.uniform4f(program.uLightAmbientColor, 1.0, 1.0, 1.0, 1.0);
+  gl.uniform4f(program.uLightDiffuseColor, 1.0, 1.0, 1.0, 1.0);
+  gl.uniform4f(program.uLightSpecularColor, 1.0, 1.0, 1.0, 1.0);
+  gl.uniform4f(program.uMaterialAmbientColor, 0.1, 0.1, 0.1, 1.0);
+  gl.uniform4f(program.uMaterialDiffuseColor, 0.5, 0.8, 0.1, 1.0);
+  gl.uniform4f(program.uMaterialSpecularColor, 0.6, 0.6, 0.6, 1.0);
 };
 
 const initGUIControl = () => {
   initController();
+  createColorInputForm({
+    label: "Sphere color",
+    value: rgbToHex(
+      denormalizeColor(
+        objects.find((o) => o.id == "sphere")?.diffuse || [1.0, 1.0, 1.0]
+      )
+    ),
+    onChange: (v) => {
+      const obj = objects.find((o) => o.id == "sphere");
+      if (!obj) return;
+      obj.diffuse = [...normalizeColor(hexToRgb(v)), 1.0];
+    },
+  });
+  createColorInputForm({
+    label: "Cone color",
+    value: rgbToHex(
+      denormalizeColor(
+        objects.find((o) => o.id == "cone")?.diffuse || [1.0, 1.0, 1.0]
+      )
+    ),
+    onChange: (v) => {
+      const obj = objects.find((o) => o.id == "cone");
+      if (!obj) return;
+      obj.diffuse = [...normalizeColor(hexToRgb(v)), 1.0];
+    },
+  });
   createNumericInput({
     label: "Shininess",
     value: shininess,
@@ -297,7 +321,7 @@ const initGUIControl = () => {
   });
 };
 
-const init = () => {
+const init = async () => {
   initGUI();
   createDescriptionPanel(
     "Renders a scene with directional lights as well as directional lights."
@@ -309,7 +333,7 @@ const init = () => {
 
   initProgram();
   initLights();
-  initBuffers();
+  await initBuffers();
   initGUIControl();
   render();
 };
