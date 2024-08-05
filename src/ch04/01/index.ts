@@ -136,7 +136,7 @@ const initData = async () => {
 
 const initLightUniforms = () => {
   gl.uniform3fv(program.uniforms.uLightPosition, [0, 120, 120]);
-  gl.uniform4fv(program.uniforms.uLightAmbient, [0.2, 0.2, 0.2, 1]);
+  gl.uniform4fv(program.uniforms.uLightAmbient, [1.0, 1.0, 1.0, 1]);
   gl.uniform4fv(program.uniforms.uLightDiffuse, [1, 1, 1, 1]);
 };
 
