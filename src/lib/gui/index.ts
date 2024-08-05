@@ -10,7 +10,32 @@ export const initController = () => {
   const controlContainer = document.createElement("div");
 
   // Set the id attribute for the div
-  controlContainer.setAttribute("id", CONTROL_CONTAINER_ID);
+  controlContainer.setAttribute("id", "control-panel");
+
+  // Create title bar
+  const titleBar = document.createElement("div");
+  titleBar.className = "title";
+  titleBar.innerHTML = "Control panel";
+  const caret = document.createElement("span");
+  caret.className = "caret";
+  titleBar.appendChild(caret);
+  caret.classList.add("open");
+  controlContainer.appendChild(titleBar);
+
+  // Create body bar
+  const controlBody = document.createElement("div");
+  controlBody.setAttribute("id", CONTROL_CONTAINER_ID);
+  controlContainer.appendChild(controlBody);
+
+  titleBar.addEventListener("click", () => {
+    if (controlBody.style.display === "none") {
+      controlBody.style.display = "flex";
+      caret.classList.add("open");
+    } else {
+      controlBody.style.display = "none";
+      caret.classList.remove("open");
+    }
+  });
 
   // Append the container to the body of the document
   document.body.appendChild(controlContainer);
