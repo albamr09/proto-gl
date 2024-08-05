@@ -85,6 +85,34 @@ body {
 .caret.open {
   transform: rotate(-135deg);
 }
+
+#lower-left-panel {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  z-index: 1000;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+table {
+  font-size: 14px;
+  border: 1px dotted black;
+  margin: 10px;
+}
+
+tr {
+  color: black;
+}
+
+td {
+  padding: 5px 15px;
+}
 `;
 
 export const setupStyles = () => {

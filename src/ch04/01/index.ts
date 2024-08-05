@@ -1,10 +1,14 @@
 import { loadData } from "../../lib/files.js";
 import {
   createDescriptionPanel,
+  createLowerLeftPanel,
+  createMatrixElement,
   createSelectorForm,
   createVector3dSliders,
   initController,
   initGUI,
+  updateMatrixElement,
+  updatePanelTitle,
 } from "../../lib/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
@@ -218,19 +222,8 @@ const updateGUIMatrixValues = () => {
       ? modelViewMatrix
       : cameraMatrix;
 
-  const matrixTableTitle = document.getElementById("coordinates");
-  if (matrixTableTitle) {
-    matrixTableTitle.innerHTML = coordinateSystem;
-  }
-  matrix
-    .elements()
-    .flat()
-    .forEach((data, i) => {
-      const matrixElement = document.getElementById(`m${i}`);
-      if (matrixElement) {
-        matrixElement.innerText = data.toFixed(1);
-      }
-    });
+  updateMatrixElement(matrix.elements().flat());
+  updatePanelTitle("lower-left-panel", coordinateSystem);
 };
 
 const render = () => {
@@ -242,6 +235,8 @@ const render = () => {
 const init = async () => {
   initGUI();
   createDescriptionPanel("See the Camera Translation in action");
+  createLowerLeftPanel(coordinateSystem);
+  createMatrixElement("lower-left-panel", 4);
 
   const canvas = configureCanvas();
   autoResizeCanvas(canvas);

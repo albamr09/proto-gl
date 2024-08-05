@@ -393,3 +393,55 @@ export const createDescriptionPanel = (description: string) => {
     }
   });
 };
+
+export const createMatrixElement = (containerId: string, dimension: number) => {
+  const containerElement = document.getElementById(containerId);
+  if (!containerElement) return;
+
+  const matrixElement = document.createElement("table");
+
+  for (let i = 0; i < dimension; i++) {
+    const row = document.createElement("tr");
+    for (let j = 0; j < dimension; j++) {
+      const cell = document.createElement("td");
+      const cellId = `m${j * dimension + i}`;
+      cell.id = cellId;
+      row.appendChild(cell);
+    }
+
+    matrixElement.appendChild(row);
+  }
+  containerElement.appendChild(matrixElement);
+};
+
+export const updateMatrixElement = (m: number[]) => {
+  m.forEach((data, i) => {
+    const matrixElement = document.getElementById(`m${i}`);
+    if (matrixElement) {
+      matrixElement.innerText = data.toFixed(1);
+    }
+  });
+};
+
+export const createLowerLeftPanel = (title: string) => {
+  const panel = document.createElement("div");
+  panel.id = "lower-left-panel";
+
+  // Create title bar
+  const titleBar = document.createElement("div");
+  titleBar.className = "title";
+  titleBar.innerHTML = title;
+  panel.appendChild(titleBar);
+
+  // Append panel to body
+  document.body.appendChild(panel);
+};
+
+export const updatePanelTitle = (id: string, title: string) => {
+  const panelElement = document.getElementById(id);
+  if (!panelElement) return;
+
+  const titleElement = panelElement.getElementsByClassName("title")[0];
+  if (!titleElement) return;
+  titleElement.innerHTML = title;
+};
