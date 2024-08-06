@@ -37,7 +37,6 @@ const uniforms = [
   "uLightAmbient",
   "uMaterialDiffuse",
   "uMaterialAmbient",
-  "uMaterialSpecular",
   "uWireFrame",
 ] as const;
 
