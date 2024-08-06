@@ -234,7 +234,9 @@ const render = () => {
 
 const init = async () => {
   initGUI();
-  createDescriptionPanel("See the Camera Translation in action");
+  createDescriptionPanel(
+    "See the Camera Translation in action. Note that when we change from 'World Coordinates' to 'Camera Coordinates' then we need to negate the translation to be able to see the cone the same way."
+  );
   createLowerLeftPanel(coordinateSystem);
   createMatrixElement("lower-left-panel", 4);
 
