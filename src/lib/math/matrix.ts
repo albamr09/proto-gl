@@ -207,6 +207,32 @@ export class Matrix4 extends Matrix {
   }
 
   /**
+   * Rotates a matrix by the given vector angle, where the vector angle
+   * stores information about the angle of rotation for each axis (x, y, z)
+   * The angle is measured in degrees
+   **/
+  rotateVecDeg(angle: Vector) {
+    let result = this as Matrix4;
+    result = this.rotateDeg(angle.at(0), new Vector([1, 0, 0]));
+    result = result.rotateDeg(angle.at(1), new Vector([0, 1, 0]));
+    result = result.rotateDeg(angle.at(2), new Vector([0, 0, 1]));
+    return result;
+  }
+
+  /**
+   * Rotates a matrix by the given vector angle, where the vector angle
+   * stores information about the angle of rotation for each axis (x, y, z)
+   * The angle is measured in radians
+   **/
+  rotateVec(angle: Vector) {
+    let result = this as Matrix4;
+    result = this.rotate(angle.at(0), new Vector([1, 0, 0]));
+    result = result.rotate(angle.at(1), new Vector([0, 1, 0]));
+    result = result.rotate(angle.at(2), new Vector([0, 0, 1]));
+    return result;
+  }
+
+  /**
    * Rotates a matrix on the given axis by the given angle (in degreee)
    * For more information see rotate funcion.
    **/

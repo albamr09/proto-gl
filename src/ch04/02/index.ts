@@ -126,18 +126,7 @@ const initLightUniforms = () => {
 const updateTransforms = () => {
   let modelViewMatrix = Matrix4.identity();
   modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
-  modelViewMatrix = modelViewMatrix.rotateDeg(
-    modelRotation[0],
-    new Vector([1, 0, 0])
-  );
-  modelViewMatrix = modelViewMatrix.rotateDeg(
-    modelRotation[1],
-    new Vector([0, 1, 0])
-  );
-  modelViewMatrix = modelViewMatrix.rotateDeg(
-    modelRotation[2],
-    new Vector([0, 0, 1])
-  );
+  modelViewMatrix = modelViewMatrix.rotateVecDeg(new Vector(modelRotation));
   const normalMatrix = computeNormalMatrix(modelViewMatrix);
   const projectionMatrix = Matrix4.perspective(
     45,

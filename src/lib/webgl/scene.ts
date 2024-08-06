@@ -27,7 +27,7 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
     uniforms,
   }: {
     attributes: {
-      [P in A[number]]: {
+      [P in A[number]]?: {
         data: number[];
         size: number;
         type: GLenum;
@@ -45,8 +45,9 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
     // Attributes
     for (const attribute of Object.keys(attributes)) {
       const attributeLocation = this.program.getAttribute(attribute);
-      const { data, size, type, stride, offset } =
-        attributes[attribute as A[number]];
+      const attributeData = attributes[attribute as A[number]];
+      if (!attributeData) return;
+      const { data, size, type, stride, offset } = attributeData;
       // If attribute location does not exist
       if (attributeLocation < 0) continue;
       const buffer = this.gl.createBuffer();
