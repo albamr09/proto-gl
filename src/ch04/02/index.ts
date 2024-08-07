@@ -1,13 +1,17 @@
 import { loadData } from "../../lib/files.js";
 import {
   createDescriptionPanel,
+  createLowerLeftPanel,
+  createMatrixElement,
+  updateMatrixElement,
+  updatePanelTitle,
   createSelectorForm,
   createVector3dSliders,
   initController,
   initGUI,
 } from "../../lib/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
-import { Matrix4 } from "../../lib/math/matrix.js";
+import { Matrix, Matrix4 } from "../../lib/math/matrix.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
   autoResizeCanvas,
@@ -42,6 +46,8 @@ let scene: Scene<typeof attributes, typeof uniforms>;
 let modelTranslation = [0, -2, -50];
 let modelRotation = [0, 0, 0];
 let coordinateSystem = COORDINATE_SYSTEM.WORLD_COORDINATES;
+let modelViewMatrix = Matrix4.identity(),
+  cameraMatrix = Matrix4.identity();
 
 const initProgram = () => {
   // Background colors :)
@@ -124,9 +130,10 @@ const initLightUniforms = () => {
 };
 
 const updateTransforms = () => {
-  let modelViewMatrix = Matrix4.identity();
+  modelViewMatrix = Matrix4.identity();
   modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
   modelViewMatrix = modelViewMatrix.rotateVecDeg(new Vector(modelRotation));
+  cameraMatrix = modelViewMatrix.inverse() as Matrix4;
   const normalMatrix = computeNormalMatrix(modelViewMatrix);
   const projectionMatrix = Matrix4.perspective(
     45,
@@ -135,11 +142,19 @@ const updateTransforms = () => {
     1000
   );
 
-  gl.uniformMatrix4fv(
-    program.uniforms.uModelViewMatrix,
-    false,
-    modelViewMatrix.toFloatArray()
-  );
+  if (coordinateSystem == COORDINATE_SYSTEM.WORLD_COORDINATES) {
+    gl.uniformMatrix4fv(
+      program.uniforms.uModelViewMatrix,
+      false,
+      modelViewMatrix.toFloatArray()
+    );
+  } else {
+    gl.uniformMatrix4fv(
+      program.uniforms.uModelViewMatrix,
+      false,
+      cameraMatrix.toFloatArray()
+    );
+  }
   gl.uniformMatrix4fv(
     program.uniforms.uNormalMatrix,
     false,
@@ -185,9 +200,20 @@ const draw = () => {
   });
 };
 
+const updateGUI = () => {
+  const matrix =
+    coordinateSystem == COORDINATE_SYSTEM.WORLD_COORDINATES
+      ? modelViewMatrix.toFloatArray()
+      : cameraMatrix.toFloatArray();
+
+  updatePanelTitle("lower-left-panel", coordinateSystem);
+  updateMatrixElement(matrix);
+};
+
 const render = () => {
   requestAnimationFrame(render);
   updateTransforms();
+  updateGUI();
   draw();
 };
 
@@ -216,6 +242,8 @@ const initControls = () => {
 const init = async () => {
   initGUI();
   createDescriptionPanel("See how camera rotation works.");
+  createLowerLeftPanel(coordinateSystem);
+  createMatrixElement("lower-left-panel", 4);
 
   const canvas = configureCanvas();
   autoResizeCanvas(canvas);
