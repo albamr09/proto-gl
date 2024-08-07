@@ -23,8 +23,12 @@ export const initController = () => {
   controlContainer.appendChild(titleBar);
 
   // Create body bar
-  const controlBody = document.createElement("div");
+  const controlBody = document.createElement("form");
   controlBody.setAttribute("id", CONTROL_CONTAINER_ID);
+  // Avoid reload on submit
+  controlBody.addEventListener("submit", function (event) {
+    event.preventDefault();
+  });
   controlContainer.appendChild(controlBody);
 
   titleBar.addEventListener("click", () => {
@@ -63,7 +67,7 @@ export const createNumericInput = ({
   formContainer.classList.add("controller-element");
 
   // Create the form element
-  const form = document.createElement("form");
+  const form = document.createElement("div");
   form.classList.add("form-container");
 
   // Create a label for the input
@@ -97,11 +101,6 @@ export const createNumericInput = ({
   form.appendChild(labelElement);
   form.appendChild(numericInput);
 
-  // Avoid reload on submit
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-  });
-
   // Append the form to the container
   formContainer.appendChild(form);
 
@@ -125,7 +124,7 @@ export const createSelectorForm = <T>({
   formContainer.classList.add("controller-element");
 
   // Create the form element
-  const form = document.createElement("form");
+  const form = document.createElement("div");
   form.classList.add("form-container");
 
   // Create a label for the input
@@ -186,7 +185,7 @@ export const createColorInputForm = ({
   formContainer.classList.add("controller-element");
 
   // Create the form element
-  const form = document.createElement("form");
+  const form = document.createElement("div");
   form.classList.add("form-container");
 
   // Create a label for the input
@@ -247,7 +246,7 @@ export const createSliderInputForm = ({
   formContainer.classList.add("controller-element");
 
   // Create the form element
-  const form = document.createElement("form");
+  const form = document.createElement("div");
   form.classList.add("form-container");
 
   // Create a label for the input

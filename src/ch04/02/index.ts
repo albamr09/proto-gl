@@ -230,8 +230,8 @@ const initControls = () => {
   createVector3dSliders({
     labels: ["Rotation X", "Rotation Y", "Rotation Z"],
     value: [0.0, 0.0, 0.0],
-    min: 0,
-    max: 720,
+    min: -180,
+    max: 180,
     step: 0.1,
     onChange: (v) => {
       modelRotation = v;

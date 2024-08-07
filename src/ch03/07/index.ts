@@ -118,10 +118,9 @@ const initBuffer = (data: DataObject) => {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 };
 
-const initData = async () => {
+const initData = () => {
   for (let i = 1; i < 179; i++) {
-    const data = await loadData(`/data/models/nissan-gtr/part${i}.json`);
-    initBuffer(data);
+    loadData(`/data/models/nissan-gtr/part${i}.json`).then(initBuffer);
   }
 };
 
@@ -289,7 +288,7 @@ const initControls = () => {
   });
 };
 
-const init = async () => {
+const init = () => {
   initGUI();
   createDescriptionPanel(
     "Renders a complex model using Phong shading and Phong lights."
@@ -300,7 +299,7 @@ const init = async () => {
   gl = getGLContext();
 
   initProgram();
-  await initData();
+  initData();
   initControls();
   render();
 };
