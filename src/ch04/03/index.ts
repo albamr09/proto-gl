@@ -228,6 +228,16 @@ const initControls = () => {
     },
   });
   createVector3dSliders({
+    labels: ["Translation X", "Translation Y", "Translation Z"],
+    value: modelTranslation,
+    min: -500,
+    max: 500,
+    step: 0.1,
+    onChange: (v) => {
+      modelTranslation = v;
+    },
+  });
+  createVector3dSliders({
     labels: ["Rotation X", "Rotation Y", "Rotation Z"],
     value: modelRotation,
     min: -180,
@@ -242,7 +252,7 @@ const initControls = () => {
 const init = async () => {
   initGUI();
   createDescriptionPanel(
-    "See how camera rotation works. Note that the camera is located at [0, 2, 50] in world coordinates. The controls allow you to rotate the camera. The rotation will be done with respect to the origin (the objects are the ones rotating) when we are using world coordinates. But when we use the camera coordinate system the rotation will be done with respect the camera position"
+    "See how camera rotation and translation works. As with the previous examples, when we operate on the camera coordinate system the transformations are applied on the camera. When we rotate we rotate the camera around itself, and when we translate we move the camera. For example if the translation vector is [0, -2, -50], then the camera is moved down two units from the origin towards the 'inside' of the screen 50 units (in our case it means the camera i behind the object which is assumed to be on (0,0), if you rotate 180 degrees on the Y axis you will se the cone is behind you!). However when we transform the scene using the world coordinate system then the objects are the ones that move, so when you rotate it seems that the camera is rotating with respect to the origin, when the objects are the ones moving (really objects are always the ones moving but you get what I mean)."
   );
   createLowerLeftPanel(coordinateSystem);
   createMatrixElement("lower-left-panel", 4);
