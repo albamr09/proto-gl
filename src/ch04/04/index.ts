@@ -14,17 +14,13 @@ import {
   configureCanvas,
   getGLContext,
 } from "../../lib/web-gl.js";
+import Camera, { CAMERA_TYPE } from "../../lib/webgl/camera.js";
 import Axis from "../../lib/webgl/models/axis.js";
 import Floor from "../../lib/webgl/models/floor.js";
 import Program from "../../lib/webgl/program.js";
 import Scene from "../../lib/webgl/scene.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
-
-enum CAMERA_TYPES {
-  TRACKING = "Tracking Camera",
-  ORBITING = "Orbiting Camera",
-}
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
@@ -42,7 +38,8 @@ let scene: Scene<typeof attributes, typeof uniforms>;
 let modelViewMatrix = Matrix4.identity();
 let modelTranslation = [0, -2, -50];
 let modelRotation = [0, 0, 0];
-let cameraType = CAMERA_TYPES.ORBITING;
+let cameraType = CAMERA_TYPE.ORBITING;
+let camera: Camera;
 
 const initProgram = () => {
   // Background colors :)
@@ -59,6 +56,7 @@ const initProgram = () => {
     uniforms
   );
   scene = new Scene(gl, program);
+  camera = new Camera(cameraType);
 };
 
 const initData = () => {
@@ -153,9 +151,7 @@ const draw = () => {
 };
 
 const updateTransforms = () => {
-  modelViewMatrix = Matrix4.identity();
-  modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
-  modelViewMatrix = modelViewMatrix.rotateVecDeg(new Vector(modelRotation));
+  modelViewMatrix = camera.getViewTransform();
   const normalMatrix = computeNormalMatrix(modelViewMatrix);
   const projectionMatrix = Matrix4.perspective(
     45,
@@ -192,9 +188,9 @@ const initControls = () => {
   createSelectorForm({
     label: "Camera Type",
     value: cameraType,
-    options: Object.values(CAMERA_TYPES),
+    options: Object.values(CAMERA_TYPE),
     onChange: (v) => {
-      cameraType = v;
+      camera.setType(v);
     },
   });
   createVector3dSliders({
@@ -203,8 +199,11 @@ const initControls = () => {
     min: -500,
     max: 500,
     step: 1,
+    onInit: (v) => {
+      camera.setPosition(new Vector(v));
+    },
     onChange: (v) => {
-      modelTranslation = v;
+      camera.setPosition(new Vector(v));
     },
   });
   createVector3dSliders({
@@ -213,8 +212,17 @@ const initControls = () => {
     min: -180,
     max: 180,
     step: 1,
+    onInit: (v) => {
+      // Rotation on X
+      camera.setElevation(v[0]);
+      // Rotation on Y
+      camera.setAzimuth(v[1]);
+    },
     onChange: (v) => {
-      modelRotation = v;
+      // Rotation on X
+      camera.setElevation(v[0]);
+      // Rotation on Y
+      camera.setAzimuth(v[1]);
     },
   });
 };

@@ -87,6 +87,13 @@ yarn test
 - [Positional Lighting with Phong Lights](./src/ch03/06/): Renders a moving scene that is iluminated by a single positional light using the Phong Shading model alongside the Phong Light model.
 - [Car with Lights](./src/ch03/07/): Renders a moving scene showing a car iluminated by a positional light.
 
+### Chapter 4: Camera
+
+- [Camera Translation](./src/ch04/01/): Renders a scene where you can translate the camera/objects depending on the transformation matrix you choose.
+- [Camera Rotation](./src/ch04/02/): Renders a scene where you can rotate the camera/objects depending on the transformation matrix you choose.
+- [Camera Transformation](./src/ch04/03/): Renders a scene where you can translate or rotate the camera/objects depending on the transformation matrix you choose.
+- [Camera Types](./src/ch04/04/): Renders a scene that you can translate/rotate using the different camera types: tracking and orbiting.
+
 ---
 
 ## Reference code
