@@ -22,13 +22,13 @@ describe("Vector", () => {
 
   it("should set elements correctly", () => {
     const v = new Vector([1, 2, 3]);
-    v.set(1, 5);
+    v.set(1, 0, 5);
     expect(v.at(1)).toBe(5);
   });
 
   it("should return the correct dimension", () => {
     const v = new Vector([1, 2, 3]);
-    expect(v.dim()).toBe(3);
+    expect(v.dimension()).toBe(3);
   });
 
   it("should calculate the length correctly", () => {

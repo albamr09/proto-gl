@@ -52,6 +52,14 @@ export class Matrix {
     return 0;
   }
 
+  rows() {
+    return 0;
+  }
+
+  cols() {
+    return 0;
+  }
+
   elements() {
     return this.matrix.map((row) => row.elements);
   }
@@ -69,7 +77,7 @@ export class Matrix {
   }
 
   set(i: number, j: number, value: number) {
-    this.row(i).set(j, value);
+    this.row(i).set(j, 0, value);
   }
 
   setRow(i: number, value: Vector) {
@@ -82,7 +90,7 @@ export class Matrix {
 
   setColumn(i: number, value: Vector) {
     for (let j = 0; j < this.dimension(); j++) {
-      this.matrix[j].set(i, value.at(j));
+      this.matrix[j].set(i, 0, value.at(j));
     }
   }
 
@@ -163,10 +171,10 @@ export class Matrix {
     return copy;
   }
 
-  multiply<T extends Matrix>(m: T): T {
-    const _copy = this.copy() as T;
-    for (let i = 0; i < this.dimension(); i++) {
-      for (let j = 0; j < this.dimension(); j++) {
+  multiply<T extends Matrix | Vector>(m: T): T {
+    const _copy = m.copy() as T;
+    for (let i = 0; i < this.rows(); i++) {
+      for (let j = 0; j < m.cols(); j++) {
         _copy.set(i, j, this.row(i).dot(m.col(j)));
       }
     }
@@ -186,6 +194,14 @@ export class Matrix4 extends Matrix {
     return 4;
   }
 
+  rows() {
+    return this.dimension();
+  }
+
+  cols() {
+    return this.dimension();
+  }
+
   static identity() {
     return Matrix.identity(4) as Matrix4;
   }
@@ -195,7 +211,7 @@ export class Matrix4 extends Matrix {
   // https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
   translate(offset: Vector) {
     const translationMatrix = Matrix4.identity();
-    if (offset.dim() != 3) {
+    if (offset.dimension() != 3) {
       throw Error("Translate offset has incompatible dimensionality");
     }
 
@@ -244,6 +260,9 @@ export class Matrix4 extends Matrix {
    * Reference: https://mathworld.wolfram.com/RotationMatrix.html
    * In this reference they use 3d rotation matrices, we use 4d rotation matrices
    * to take intro account translation (stored on the las row)
+   *
+   * Note: by inversing the sign of the sine on the rotation matrices you change
+   * the direction of the translation (clockwise or counter-clockwise)
    */
   rotate(angle: number, axis: Vector) {
     let [x, y, z] = [axis.at(0), axis.at(1), axis.at(2)];
@@ -254,8 +273,8 @@ export class Matrix4 extends Matrix {
     // Rotation on axis X
     const rotationMatrixX = new Matrix4([
       [1, 0, 0, 0],
-      [0, c, s, 0],
-      [0, -s, c, 0],
+      [0, c, -s, 0],
+      [0, s, c, 0],
       [0, 0, 0, 1],
     ]);
 
@@ -278,6 +297,8 @@ export class Matrix4 extends Matrix {
     let result = this as Matrix4;
 
     // Combine rotations based on axis
+    // TODO: maybe the multiplications should only be made on a 3x3 matrix?
+    // to not apply the rotation on the trasnlation row?¿
     if (x == 1) {
       result = rotationMatrixX.multiply(result);
     }
@@ -332,6 +353,14 @@ export class Matrix3 extends Matrix {
     return 3;
   }
 
+  rows() {
+    return this.dimension();
+  }
+
+  cols() {
+    return this.dimension();
+  }
+
   submatrix(i: number, j: number) {
     return new Matrix2(this.filterRowAndCol(i, j));
   }
@@ -349,8 +378,16 @@ export class Matrix2 extends Matrix {
     return Matrix.identity(2) as Matrix2;
   }
 
-  dimension(): number {
+  dimension() {
     return 2;
+  }
+
+  rows() {
+    return this.dimension();
+  }
+
+  cols() {
+    return this.dimension();
   }
 
   // Determinant of a 2x2 matrix

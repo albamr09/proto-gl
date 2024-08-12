@@ -6,7 +6,11 @@ export class Vector {
   }
 
   static copy(v: Vector) {
-    return new Vector([...v.toArray()]);
+    return v.copy();
+  }
+
+  copy() {
+    return new Vector([...this.toArray()]);
   }
 
   toArray() {
@@ -17,12 +21,28 @@ export class Vector {
     return this.elements[idx];
   }
 
-  set(idx: number, value: number) {
-    return (this.elements[idx] = value);
+  set(i: number, _j: number, value: number) {
+    return (this.elements[i] = value);
   }
 
-  dim() {
+  col(_i: number) {
+    return this;
+  }
+
+  row(i: number) {
+    return new Vector([this.elements[i]]);
+  }
+
+  dimension() {
     return this.elements.length;
+  }
+
+  rows() {
+    return this.dimension();
+  }
+
+  cols() {
+    return 1;
   }
 
   length() {
@@ -39,7 +59,7 @@ export class Vector {
   }
 
   sum(v: Vector) {
-    if (this.dim() != v.dim()) {
+    if (this.dimension() != v.dimension()) {
       throw Error("Cannot sum vectors of different dimensions");
     }
     return new Vector(this.elements.map((_, idx) => this.at(idx) + v.at(idx)));
@@ -55,7 +75,7 @@ export class Vector {
    * Reference: https://en.wikipedia.org/wiki/Cross_product#Coordinate_notation
    */
   cross(v: Vector) {
-    if (this.dim() != 3) {
+    if (this.dimension() != 3) {
       throw new Error("Cross product only implemented for 3-dim vectors");
     }
 
@@ -67,7 +87,7 @@ export class Vector {
   }
 
   dot(v: Vector) {
-    if (this.dim() != v.dim()) {
+    if (this.dimension() != v.dimension()) {
       throw new Error(
         "Cannot compute dot product between vectors of different dimensions"
       );

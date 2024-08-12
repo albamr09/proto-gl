@@ -1,10 +1,14 @@
 import { loadData } from "../../lib/files.js";
 import {
   createDescriptionPanel,
+  createLowerLeftPanel,
+  createMatrixElement,
   createSelectorForm,
+  createSliderInputForm,
   createVector3dSliders,
   initController,
   initGUI,
+  updateMatrixElement,
 } from "../../lib/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
@@ -38,7 +42,7 @@ let scene: Scene<typeof attributes, typeof uniforms>;
 let modelViewMatrix = Matrix4.identity();
 let modelTranslation = [0, -2, -50];
 let modelRotation = [0, 0, 0];
-let cameraType = CAMERA_TYPE.ORBITING;
+let cameraType = CAMERA_TYPE.TRACKING;
 let camera: Camera;
 
 const initProgram = () => {
@@ -57,6 +61,7 @@ const initProgram = () => {
   );
   scene = new Scene(gl, program);
   camera = new Camera(cameraType);
+  camera.setInitialPosition(new Vector(modelTranslation));
 };
 
 const initData = () => {
@@ -177,9 +182,15 @@ const updateTransforms = () => {
   );
 };
 
+const updateGUI = () => {
+  const matrix = camera.getViewTransform().toFloatArray();
+  updateMatrixElement(matrix);
+};
+
 const render = () => {
   requestAnimationFrame(render);
   updateTransforms();
+  updateGUI();
   draw();
 };
 
@@ -191,6 +202,16 @@ const initControls = () => {
     options: Object.values(CAMERA_TYPE),
     onChange: (v) => {
       camera.setType(v);
+    },
+  });
+  createSliderInputForm({
+    label: "Dolly",
+    value: 0,
+    min: -100,
+    max: 100,
+    step: 1,
+    onChange: (v) => {
+      camera.dolly(v);
     },
   });
   createVector3dSliders({
@@ -209,8 +230,8 @@ const initControls = () => {
   createVector3dSliders({
     labels: ["Rotate X", "Rotate Y", "Rotate Z"],
     value: modelRotation,
-    min: -180,
-    max: 180,
+    min: -360,
+    max: 360,
     step: 1,
     onInit: (v) => {
       // Rotation on X
@@ -232,6 +253,9 @@ const init = () => {
   createDescriptionPanel(
     "Tinker with how the different camera types work. We differentiate between an orbiting camera type (the camera always points to the center and it moves 'around' the scene) and a tracking camera type (the camera is being moved, so you can 'look up', etc)"
   );
+
+  createLowerLeftPanel("Camera Matrix");
+  createMatrixElement("lower-left-panel", 4);
 
   const canvas = configureCanvas();
   autoResizeCanvas(canvas);

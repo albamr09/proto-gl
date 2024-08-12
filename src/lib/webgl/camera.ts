@@ -11,6 +11,8 @@ class Camera {
   public type: CAMERA_TYPE;
   private matrix: Matrix4;
   private position: Vector;
+  private initialPosition: Vector;
+  private steps: number;
   // Perspective Camera
   private fov: number;
   private minZ: number;
@@ -44,6 +46,8 @@ class Camera {
     this.azimuth = 0;
     // Translation parameter
     this.position = new Vector([0, 0, 0]);
+    this.initialPosition = new Vector([0, 0, 0]);
+    this.steps = 0;
   }
 
   isOrbiting() {
@@ -55,9 +59,6 @@ class Camera {
   }
 
   setType(type: CAMERA_TYPE) {
-    if (!(type in CAMERA_TYPE)) {
-      console.error(`Camera type ${type} not supported`);
-    }
     this.type = type;
   }
 
@@ -84,10 +85,54 @@ class Camera {
     this.update();
   }
 
+  // TODO: what is going on here
+  computeOrientation() {
+    const right = new Vector([1, 0, 0, 0]);
+    this.right = new Vector(this.matrix.multiply(right).elements.slice(0, 3));
+
+    const up = new Vector([0, 1, 0, 0]);
+    this.up = new Vector(this.matrix.multiply(up).elements.slice(0, 3));
+
+    const normal = new Vector([0, 0, 1, 0]);
+    this.normal = new Vector(this.matrix.multiply(normal).elements.slice(0, 3));
+  }
+
   // Change camera position
+  setInitialPosition(position: Vector) {
+    this.initialPosition = position;
+  }
+
+  // Change camera initial position for reset
   setPosition(position: Vector) {
     this.position = position;
     this.update();
+  }
+
+  // TODO: what is going on here
+  dolly(newSteps: number) {
+    const newPosition = new Vector([0, 0, 0]);
+    const normal = this.normal.normalize();
+
+    const step = newSteps - this.steps;
+    if (this.isTracking()) {
+      newPosition.set(0, 0, this.position.at(0) + step * normal.at(0));
+      newPosition.set(1, 0, this.position.at(1) + step * normal.at(1));
+      newPosition.set(2, 0, this.position.at(2) + step * normal.at(2));
+    } else {
+      newPosition.set(0, 0, this.position.at(0));
+      newPosition.set(1, 0, this.position.at(1));
+      newPosition.set(2, 0, this.position.at(2) + step);
+    }
+
+    this.steps = newSteps;
+    this.setPosition(newPosition);
+  }
+
+  // Set initial values
+  reset() {
+    this.elevation = 0;
+    this.azimuth = 0;
+    this.position = this.initialPosition;
   }
 
   // Updates camera transformation matrix
@@ -109,6 +154,9 @@ class Camera {
         new Vector([this.elevation, this.azimuth, 0])
       );
     }
+
+    // TODO: how should the translation be coded with positive or negative values?
+    this.computeOrientation();
   }
 }
 

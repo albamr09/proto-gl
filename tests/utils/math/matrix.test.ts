@@ -64,8 +64,8 @@ describe("Matrix4", () => {
 
     const expected = new Matrix4([
       [1, 0, 0, 0],
-      [0, Math.cos(angle), Math.sin(angle), 0],
-      [0, -Math.sin(angle), Math.cos(angle), 0],
+      [0, Math.cos(angle), -Math.sin(angle), 0],
+      [0, Math.sin(angle), Math.cos(angle), 0],
       [0, 0, 0, 1],
     ]);
 
