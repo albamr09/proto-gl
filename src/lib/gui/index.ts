@@ -169,6 +169,34 @@ export const createSelectorForm = <T>({
   document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
 };
 
+export const createButtonForm = ({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) => {
+  // Create a div container
+  const formContainer = document.createElement("div");
+  formContainer.classList.add("controller-element");
+
+  // Create the form element
+  const form = document.createElement("div");
+  form.classList.add("form-container");
+
+  // Create the button element
+  const button = document.createElement("button");
+  button.innerHTML = label;
+  button.addEventListener("click", onClick);
+  form.appendChild(button);
+
+  // Append the form to the container
+  formContainer.appendChild(form);
+
+  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
+  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+};
+
 export const createColorInputForm = ({
   label,
   value,

@@ -113,14 +113,34 @@ tr {
 td {
   padding: 5px 15px;
 }
+
+button {
+  background: #f2f2f2;
+  width: 100%;
+  border: 1px solid #e1e1e1;
+  border-radius: 3px;
+  padding: 5px;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #e9e9e9;
+}
 `;
 
 export const setupStyles = () => {
   // Create a <style> element
   const styleElement = document.createElement("style");
-
   styleElement.appendChild(document.createTextNode(cssCode));
+
+  // Create a <link> element to fav icon
+  const favIcon = document.createElement("link");
+  favIcon.setAttribute("rel", "icon");
+  favIcon.setAttribute("type", "image/x-icon");
+  favIcon.setAttribute("href", "/public/favicon.ico");
 
   // Append the <style> element to the <head>
   document.head.appendChild(styleElement);
+  // Append the <link> element to the <head>
+  document.head.appendChild(favIcon);
 };

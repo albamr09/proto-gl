@@ -335,6 +335,36 @@ export class Matrix4 extends Matrix {
   submatrix(i: number, j: number) {
     return new Matrix3(this.filterRowAndCol(i, j));
   }
+
+  /**
+   * Obtains the right vector (orientation on the X axis) stored as the
+   * first column on the transformation matrix.
+   */
+  rightVector() {
+    return new Vector(
+      this.multiply(new Vector([1, 0, 0, 0])).elements.slice(0, 3)
+    );
+  }
+
+  /**
+   * Obtains the up vector (orientation on the Y axis) stored as the
+   * second column on the transformation matrix.
+   */
+  upVector() {
+    return new Vector(
+      this.multiply(new Vector([0, 1, 0, 0])).elements.slice(0, 3)
+    );
+  }
+
+  /**
+   * Obtains the right vector (orientation on the Z axis) stored as the
+   * third column on the transformation matrix.
+   */
+  normalVector() {
+    return new Vector(
+      this.multiply(new Vector([0, 0, 1, 0])).elements.slice(0, 3)
+    );
+  }
 }
 
 export class Matrix3 extends Matrix {

@@ -60,6 +60,7 @@ class Camera {
 
   setType(type: CAMERA_TYPE) {
     this.type = type;
+    this.update();
   }
 
   // Obtain model-view transform
@@ -85,42 +86,32 @@ class Camera {
     this.update();
   }
 
-  // TODO: what is going on here
   computeOrientation() {
-    const right = new Vector([1, 0, 0, 0]);
-    this.right = new Vector(this.matrix.multiply(right).elements.slice(0, 3));
-
-    const up = new Vector([0, 1, 0, 0]);
-    this.up = new Vector(this.matrix.multiply(up).elements.slice(0, 3));
-
-    const normal = new Vector([0, 0, 1, 0]);
-    this.normal = new Vector(this.matrix.multiply(normal).elements.slice(0, 3));
+    this.right = this.matrix.rightVector();
+    this.up = this.matrix.upVector();
+    this.normal = this.matrix.normalVector();
   }
 
   // Change camera position
   setInitialPosition(position: Vector) {
-    this.initialPosition = position;
+    this.initialPosition = position.copy();
   }
 
   // Change camera initial position for reset
   setPosition(position: Vector) {
-    this.position = position;
+    this.position = position.copy();
     this.update();
   }
 
-  // TODO: what is going on here
   dolly(newSteps: number) {
-    const newPosition = new Vector([0, 0, 0]);
+    let newPosition;
     const normal = this.normal.normalize();
 
     const step = newSteps - this.steps;
     if (this.isTracking()) {
-      newPosition.set(0, 0, this.position.at(0) + step * normal.at(0));
-      newPosition.set(1, 0, this.position.at(1) + step * normal.at(1));
-      newPosition.set(2, 0, this.position.at(2) + step * normal.at(2));
+      newPosition = this.position.sum(normal.escalarProduct(step).negate());
     } else {
-      newPosition.set(0, 0, this.position.at(0));
-      newPosition.set(1, 0, this.position.at(1));
+      newPosition = this.position.copy();
       newPosition.set(2, 0, this.position.at(2) + step);
     }
 
@@ -132,12 +123,13 @@ class Camera {
   reset() {
     this.elevation = 0;
     this.azimuth = 0;
-    this.position = this.initialPosition;
+    this.setPosition(this.initialPosition);
   }
 
   // Updates camera transformation matrix
   update() {
     this.matrix = Matrix4.identity();
+    const negatedPosition = this.position.negate();
 
     if (this.isTracking()) {
       // Rotate
@@ -145,17 +137,16 @@ class Camera {
         new Vector([this.elevation, this.azimuth, 0])
       );
       // Translate to new camera position
-      this.matrix = this.matrix.translate(this.position);
+      this.matrix = this.matrix.translate(negatedPosition);
     } else {
       // Translate to new camera position
-      this.matrix = this.matrix.translate(this.position);
+      this.matrix = this.matrix.translate(negatedPosition);
       // Rotate
       this.matrix = this.matrix.rotateVecDeg(
         new Vector([this.elevation, this.azimuth, 0])
       );
     }
 
-    // TODO: how should the translation be coded with positive or negative values?
     this.computeOrientation();
   }
 }

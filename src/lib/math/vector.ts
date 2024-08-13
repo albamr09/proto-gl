@@ -54,8 +54,7 @@ export class Vector {
   }
 
   negate() {
-    this.elements = this.elements.map((e) => -e);
-    return this;
+    return new Vector(this.elements.map((e) => -e));
   }
 
   sum(v: Vector) {
@@ -63,6 +62,20 @@ export class Vector {
       throw Error("Cannot sum vectors of different dimensions");
     }
     return new Vector(this.elements.map((_, idx) => this.at(idx) + v.at(idx)));
+  }
+
+  escalarProduct(x: number) {
+    return new Vector(this.elements.map((element) => element * x));
+  }
+
+  /**
+   * Element wise vector multiplicaiton
+   */
+  multiply(v: Vector) {
+    if (this.dimension() != v.dimension()) {
+      throw Error("Cannot sum vectors of different dimensions");
+    }
+    return new Vector(this.elements.map((_, idx) => this.at(idx) * v.at(idx)));
   }
 
   normalize() {

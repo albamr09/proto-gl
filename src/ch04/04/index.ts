@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
+  createButtonForm,
   createDescriptionPanel,
   createLowerLeftPanel,
   createMatrixElement,
@@ -40,7 +41,7 @@ let gl: WebGL2RenderingContext;
 let program: Program<typeof attributes, typeof uniforms>;
 let scene: Scene<typeof attributes, typeof uniforms>;
 let modelViewMatrix = Matrix4.identity();
-let modelTranslation = [0, -2, -50];
+let modelTranslation = [0, 2, 50];
 let modelRotation = [0, 0, 0];
 let cameraType = CAMERA_TYPE.TRACKING;
 let camera: Camera;
@@ -202,6 +203,12 @@ const initControls = () => {
     options: Object.values(CAMERA_TYPE),
     onChange: (v) => {
       camera.setType(v);
+    },
+  });
+  createButtonForm({
+    label: "Reset",
+    onClick: () => {
+      camera.reset();
     },
   });
   createSliderInputForm({
