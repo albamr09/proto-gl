@@ -13,10 +13,6 @@ class Camera {
   private position: Vector;
   private initialPosition: Vector;
   private steps: number;
-  // Perspective Camera
-  private fov: number;
-  private minZ: number;
-  private maxZ: number;
   // Rotation vectors
   public up: Vector;
   public right: Vector;
@@ -35,11 +31,6 @@ class Camera {
     this.right = new Vector([0, 0, 0]);
     // Rotation Z Axis
     this.normal = new Vector([0, 0, 0]);
-
-    // Perspective camera parameters
-    this.fov = 45;
-    this.minZ = 0.1;
-    this.maxZ = 10000;
 
     // Rotation parameters
     this.elevation = 0;
@@ -129,19 +120,33 @@ class Camera {
   // Updates camera transformation matrix
   update() {
     this.matrix = Matrix4.identity();
+    // As you know the position of the camera
+    // is obtained by moving the objects on the
+    // world on the opposite direction
+    // Ref: https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04.html#Camera-Vertex%20Transformations-The%20Model,%20View%20and%20Projection%20matrices-The%20View%20Matrix
     const negatedPosition = this.position.negate();
 
     if (this.isTracking()) {
-      // Rotate
+      // When the camera is tracking, in order to "move the camera"
+      // instead of everything else, we have to first rotate everything
+      // with respect to the orgin (remember the camera is always on the origin)
+      // and then we move the objects on the opposite direction to
+      // where the camera is. This makes the illusion we are
+      // "moving the camera"
       this.matrix = this.matrix.rotateVecDeg(
         new Vector([this.elevation, this.azimuth, 0])
       );
-      // Translate to new camera position
       this.matrix = this.matrix.translate(negatedPosition);
     } else {
-      // Translate to new camera position
+      // On the other hand if you want the camera to not move, and move
+      // the objects on the scene (or at least make it seem like so). You have
+      // to inverse the computations. First you translate the objects, so now
+      // the camera is the only thing at the origin (note the camera does not exist
+      // but we are always at the origin). So when you now rotate the objects, these
+      // are being rotated with respect to the origin, and it seems you
+      // are moving the objects instead of the camera (the camera never moves!!,
+      // i know sorry this does not make much sense)
       this.matrix = this.matrix.translate(negatedPosition);
-      // Rotate
       this.matrix = this.matrix.rotateVecDeg(
         new Vector([this.elevation, this.azimuth, 0])
       );

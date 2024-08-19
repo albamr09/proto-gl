@@ -205,12 +205,6 @@ const initControls = () => {
       camera.setType(v);
     },
   });
-  createButtonForm({
-    label: "Reset",
-    onClick: () => {
-      camera.reset();
-    },
-  });
   createSliderInputForm({
     label: "Dolly",
     value: 0,
@@ -218,7 +212,7 @@ const initControls = () => {
     max: 100,
     step: 1,
     onChange: (v) => {
-      camera.dolly(v);
+      // camera.dolly(v);
     },
   });
   createVector3dSliders({
@@ -251,6 +245,12 @@ const initControls = () => {
       camera.setElevation(v[0]);
       // Rotation on Y
       camera.setAzimuth(v[1]);
+    },
+  });
+  createButtonForm({
+    label: "Reset",
+    onClick: () => {
+      camera.reset();
     },
   });
 };
