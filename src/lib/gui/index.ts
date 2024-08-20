@@ -167,6 +167,7 @@ export const createSelectorForm = <T>({
 
   // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
   document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+  return select;
 };
 
 export const createButtonForm = ({
@@ -337,6 +338,7 @@ export const createSliderInputForm = ({
 
   // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
   document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+  return { sliderInput, textInput };
 };
 
 /**
@@ -360,8 +362,8 @@ export const createVector3dSliders = ({
   onChange: (v: number[]) => void;
 }) => {
   let _value = value;
-  value.forEach((v, idx) => {
-    createSliderInputForm({
+  return value.map((v, idx) => {
+    return createSliderInputForm({
       label: labels[idx],
       value: v,
       min,

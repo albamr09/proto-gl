@@ -337,33 +337,33 @@ export class Matrix4 extends Matrix {
   }
 
   /**
-   * Obtains the right vector (orientation on the X axis) stored as the
-   * first column on the transformation matrix.
+   * Obtains the right vector (orientation on the X axis)
+   * This vector is basically the first column on the transformation matrix
+   *
+   * See https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04.html#Camera-The%20Model-View%20Matrix-Spatial%20Encoding%20of%20the%20World
    */
   rightVector() {
-    return new Vector(
-      this.multiply(new Vector([1, 0, 0, 0])).elements.slice(0, 3)
-    );
+    return new Vector(this.col(0).elements.slice(0, 3));
   }
 
   /**
-   * Obtains the up vector (orientation on the Y axis) stored as the
+   * Obtains the up vector (orientation on the Y axis) which is stored as the
    * second column on the transformation matrix.
+   *
+   * See https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04.html#Camera-The%20Model-View%20Matrix-Spatial%20Encoding%20of%20the%20World
    */
   upVector() {
-    return new Vector(
-      this.multiply(new Vector([0, 1, 0, 0])).elements.slice(0, 3)
-    );
+    return new Vector(this.col(1).elements.slice(0, 3));
   }
 
   /**
    * Obtains the right vector (orientation on the Z axis) stored as the
    * third column on the transformation matrix.
+   *
+   * See https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04.html#Camera-The%20Model-View%20Matrix-Spatial%20Encoding%20of%20the%20World
    */
   normalVector() {
-    return new Vector(
-      this.multiply(new Vector([0, 0, 1, 0])).elements.slice(0, 3)
-    );
+    return new Vector(this.col(2).elements.slice(0, 3));
   }
 }
 

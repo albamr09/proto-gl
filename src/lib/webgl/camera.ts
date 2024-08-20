@@ -77,6 +77,12 @@ class Camera {
     this.update();
   }
 
+  /**
+   * Obtains the axis vectors using the transformation matrix
+   * The right vector: X axis
+   * The up vector: Y axis
+   * The normal vector: Z axis
+   */
   computeOrientation() {
     this.right = this.matrix.rightVector();
     this.up = this.matrix.upVector();
@@ -88,20 +94,43 @@ class Camera {
     this.initialPosition = position.copy();
   }
 
+  getPosition() {
+    return this.position.copy();
+  }
+
   // Change camera initial position for reset
   setPosition(position: Vector) {
     this.position = position.copy();
     this.update();
   }
 
+  // Moves backwards/towards on the space newSpace units
   dolly(newSteps: number) {
     let newPosition;
     const normal = this.normal.normalize();
 
     const step = newSteps - this.steps;
     if (this.isTracking()) {
-      newPosition = this.position.sum(normal.escalarProduct(step).negate());
+      // For the tracking camera we moves forward/backward like walking with a flashlight
+      // pointing to a direction. Therefore we need to know which way the flashlight
+      // is pointing (normal vector).
+      // We multiply the direction the camera
+      // is pointing (Z axis) by the step (the distance we advance)
+      const directedStep = normal.escalarProduct(step);
+      // Note that, as we have said that translations work the other way around
+      // in order to move forward we have to substract and viceversa
+      // Therefore we negate the direction of the directedStep vector
+      // and we sum this vector to the position
+      newPosition = this.position.sum(directedStep.negate());
     } else {
+      // For the orbiting camera the camera is always at a fixed distance from you.
+      // It doesn’t move closer or farther away on its own; it just circles around you.
+      // As the objects orbit, its direction changes automatically because it is always
+      // facing the center of the circle (the camera). The camera doesn’t need to be told
+      // where to look because it naturally points towards the object it's orbiting.
+      //
+      // So the camera only need to know how far away it is from the object, and
+      // this is stored on the z component
       newPosition = this.position.copy();
       newPosition.set(2, 0, this.position.at(2) + step);
     }
@@ -115,6 +144,7 @@ class Camera {
     this.elevation = 0;
     this.azimuth = 0;
     this.setPosition(this.initialPosition);
+    this.type = CAMERA_TYPE.TRACKING;
   }
 
   // Updates camera transformation matrix

@@ -197,7 +197,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createSelectorForm({
+  const cameraTypeSelector = createSelectorForm({
     label: "Camera Type",
     value: cameraType,
     options: Object.values(CAMERA_TYPE),
@@ -205,17 +205,17 @@ const initControls = () => {
       camera.setType(v);
     },
   });
-  createSliderInputForm({
+  const dollySlider = createSliderInputForm({
     label: "Dolly",
     value: 0,
     min: -100,
     max: 100,
     step: 1,
     onChange: (v) => {
-      // camera.dolly(v);
+      camera.dolly(v);
     },
   });
-  createVector3dSliders({
+  const translateSliders = createVector3dSliders({
     labels: ["Translate X", "Translate Y", "Translate Z"],
     value: modelTranslation,
     min: -500,
@@ -228,7 +228,7 @@ const initControls = () => {
       camera.setPosition(new Vector(v));
     },
   });
-  createVector3dSliders({
+  const rotateSliders = createVector3dSliders({
     labels: ["Rotate X", "Rotate Y", "Rotate Z"],
     value: modelRotation,
     min: -360,
@@ -251,6 +251,21 @@ const initControls = () => {
     label: "Reset",
     onClick: () => {
       camera.reset();
+      dollySlider.sliderInput.value = "0";
+      dollySlider.textInput.value = "0";
+      const position = camera.getPosition();
+
+      translateSliders.forEach((s, i) => {
+        s.sliderInput.value = position.at(i).toString();
+        s.textInput.value = position.at(i).toString();
+      });
+
+      rotateSliders.forEach((s) => {
+        s.sliderInput.value = "0";
+        s.textInput.value = "0";
+      });
+
+      cameraTypeSelector.value = camera.type;
     },
   });
 };
