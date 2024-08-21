@@ -127,7 +127,7 @@ const initData = () => {
 const synchWorld = () => {
   let modelViewMatrix = Matrix4.identity();
   modelViewMatrix = modelViewMatrix.translate(new Vector(modelTranslation));
-  modelViewMatrix = modelViewMatrix.rotateDeg(20, new Vector([1, 0, 0]));
+  modelViewMatrix = modelViewMatrix.rotateDeg(-20, new Vector([1, 0, 0]));
   modelViewMatrix = modelViewMatrix.rotateDeg(angle, new Vector([0, 1, 0]));
   const normalMatrix = computeNormalMatrix(modelViewMatrix);
   const projectionMatrix = Matrix4.perspective(

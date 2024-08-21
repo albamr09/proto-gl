@@ -62,7 +62,7 @@ type DataObject = {
 let gl: WebGL2RenderingContext;
 let program: ExtendedProgram;
 let objects: DataObject[] = [];
-let modelViewTranslation = [0, 0, -90];
+let modelViewTranslation = [0, 20, -90];
 let lightPosition = [4.5, 3, 15],
   shininess = 20,
   angle = 0,
@@ -200,12 +200,14 @@ const synchWorld = (isLight = false) => {
   let modelViewMatrix = Matrix4.identity().translate(
     new Vector(modelViewTranslation)
   );
-  modelViewMatrix = modelViewMatrix.rotateDeg(30, new Vector([1, 0, 0]));
+  modelViewMatrix = modelViewMatrix.rotateDeg(330, new Vector([1, 0, 0]));
   modelViewMatrix = modelViewMatrix.rotateDeg(angle, new Vector([0, 1, 0]));
   // If object is the light, we update its position
   if (isLight) {
-    const lightPosition =
-      program.uLightPosition && gl.getUniform(program, program.uLightPosition);
+    // This is the worst way to do it :(, performance goes from 5% CPU usage to 99%
+    // const lightPosition =
+    //   program.uLightPosition && gl.getUniform(program, program.uLightPosition);
+    // Instead we save the most updated value on the variable lightPosition
     modelViewMatrix = modelViewMatrix.translate(new Vector(lightPosition));
   }
   const normalMatrix = computeNormalMatrix(modelViewMatrix);
@@ -313,9 +315,11 @@ const initGUIControl = () => {
     max: 50,
     step: 1,
     onInit: (v) => {
+      lightPosition = v;
       gl.uniform3fv(program.uLightPosition, v);
     },
     onChange: (v) => {
+      lightPosition = v;
       gl.uniform3fv(program.uLightPosition, v);
     },
   });
