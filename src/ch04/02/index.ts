@@ -21,7 +21,7 @@ import {
 import Axis from "../../lib/webgl/models/axis.js";
 import Floor from "../../lib/webgl/models/floor.js";
 import Program from "../../lib/webgl/program.js";
-import Scene from "../../lib/webgl/scene.js";
+import Scene, { UniformType } from "../../lib/webgl/scene.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
 
@@ -88,8 +88,21 @@ const initData = async () => {
       },
     },
     uniforms: {
-      uMaterialDiffuse: diffuse,
-      uMaterialAmbient: [0.2, 0.2, 0.2, 1],
+      uMaterialDiffuse: {
+        data: diffuse,
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
+      },
+      uMaterialAmbient: {
+        data: [0.2, 0.2, 0.2, 1],
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
+      },
+      uWireFrame: {
+        data: false,
+        size: 1,
+        type: UniformType.INT,
+      },
     },
     indices,
   });
@@ -102,9 +115,18 @@ const initData = async () => {
       },
     },
     uniforms: {
-      uWireFrame: floorModel.wireframe,
-      uMaterialDiffuse: floorModel.color,
+      uWireFrame: {
+        data: floorModel.wireframe,
+        size: 1,
+        type: UniformType.INT,
+      },
+      uMaterialDiffuse: {
+        data: floorModel.color,
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
+      },
     },
+    renderingMode: gl.LINES,
     indices: floorModel.indices,
   });
   scene.addObject({
@@ -116,9 +138,18 @@ const initData = async () => {
       },
     },
     uniforms: {
-      uWireFrame: axisModel.wireframe,
-      uMaterialDiffuse: axisModel.color,
+      uWireFrame: {
+        data: axisModel.wireframe,
+        size: 1,
+        type: UniformType.INT,
+      },
+      uMaterialDiffuse: {
+        data: axisModel.color,
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
+      },
     },
+    renderingMode: gl.LINES,
     indices: axisModel.indices,
   });
 };
@@ -168,36 +199,7 @@ const updateTransforms = () => {
 };
 
 const draw = () => {
-  scene.clear();
-  scene.render((o) => {
-    if (o.uniforms?.uMaterialDiffuse) {
-      gl.uniform4fv(
-        program.uniforms.uMaterialDiffuse,
-        o.uniforms.uMaterialDiffuse
-      );
-    }
-
-    if (o.uniforms?.uMaterialAmbient) {
-      gl.uniform4fv(
-        program.uniforms.uMaterialAmbient,
-        o.uniforms.uMaterialAmbient
-      );
-    }
-
-    gl.bindVertexArray(o.vao);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.ibo);
-
-    if (o.uniforms?.uWireFrame) {
-      gl.uniform1i(program.uniforms.uWireFrame, o.uniforms.uWireFrame);
-      gl.drawElements(gl.LINES, o.len, gl.UNSIGNED_SHORT, 0);
-    } else {
-      gl.uniform1i(program.uniforms.uWireFrame, 0);
-      gl.drawElements(gl.TRIANGLES, o.len, gl.UNSIGNED_SHORT, 0);
-    }
-
-    gl.bindVertexArray(null);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-  });
+  scene.render();
 };
 
 const updateGUI = () => {

@@ -21,7 +21,7 @@ import {
 import Axis from "../../lib/webgl/models/axis.js";
 import Floor from "../../lib/webgl/models/floor.js";
 import Program from "../../lib/webgl/program.js";
-import Scene from "../../lib/webgl/scene.js";
+import Scene, { UniformType } from "../../lib/webgl/scene.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
 
@@ -71,27 +71,42 @@ const initProgram = () => {
 };
 
 const initData = async () => {
-  const data = await loadData("/data/models/geometries/cone3.json");
+  const { vertices, diffuse, indices } = await loadData(
+    "/data/models/geometries/cone3.json"
+  );
   const floorModel = new Floor(80, 2);
   const axisModel = new Axis(82);
   scene.addObject({
     attributes: {
       aPosition: {
-        data: data.vertices as number[],
+        data: vertices,
         size: 3,
         type: gl.FLOAT,
       },
       aNormal: {
-        data: calculateNormals(data.vertices, data.indices, 3),
+        data: calculateNormals(vertices, indices, 3),
         size: 3,
         type: gl.FLOAT,
       },
     },
     uniforms: {
-      uMaterialDiffuse: data.diffuse,
-      uMaterialAmbient: [0.2, 0.2, 0.2, 1],
+      uMaterialDiffuse: {
+        data: diffuse,
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
+      },
+      uMaterialAmbient: {
+        data: [0.2, 0.2, 0.2, 1],
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
+      },
+      uWireFrame: {
+        data: false,
+        size: 1,
+        type: UniformType.INT,
+      },
     },
-    indices: data.indices,
+    indices,
   });
   scene.addObject({
     attributes: {
@@ -100,17 +115,21 @@ const initData = async () => {
         size: 3,
         type: gl.FLOAT,
       },
-      aNormal: {
-        data: calculateNormals(floorModel.vertices, floorModel.indices, 3),
-        size: 3,
-        type: gl.FLOAT,
+    },
+    uniforms: {
+      uWireFrame: {
+        data: floorModel.wireframe,
+        size: 1,
+        type: UniformType.INT,
+      },
+      uMaterialDiffuse: {
+        data: floorModel.color,
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
       },
     },
+    renderingMode: gl.LINES,
     indices: floorModel.indices,
-    uniforms: {
-      uWireFrame: floorModel.wireframe,
-      uMaterialDiffuse: floorModel.color,
-    },
   });
   scene.addObject({
     attributes: {
@@ -119,17 +138,21 @@ const initData = async () => {
         size: 3,
         type: gl.FLOAT,
       },
-      aNormal: {
-        data: calculateNormals(axisModel.vertices, axisModel.indices, 3),
-        size: 3,
-        type: gl.FLOAT,
+    },
+    uniforms: {
+      uWireFrame: {
+        data: axisModel.wireframe,
+        size: 1,
+        type: UniformType.INT,
+      },
+      uMaterialDiffuse: {
+        data: axisModel.color,
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
       },
     },
+    renderingMode: gl.LINES,
     indices: axisModel.indices,
-    uniforms: {
-      uWireFrame: axisModel.wireframe,
-      uMaterialDiffuse: axisModel.color,
-    },
   });
 };
 
@@ -176,40 +199,9 @@ const setTransformUniforms = () => {
 };
 
 const draw = () => {
-  scene.clear();
   try {
     setTransformUniforms();
-    scene.render((o) => {
-      if (o.uniforms?.uMaterialAmbient) {
-        gl.uniform4fv(
-          program.uniforms.uMaterialAmbient,
-          o.uniforms.uMaterialAmbient
-        );
-      }
-      if (o.uniforms?.uMaterialDiffuse) {
-        gl.uniform4fv(
-          program.uniforms.uMaterialDiffuse,
-          o.uniforms.uMaterialDiffuse
-        );
-      }
-      if (o.uniforms?.uWireFrame) {
-        gl.uniform1i(program.uniforms.uWireFrame, o.uniforms?.uWireFrame);
-      } else {
-        gl.uniform1i(program.uniforms.uWireFrame, 0);
-      }
-
-      gl.bindVertexArray(o.vao);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.ibo);
-
-      if (o.uniforms?.uWireFrame) {
-        gl.drawElements(gl.LINES, o.len, gl.UNSIGNED_SHORT, 0);
-      } else {
-        gl.drawElements(gl.TRIANGLES, o.len, gl.UNSIGNED_SHORT, 0);
-      }
-
-      gl.bindVertexArray(null);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-    });
+    scene.render();
   } catch (error) {
     console.error(`Could not render scene ${error}`);
   }

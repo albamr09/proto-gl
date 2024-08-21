@@ -51,6 +51,10 @@ class Program<A extends readonly string[], U extends readonly string[]> {
     this.gl.useProgram(this._program);
   }
 
+  getProgram() {
+    return this._program;
+  }
+
   /**
    * Returns the location of the attribute
    */

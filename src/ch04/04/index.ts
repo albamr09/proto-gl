@@ -23,7 +23,7 @@ import Camera, { CAMERA_TYPE } from "../../lib/webgl/camera.js";
 import Axis from "../../lib/webgl/models/axis.js";
 import Floor from "../../lib/webgl/models/floor.js";
 import Program from "../../lib/webgl/program.js";
-import Scene from "../../lib/webgl/scene.js";
+import Scene, { UniformType } from "../../lib/webgl/scene.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
 
@@ -81,8 +81,21 @@ const initData = () => {
         },
       },
       uniforms: {
-        uMaterialDiffuse: data.diffuse,
-        uMaterialAmbient: [0.2, 0.2, 0.2, 1],
+        uMaterialDiffuse: {
+          data: data.diffuse,
+          size: 4,
+          type: UniformType.VECTOR_FLOAT,
+        },
+        uMaterialAmbient: {
+          data: [0.2, 0.2, 0.2, 1],
+          size: 4,
+          type: UniformType.VECTOR_FLOAT,
+        },
+        uWireFrame: {
+          data: false,
+          size: 1,
+          type: UniformType.INT,
+        },
       },
       indices: data.indices,
     });
@@ -98,10 +111,19 @@ const initData = () => {
       },
     },
     uniforms: {
-      uWireFrame: floorModel.wireframe,
-      uMaterialDiffuse: floorModel.color,
+      uWireFrame: {
+        data: floorModel.wireframe,
+        size: 1,
+        type: UniformType.INT,
+      },
+      uMaterialDiffuse: {
+        data: floorModel.color,
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
+      },
     },
     indices: floorModel.indices,
+    renderingMode: gl.LINES,
   });
   scene.addObject({
     attributes: {
@@ -112,10 +134,19 @@ const initData = () => {
       },
     },
     uniforms: {
-      uWireFrame: axisModel.wireframe,
-      uMaterialDiffuse: axisModel.color,
+      uWireFrame: {
+        data: axisModel.wireframe,
+        size: 1,
+        type: UniformType.INT,
+      },
+      uMaterialDiffuse: {
+        data: axisModel.color,
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
+      },
     },
     indices: axisModel.indices,
+    renderingMode: gl.LINES,
   });
 };
 
@@ -126,34 +157,7 @@ const initLightUniforms = () => {
 };
 
 const draw = () => {
-  scene.clear();
-  scene.render((o) => {
-    if (o.uniforms?.uMaterialAmbient) {
-      gl.uniform4fv(
-        program.uniforms.uMaterialAmbient,
-        o.uniforms.uMaterialAmbient
-      );
-    }
-    if (o.uniforms?.uMaterialDiffuse) {
-      gl.uniform4fv(
-        program.uniforms.uMaterialDiffuse,
-        o.uniforms.uMaterialDiffuse
-      );
-    }
-    gl.bindVertexArray(o.vao);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.ibo);
-
-    if (o.uniforms?.uWireFrame) {
-      gl.uniform1i(program.uniforms.uWireFrame, 1);
-      gl.drawElements(gl.LINES, o.len, gl.UNSIGNED_SHORT, 0);
-    } else {
-      gl.uniform1i(program.uniforms.uWireFrame, 0);
-      gl.drawElements(gl.TRIANGLES, o.len, gl.UNSIGNED_SHORT, 0);
-    }
-
-    gl.bindVertexArray(null);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-  });
+  scene.render();
 };
 
 const updateTransforms = () => {
