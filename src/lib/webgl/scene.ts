@@ -1,5 +1,3 @@
-import { type } from "os";
-import { clearScene } from "../web-gl.js";
 import Program from "./program.js";
 
 type DataObject<U extends readonly string[]> = {

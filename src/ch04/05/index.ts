@@ -1,0 +1,201 @@
+import { loadDataFromFolder } from "../../lib/files.js";
+import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
+import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
+import { Matrix4 } from "../../lib/math/matrix.js";
+import { Vector } from "../../lib/math/vector.js";
+import {
+  autoResizeCanvas,
+  configureCanvas,
+  getGLContext,
+} from "../../lib/web-gl.js";
+import Camera, { CAMERA_TYPE } from "../../lib/webgl/camera.js";
+import Axis from "../../lib/webgl/models/axis.js";
+import Floor from "../../lib/webgl/models/floor.js";
+import Program from "../../lib/webgl/program.js";
+import Scene, { UniformType } from "../../lib/webgl/scene.js";
+import fragmentShaderSource from "./fs.gl.js";
+import vertexShaderSource from "./vs.gl.js";
+
+const attributes = ["aPosition", "aNormal"] as const;
+const uniforms = [
+  "uLightPosition",
+  "uLightAmbient",
+  "uLightDiffuse",
+  "uMaterialAmbient",
+  "uMaterialDiffuse",
+  "uWireFrame",
+] as const;
+
+let gl: WebGL2RenderingContext;
+let program: Program<typeof attributes, typeof uniforms>;
+let scene: Scene<typeof attributes, typeof uniforms>;
+let camera: Camera;
+
+const initProgram = () => {
+  // Background colors :)
+  gl.clearColor(0.9, 0.9, 0.9, 1);
+  // Depth testing
+  gl.clearDepth(1);
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+  program = new Program(
+    gl,
+    vertexShaderSource,
+    fragmentShaderSource,
+    attributes,
+    uniforms
+  );
+  scene = new Scene(gl, program);
+  camera = new Camera(CAMERA_TYPE.ORBITING);
+};
+
+const initData = () => {
+  loadDataFromFolder("/data/models/nissan-gtr", 178, (data) => {
+    scene.addObject({
+      attributes: {
+        aPosition: {
+          data: data.vertices,
+          size: 3,
+          type: gl.FLOAT,
+        },
+        aNormal: {
+          data: calculateNormals(data.vertices, data.indices, 3),
+          size: 3,
+          type: gl.FLOAT,
+        },
+      },
+      uniforms: {
+        uMaterialAmbient: {
+          data: [...data.Ka, 1.0],
+          size: 4,
+          type: UniformType.VECTOR_FLOAT,
+        },
+        uMaterialDiffuse: {
+          data: [...data.Kd, 1.0],
+          size: 4,
+          type: UniformType.VECTOR_FLOAT,
+        },
+        uWireFrame: {
+          data: false,
+          size: 1,
+          type: UniformType.INT,
+        },
+      },
+      indices: data.indices,
+    });
+  });
+
+  const floorModel = new Floor(2000, 100);
+  const axisModel = new Axis(2000);
+
+  scene.addObject({
+    attributes: {
+      aPosition: {
+        data: floorModel.vertices,
+        size: 3,
+        type: gl.FLOAT,
+      },
+    },
+    uniforms: {
+      uWireFrame: {
+        data: floorModel.wireframe,
+        size: 1,
+        type: UniformType.INT,
+      },
+      uMaterialDiffuse: {
+        data: floorModel.color,
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
+      },
+    },
+    indices: floorModel.indices,
+    renderingMode: gl.LINES,
+  });
+  scene.addObject({
+    attributes: {
+      aPosition: {
+        data: axisModel.vertices,
+        size: 3,
+        type: gl.FLOAT,
+      },
+    },
+    uniforms: {
+      uWireFrame: {
+        data: axisModel.wireframe,
+        size: 1,
+        type: UniformType.INT,
+      },
+      uMaterialDiffuse: {
+        data: axisModel.color,
+        size: 4,
+        type: UniformType.VECTOR_FLOAT,
+      },
+    },
+    indices: axisModel.indices,
+    renderingMode: gl.LINES,
+  });
+};
+
+const initLightUniforms = () => {
+  gl.uniform4fv(program.uniforms.uLightAmbient, [0.1, 0.1, 0.1, 1]);
+  gl.uniform3fv(program.uniforms.uLightPosition, [0, 0, 2120]);
+  gl.uniform4fv(program.uniforms.uLightDiffuse, [0.7, 0.7, 0.7, 1]);
+};
+
+const draw = () => {
+  scene.render();
+};
+
+const updateTransformations = () => {
+  // TODO: move this to controls
+  camera.setPosition(new Vector([0, 25, 300]));
+  const modelViewMatrix = camera.getViewTransform();
+  const normalMatrix = computeNormalMatrix(modelViewMatrix);
+  const projectionMatrix = Matrix4.perspective(
+    45,
+    gl.canvas.width / gl.canvas.height,
+    0.1,
+    5000
+  );
+
+  gl.uniformMatrix4fv(
+    program.uniforms.uModelViewMatrix,
+    false,
+    modelViewMatrix.toFloatArray()
+  );
+  gl.uniformMatrix4fv(
+    program.uniforms.uNormalMatrix,
+    false,
+    normalMatrix.toFloatArray()
+  );
+  gl.uniformMatrix4fv(
+    program.uniforms.uProjectionMatrix,
+    false,
+    projectionMatrix.toFloatArray()
+  );
+};
+
+const render = () => {
+  requestAnimationFrame(render);
+  updateTransformations();
+  draw();
+};
+
+const init = () => {
+  initGUI();
+  createDescriptionPanel(
+    "This example renders a complex object (a car) and defines a camera that can be interacted with using the mouse."
+  );
+
+  const canvas = configureCanvas();
+  autoResizeCanvas(canvas);
+  gl = getGLContext();
+
+  initProgram();
+  initData();
+  initLightUniforms();
+  render();
+  // Controls
+};
+
+window.onload = init;
