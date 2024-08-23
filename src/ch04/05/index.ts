@@ -1,5 +1,12 @@
 import { loadDataFromFolder } from "../../lib/files.js";
-import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
+import {
+  createDescriptionPanel,
+  createSelectorForm,
+  createSliderInputForm,
+  createVector3dSliders,
+  initController,
+  initGUI,
+} from "../../lib/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
 import { Vector } from "../../lib/math/vector.js";
@@ -9,6 +16,7 @@ import {
   getGLContext,
 } from "../../lib/web-gl.js";
 import Camera, { CAMERA_TYPE } from "../../lib/webgl/camera.js";
+import Controller from "../../lib/webgl/controller.js";
 import Axis from "../../lib/webgl/models/axis.js";
 import Floor from "../../lib/webgl/models/floor.js";
 import Program from "../../lib/webgl/program.js";
@@ -27,9 +35,15 @@ const uniforms = [
 ] as const;
 
 let gl: WebGL2RenderingContext;
+let canvas: HTMLCanvasElement;
 let program: Program<typeof attributes, typeof uniforms>;
 let scene: Scene<typeof attributes, typeof uniforms>;
 let camera: Camera;
+let controller: Controller;
+let cameraType = CAMERA_TYPE.ORBITING;
+let modelTranslation = [0, 25, 120];
+let modelRotation = [0, 0, 0];
+let dollyValue = 0;
 
 const initProgram = () => {
   // Background colors :)
@@ -46,7 +60,8 @@ const initProgram = () => {
     uniforms
   );
   scene = new Scene(gl, program);
-  camera = new Camera(CAMERA_TYPE.ORBITING);
+  camera = new Camera(cameraType);
+  controller = new Controller(camera, canvas);
 };
 
 const initData = () => {
@@ -147,8 +162,6 @@ const draw = () => {
 };
 
 const updateTransformations = () => {
-  // TODO: move this to controls
-  camera.setPosition(new Vector([0, 25, 300]));
   const modelViewMatrix = camera.getViewTransform();
   const normalMatrix = computeNormalMatrix(modelViewMatrix);
   const projectionMatrix = Matrix4.perspective(
@@ -181,13 +194,67 @@ const render = () => {
   draw();
 };
 
+const initControls = () => {
+  initController();
+  createSelectorForm({
+    label: "Camera Type",
+    value: cameraType,
+    options: Object.values(CAMERA_TYPE),
+    onChange: (v) => {
+      cameraType = v;
+      camera.setType(v);
+    },
+  });
+  createVector3dSliders({
+    labels: ["Translate X", "Translate Y", "Translate Z"],
+    value: modelTranslation,
+    min: -500,
+    max: 500,
+    step: 0.1,
+    onInit: (v) => {
+      camera.setPosition(new Vector(v));
+    },
+    onChange: (v) => {
+      camera.setPosition(new Vector(v));
+    },
+  });
+  createVector3dSliders({
+    labels: ["Rotate X", "Rotate Y", "Rotate Z"],
+    value: modelRotation,
+    min: -360,
+    max: 360,
+    step: 0.1,
+    onInit: (v) => {
+      camera.setAzimuth(v[0]);
+      camera.setAzimuth(v[1]);
+    },
+    onChange: (v) => {
+      camera.setAzimuth(v[0]);
+      camera.setAzimuth(v[1]);
+    },
+  });
+  createSliderInputForm({
+    label: "Dolly",
+    value: dollyValue,
+    min: -100,
+    max: 100,
+    step: 0.1,
+    onInit: (v) => {
+      camera.dolly(v);
+    },
+    onChange: (v) => {
+      camera.dolly(v);
+    },
+  });
+};
+
 const init = () => {
   initGUI();
   createDescriptionPanel(
     "This example renders a complex object (a car) and defines a camera that can be interacted with using the mouse."
   );
 
-  const canvas = configureCanvas();
+  canvas = configureCanvas();
   autoResizeCanvas(canvas);
   gl = getGLContext();
 
@@ -195,7 +262,7 @@ const init = () => {
   initData();
   initLightUniforms();
   render();
-  // Controls
+  initControls();
 };
 
 window.onload = init;

@@ -110,4 +110,36 @@ export class Vector {
       return sum + this.at(idx) * v.at(idx);
     }, 0);
   }
+
+  /**
+   * Computes the angle between two vectors using the definition
+   * for the dot product.
+   */
+  angle(v: Vector) {
+    if (this.dimension() != v.dimension()) {
+      throw new Error(
+        "Cannot compute angle between vectors of different dimensions"
+      );
+    }
+    // First compute the value of the cosine
+    const cos = this.dot(v) / (this.length() * v.length());
+    // Obtain the angle by the inverse of the cosine
+    return Math.acos(cos);
+  }
+
+  /**
+   * Computes the direction angle of a vector by assuming its
+   * initial point is at the center (0, 0)
+   */
+  directionAngle() {
+    if (this.dimension() != 2) {
+      throw new Error(
+        "Cannot compute direction angle for vectors that are not two dimensional"
+      );
+    }
+    // By using the definition of tangent for right triangles: y / x
+    const tan = this.at(1) / this.at(0);
+    // Obtain angles by the inverse of the tangent
+    return Math.atan(tan);
+  }
 }
