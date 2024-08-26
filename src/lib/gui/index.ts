@@ -454,7 +454,8 @@ export const updateMatrixElement = (m: number[] | Float32Array) => {
 
 export const createLowerLeftPanel = (title: string) => {
   const panel = document.createElement("div");
-  panel.id = "lower-left-panel";
+  const id = "lower-left-panel";
+  panel.id = id;
 
   // Create title bar
   const titleBar = document.createElement("div");
@@ -464,6 +465,7 @@ export const createLowerLeftPanel = (title: string) => {
 
   // Append panel to body
   document.body.appendChild(panel);
+  return id;
 };
 
 export const updatePanelTitle = (id: string, title: string) => {

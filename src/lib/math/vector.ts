@@ -139,6 +139,12 @@ export class Vector {
     }
     // By using the definition of tangent for right triangles: y / x
     const tan = this.at(1) / this.at(0);
+    // Tangent is undefined when the vector is parallel to the X axis
+    // so the angle can be 0 or 180. When x is positive the angle is 0,
+    // when the x is negative the angle is 180
+    if (Number.isNaN(tan)) {
+      return this.at(0) >= 0 ? 0 : 180;
+    }
     // Obtain angles by the inverse of the tangent
     return Math.atan(tan);
   }

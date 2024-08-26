@@ -1,11 +1,15 @@
 import { loadDataFromFolder } from "../../lib/files.js";
 import {
+  createButtonForm,
   createDescriptionPanel,
+  createLowerLeftPanel,
   createSelectorForm,
   createSliderInputForm,
   createVector3dSliders,
   initController,
   initGUI,
+  updateMatrixElement,
+  createMatrixElement,
 } from "../../lib/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
@@ -62,6 +66,7 @@ const initProgram = () => {
   scene = new Scene(gl, program);
   camera = new Camera(cameraType);
   controller = new Controller(camera, canvas);
+  camera.setInitialPosition(new Vector(modelTranslation));
 };
 
 const initData = () => {
@@ -171,6 +176,8 @@ const updateTransformations = () => {
     5000
   );
 
+  updateMatrixElement(camera.getViewTransform().toFloatArray());
+
   gl.uniformMatrix4fv(
     program.uniforms.uModelViewMatrix,
     false,
@@ -196,7 +203,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createSelectorForm({
+  const cameraTypeSelector = createSelectorForm({
     label: "Camera Type",
     value: cameraType,
     options: Object.values(CAMERA_TYPE),
@@ -205,7 +212,7 @@ const initControls = () => {
       camera.setType(v);
     },
   });
-  createVector3dSliders({
+  const translateSelectors = createVector3dSliders({
     labels: ["Translate X", "Translate Y", "Translate Z"],
     value: modelTranslation,
     min: -500,
@@ -218,7 +225,7 @@ const initControls = () => {
       camera.setPosition(new Vector(v));
     },
   });
-  createVector3dSliders({
+  const rotateSelectors = createVector3dSliders({
     labels: ["Rotate X", "Rotate Y", "Rotate Z"],
     value: modelRotation,
     min: -360,
@@ -233,7 +240,7 @@ const initControls = () => {
       camera.setAzimuth(v[1]);
     },
   });
-  createSliderInputForm({
+  const dollySlider = createSliderInputForm({
     label: "Dolly",
     value: dollyValue,
     min: -100,
@@ -244,6 +251,23 @@ const initControls = () => {
     },
     onChange: (v) => {
       camera.dolly(v);
+    },
+  });
+  createButtonForm({
+    label: "Reset",
+    onClick: () => {
+      camera.reset();
+      dollySlider.sliderInput.value = "0";
+      dollySlider.textInput.innerHTML = "0";
+      translateSelectors.forEach((s, i) => {
+        s.sliderInput.value = camera.getPosition().at(i).toString();
+        s.textInput.value = camera.getPosition().at(i).toString();
+      });
+      rotateSelectors.forEach((s) => {
+        s.sliderInput.value = "0";
+        s.textInput.value = "0";
+      });
+      cameraTypeSelector.value = CAMERA_TYPE.ORBITING;
     },
   });
 };
@@ -257,6 +281,9 @@ const init = () => {
   canvas = configureCanvas();
   autoResizeCanvas(canvas);
   gl = getGLContext();
+
+  const panelId = createLowerLeftPanel("Camera Matrix");
+  createMatrixElement(panelId, 4);
 
   initProgram();
   initData();
