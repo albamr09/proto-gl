@@ -1,6 +1,9 @@
 const cssCode = `
-body {
-  margin: 0;
+html, body {
+  height: 100vh;
+  margin: 0px;
+  /* Prevents body scrolling */
+  overflow: hidden; 
 }
 
 #control-panel {
