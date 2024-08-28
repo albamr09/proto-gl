@@ -55,7 +55,6 @@ class Controller {
     if (this.isDragging) {
       const dx = this.x - this.lastX;
       const dy = this.y - this.lastY;
-      console.log(dx, dy);
 
       this.camera.setAzimuth(this.camera.azimuth + dx * this.motionFactor);
       this.camera.setElevation(this.camera.elevation + -dy * this.motionFactor);

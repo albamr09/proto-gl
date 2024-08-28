@@ -381,6 +381,60 @@ export const createVector3dSliders = ({
   });
 };
 
+export const createCheckboxInputForm = ({
+  label,
+  value,
+  onInit = () => {},
+  onChange,
+}: {
+  label: string;
+  value: boolean;
+  onInit?: (v: boolean) => void;
+  onChange: (v: boolean) => void;
+}) => {
+  // Create a div container
+  const formContainer = document.createElement("div");
+  formContainer.classList.add("controller-element");
+
+  // Create the form element
+  const form = document.createElement("div");
+  form.classList.add("form-container");
+
+  // Create a label for the input
+  const labelElement = document.createElement("label");
+  labelElement.setAttribute("for", "userCheckbox");
+  const labelSpan = document.createElement("span");
+  labelSpan.innerHTML = label;
+  labelElement.appendChild(labelSpan);
+
+  // Create an input element of type "checkbox"
+  const checkboxInput = document.createElement("input");
+  checkboxInput.setAttribute("type", "checkbox");
+  checkboxInput.setAttribute("id", "userCheckbox");
+  checkboxInput.setAttribute("name", "userCheckbox");
+
+  // Set the initial value of the checkbox input
+  checkboxInput.checked = value;
+  onInit(value);
+
+  // Add an event listener for the "change" event on the checkbox input
+  checkboxInput.addEventListener("change", function () {
+    // Call the onChange function with the checked value
+    onChange(checkboxInput.checked);
+  });
+
+  // Append the label and checkbox input to the form
+  form.appendChild(labelElement);
+  form.appendChild(checkboxInput);
+
+  // Append the form to the container
+  formContainer.appendChild(form);
+
+  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
+  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+  return checkboxInput;
+};
+
 export const createDescriptionPanel = (description: string) => {
   // Create panel container
   const panel = document.createElement("div");

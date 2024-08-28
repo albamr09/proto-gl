@@ -10,6 +10,7 @@ import {
   initGUI,
   updateMatrixElement,
   createMatrixElement,
+  createCheckboxInputForm,
 } from "../../lib/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
@@ -36,6 +37,7 @@ const uniforms = [
   "uMaterialAmbient",
   "uMaterialDiffuse",
   "uWireFrame",
+  "uStaticLight",
 ] as const;
 
 let gl: WebGL2RenderingContext;
@@ -44,10 +46,11 @@ let program: Program<typeof attributes, typeof uniforms>;
 let scene: Scene<typeof attributes, typeof uniforms>;
 let camera: Camera;
 let controller: Controller;
-let cameraType = CAMERA_TYPE.ORBITING;
+let cameraType = CAMERA_TYPE.TRACKING;
 let modelTranslation = [0, 25, 120];
 let modelRotation = [0, 0, 0];
 let dollyValue = 0;
+let useStaticLight = false;
 
 const initProgram = () => {
   // Background colors :)
@@ -97,6 +100,11 @@ const initData = () => {
         },
         uWireFrame: {
           data: false,
+          size: 1,
+          type: UniformType.INT,
+        },
+        uStaticLight: {
+          data: useStaticLight,
           size: 1,
           type: UniformType.INT,
         },
@@ -253,6 +261,13 @@ const initControls = () => {
       camera.dolly(v);
     },
   });
+  const checkboxInput = createCheckboxInputForm({
+    label: "Static Light",
+    value: useStaticLight,
+    onChange: (v) => {
+      scene.updateUniform("uStaticLight", v);
+    },
+  });
   createButtonForm({
     label: "Reset",
     onClick: () => {
@@ -267,7 +282,9 @@ const initControls = () => {
         s.sliderInput.value = "0";
         s.textInput.value = "0";
       });
-      cameraTypeSelector.value = CAMERA_TYPE.ORBITING;
+      checkboxInput.checked = false;
+      useStaticLight = false;
+      cameraTypeSelector.value = CAMERA_TYPE.TRACKING;
     },
   });
 };

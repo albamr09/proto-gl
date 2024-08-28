@@ -6,7 +6,7 @@ type DataObject<U extends readonly string[]> = {
   renderingMode?: GLenum;
   len: number;
   uniforms?: {
-    [P in U[number]]?: any;
+    [P in U[number]]?: UniformDefinition;
   };
 };
 
@@ -112,6 +112,16 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
     this.gl.bindVertexArray(null);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+  }
+
+  updateUniform(uniformName: U[number], value: unknown) {
+    this.objects.forEach((o) => {
+      // It if exists update
+      const uniform = o?.uniforms?.[uniformName];
+      if (uniform !== undefined && uniform !== null) {
+        uniform.data = value;
+      }
+    });
   }
 
   bindUniformForType(

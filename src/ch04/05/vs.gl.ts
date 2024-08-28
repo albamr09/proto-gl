@@ -12,6 +12,7 @@ uniform vec4 uLightAmbient;
 uniform vec4 uLightDiffuse;
 
 uniform bool uWireFrame;
+uniform bool uStaticLight;
 
 in vec3 aPosition;
 in vec3 aNormal;
@@ -27,7 +28,12 @@ void main(void) {
   }
 
   vec3 N = vec3(uNormalMatrix * vec4(aNormal, 1.0));
-  vec3 L = normalize(-uLightPosition);
+  vec3 L = vec3(0.0);
+  if (uStaticLight) {
+    L = normalize(-vec3(uModelViewMatrix * vec4(uLightPosition, 1.0)));
+  } else {
+    L = normalize(-uLightPosition);
+  }
 
   float lamberTerm = dot(N, -L);
   if (lamberTerm == 0.0) {
