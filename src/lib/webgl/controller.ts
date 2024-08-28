@@ -9,8 +9,8 @@ class Controller {
   private lastX: number;
   private lastY: number;
   private motionFactor: number;
-  private downEvents: PointerEvent[];
   private prevDiff: number;
+  private isTouchZoom: boolean;
 
   constructor(camera: Camera, canvas: HTMLCanvasElement) {
     this.camera = camera;
@@ -21,8 +21,8 @@ class Controller {
     this.lastX = 0;
     this.lastY = 0;
     this.motionFactor = 0.1;
-    this.downEvents = [];
     this.prevDiff = -1;
+    this.isTouchZoom = false;
 
     // Mouse events
     canvas.addEventListener(
@@ -37,12 +37,29 @@ class Controller {
     canvas.onmouseup = this.onMouseUp.bind(this);
 
     // Touch events
-    canvas.onpointerdown = this.onMouseDown.bind(this);
-    canvas.onpointermove = this.onMouseMove.bind(this);
-    canvas.onpointerup = this.onMouseUp.bind(this);
-    canvas.onpointercancel = this.onMouseUp.bind(this);
-    canvas.onpointerout = this.onMouseUp.bind(this);
-    canvas.onpointerleave = this.onMouseUp.bind(this);
+    canvas.ontouchstart = this.onTouchStart.bind(this);
+    canvas.ontouchmove = this.onTouchMove.bind(this);
+    canvas.ontouchend = this.onTouchEnd.bind(this);
+  }
+
+  /**
+   * Uses the most updated x, y pointer position to determine how to rotate the camera
+   */
+  rotate(x: number, y: number) {
+    this.lastX = this.x;
+    this.lastY = this.y;
+
+    this.x = x;
+    this.y = y;
+
+    if (this.isDragging) {
+      const dx = this.x - this.lastX;
+      const dy = this.y - this.lastY;
+      console.log(dx, dy);
+
+      this.camera.setAzimuth(this.camera.azimuth + dx * this.motionFactor);
+      this.camera.setElevation(this.camera.elevation + -dy * this.motionFactor);
+    }
   }
 
   onWheel(e: WheelEvent) {
@@ -50,49 +67,48 @@ class Controller {
     this.camera.dolly(this.dolly);
   }
 
-  // Pinch events, heavily "inspired" by
-  // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events/Pinch_zoom_gestures
-  onPointerMove(e: PointerEvent) {
-    // const index = this.downEvents.findIndex(
-    //   (cachedEv) => cachedEv.pointerId === e.pointerId
-    // );
-    // this.downEvents[index] = e;
-    // console.log(this.downEvents);
-    // // If two pointers are down, check for pinch gestures
-    // if (this.downEvents.length === 2) {
-    //   console.log("here");
-    //   // Calculate the distance between the two pointers
-    //   const curDiff = Math.abs(
-    //     this.downEvents[0].clientX - this.downEvents[1].clientX
-    //   );
-    //   if (this.prevDiff > 0) {
-    //     if (curDiff > this.prevDiff) {
-    //       // The distance between the two pointers has increased
-    //       this.camera.dolly(curDiff);
-    //     }
-    //     if (curDiff < this.prevDiff) {
-    //       // The distance between the two pointers has decreased
-    //       this.camera.dolly(curDiff);
-    //     }
-    //   }
-    //   // Cache the distance for the next move event
-    //   this.prevDiff = curDiff;
-    // }
+  onTouchStart(e: TouchEvent) {
+    if (e.touches.length === 2) {
+      this.isTouchZoom = true;
+    } else if (e.touches.length == 1) {
+      this.isDragging = true;
+      this.x = e.touches[0].clientX;
+      this.y = e.touches[0].clientY;
+    }
   }
 
-  onPointerUp(e: PointerEvent) {
-    // Remove this event from the target's cache
-    // const index = this.downEvents.findIndex(
-    //   (cachedEv) => cachedEv.pointerId === e.pointerId
-    // );
-    // this.downEvents.splice(index, 1);
-    // // If the number of pointers down is less than two then reset diff tracker
-    // if (this.downEvents.length < 2) {
-    //   this.prevDiff = -1;
-    // }
+  onTouchMove(e: TouchEvent) {
+    // Zoom
+    if (this.isTouchZoom) {
+      const curDiff = Math.sqrt(
+        Math.pow(e.touches[0].pageX - e.touches[1].pageX, 2) +
+          Math.pow(e.touches[0].pageY - e.touches[1].pageY, 2)
+      );
+      // Zoom out: distance between fingers is bigger
+      if (curDiff > this.prevDiff) {
+        this.dolly -= curDiff * this.motionFactor * 0.5;
+      } else {
+        // Zoom in: distance between fingers is lower
+        this.dolly += curDiff * this.motionFactor * 0.5;
+      }
+      this.camera.dolly(this.dolly);
+      this.prevDiff = curDiff;
+    } else if (this.isDragging) {
+      // Rotate
+      this.rotate(e.touches[0].clientX, e.touches[0].clientY);
+    }
   }
 
-  onMouseDown(e: MouseEvent | PointerEvent) {
+  onTouchEnd(e: TouchEvent) {
+    if (e.touches.length !== 2) {
+      this.isTouchZoom = false;
+    }
+    if (e.touches.length !== 1) {
+      this.isDragging = false;
+    }
+  }
+
+  onMouseDown(e: MouseEvent) {
     this.isDragging = true;
     this.x = e.clientX;
     this.y = e.clientY;
@@ -103,19 +119,7 @@ class Controller {
   }
 
   onMouseMove(e: MouseEvent) {
-    this.lastX = this.x;
-    this.lastY = this.y;
-
-    this.x = e.clientX;
-    this.y = e.clientY;
-
-    if (this.isDragging) {
-      const dx = this.x - this.lastX;
-      const dy = this.y - this.lastY;
-
-      this.camera.setAzimuth(this.camera.azimuth + dx * this.motionFactor);
-      this.camera.setElevation(this.camera.elevation + -dy * this.motionFactor);
-    }
+    this.rotate(e.clientX, e.clientY);
   }
 }
 
