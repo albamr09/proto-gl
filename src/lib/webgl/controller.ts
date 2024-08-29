@@ -1,4 +1,4 @@
-import Camera from "./camera";
+import Camera from "./camera.js";
 
 class Controller {
   private camera: Camera;
@@ -40,6 +40,9 @@ class Controller {
     canvas.ontouchstart = this.onTouchStart.bind(this);
     canvas.ontouchmove = this.onTouchMove.bind(this);
     canvas.ontouchend = this.onTouchEnd.bind(this);
+
+    // Key events
+    window.onkeydown = this.onKeyDown.bind(this);
   }
 
   /**
@@ -146,6 +149,31 @@ class Controller {
       this.drag(e);
     } else if (this.camera.isTracking()) {
       this.look(e);
+    }
+  }
+
+  onKeyDown(e: KeyboardEvent) {
+    // Emulate first person movement
+    if (this.camera.isTracking()) {
+      switch (e.key) {
+        case "ArrowRight":
+        case "d":
+          this.camera.setAzimuth(this.camera.azimuth + 1);
+          break;
+        case "ArrowLeft":
+        case "a":
+          this.camera.setAzimuth(this.camera.azimuth - 1);
+          break;
+        case "ArrowUp":
+        case "w":
+          this.dolly += 1;
+          break;
+        case "ArrowDown":
+        case "s":
+          this.dolly -= 1;
+          break;
+      }
+      this.camera.dolly(this.dolly);
     }
   }
 }
