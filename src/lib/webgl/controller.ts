@@ -43,27 +43,64 @@ class Controller {
   }
 
   /**
-   * Uses the most updated x, y pointer position to determine how to rotate the camera
+   * Handles drag event
    */
-  rotate(x: number, y: number) {
+  drag(e: MouseEvent | TouchEvent) {
     this.lastX = this.x;
     this.lastY = this.y;
 
-    this.x = x;
-    this.y = y;
+    if (e instanceof MouseEvent) {
+      this.x = e.clientX;
+      this.y = e.clientY;
+    } else if (e instanceof TouchEvent) {
+      this.x = e.touches[0].clientX;
+      this.y = e.touches[0].clientY;
+    }
 
-    if (this.isDragging) {
-      const dx = this.x - this.lastX;
-      const dy = this.y - this.lastY;
+    const dx = this.x - this.lastX;
+    const dy = this.y - this.lastY;
 
-      this.camera.setAzimuth(this.camera.azimuth + dx * this.motionFactor);
-      this.camera.setElevation(this.camera.elevation + -dy * this.motionFactor);
+    this.camera.setAzimuth(this.camera.azimuth + dx * this.motionFactor);
+    this.camera.setElevation(this.camera.elevation + -dy * this.motionFactor);
+  }
+
+  /**
+   * Handles look event (kinda like drag but used with tracking camera)
+   */
+  look(e: MouseEvent) {
+    const { width, height } = e.target as HTMLCanvasElement;
+    this.x = e.clientX;
+    this.y = e.clientY;
+    this.camera.setAzimuth((this.x - width / 2.0) * this.motionFactor);
+    this.camera.setElevation(-(this.y - height / 2.0) * this.motionFactor);
+  }
+
+  /**
+   * Handles zoom event
+   */
+  zoom(e: TouchEvent | WheelEvent) {
+    if (e instanceof WheelEvent) {
+      this.dolly += e.deltaY * this.motionFactor;
+      this.camera.dolly(this.dolly);
+    } else if (e instanceof TouchEvent) {
+      const curDiff = Math.sqrt(
+        Math.pow(e.touches[0].pageX - e.touches[1].pageX, 2) +
+          Math.pow(e.touches[0].pageY - e.touches[1].pageY, 2)
+      );
+      // Zoom out: distance between fingers is bigger
+      if (curDiff > this.prevDiff) {
+        this.dolly -= curDiff * this.motionFactor * 0.5;
+      } else {
+        // Zoom in: distance between fingers is lower
+        this.dolly += curDiff * this.motionFactor * 0.5;
+      }
+      this.camera.dolly(this.dolly);
+      this.prevDiff = curDiff;
     }
   }
 
   onWheel(e: WheelEvent) {
-    this.dolly += e.deltaY * this.motionFactor;
-    this.camera.dolly(this.dolly);
+    this.zoom(e);
   }
 
   onTouchStart(e: TouchEvent) {
@@ -79,22 +116,9 @@ class Controller {
   onTouchMove(e: TouchEvent) {
     // Zoom
     if (this.isTouchZoom) {
-      const curDiff = Math.sqrt(
-        Math.pow(e.touches[0].pageX - e.touches[1].pageX, 2) +
-          Math.pow(e.touches[0].pageY - e.touches[1].pageY, 2)
-      );
-      // Zoom out: distance between fingers is bigger
-      if (curDiff > this.prevDiff) {
-        this.dolly -= curDiff * this.motionFactor * 0.5;
-      } else {
-        // Zoom in: distance between fingers is lower
-        this.dolly += curDiff * this.motionFactor * 0.5;
-      }
-      this.camera.dolly(this.dolly);
-      this.prevDiff = curDiff;
+      this.zoom(e);
     } else if (this.isDragging) {
-      // Rotate
-      this.rotate(e.touches[0].clientX, e.touches[0].clientY);
+      this.drag(e);
     }
   }
 
@@ -118,7 +142,11 @@ class Controller {
   }
 
   onMouseMove(e: MouseEvent) {
-    this.rotate(e.clientX, e.clientY);
+    if (this.isDragging) {
+      this.drag(e);
+    } else if (this.camera.isTracking()) {
+      this.look(e);
+    }
   }
 }
 
