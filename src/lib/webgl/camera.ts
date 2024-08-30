@@ -7,9 +7,16 @@ export enum CAMERA_TYPE {
   ORBITING = "Orbiting",
 }
 
+export enum PROJECTION_TYPE {
+  PERSPECTIVE = "Perpective",
+  ORTHOGRAPHIC = "Orthographic",
+}
+
 class Camera {
   public type: CAMERA_TYPE;
-  private matrix: Matrix4;
+  public projection: PROJECTION_TYPE;
+  private modelViewMatrix: Matrix4;
+  private projectionMatrix: Matrix4;
   private position: Vector;
   private initialPosition: Vector;
   private steps: number;
@@ -21,10 +28,23 @@ class Camera {
   public elevation: number;
   // Rotation Y
   public azimuth: number;
+  // Projection params
+  public aspectRatio: number;
+  public width: number;
+  public height: number;
+  public fov: number;
+  public far: number;
+  public near: number;
 
-  constructor(type: CAMERA_TYPE) {
+  constructor(
+    type: CAMERA_TYPE,
+    projection = PROJECTION_TYPE.PERSPECTIVE,
+    gl?: WebGL2RenderingContext
+  ) {
     this.type = type;
-    this.matrix = Matrix4.identity();
+    this.projection = projection;
+    this.modelViewMatrix = Matrix4.identity();
+    this.projectionMatrix = Matrix4.identity();
     // Rotation Y Axis
     this.up = new Vector([0, 0, 0]);
     // Rotation X Axis
@@ -39,6 +59,25 @@ class Camera {
     this.position = new Vector([0, 0, 0]);
     this.initialPosition = new Vector([0, 0, 0]);
     this.steps = 0;
+
+    // Projection
+    this.aspectRatio = 0;
+    this.width = 0;
+    this.height = 0;
+    this.fov = 45;
+    this.far = 5000;
+    this.near = 0.1;
+    this.updateProjectionParams(gl);
+    window.addEventListener("resize", () => {
+      this.updateProjectionParams(gl);
+    });
+  }
+
+  updateProjectionParams(gl?: WebGL2RenderingContext) {
+    this.aspectRatio = (gl?.canvas?.width ?? 0) / (gl?.canvas?.height ?? 1);
+    this.width = gl?.canvas.width ?? 0;
+    this.height = gl?.canvas.height ?? 1;
+    this.updateProjection();
   }
 
   isOrbiting() {
@@ -51,12 +90,44 @@ class Camera {
 
   setType(type: CAMERA_TYPE) {
     this.type = type;
-    this.update();
+    this.updateModelView();
+  }
+
+  setProjection(projection: PROJECTION_TYPE) {
+    this.projection = projection;
+    this.updateProjection();
+  }
+
+  setFov(x: number) {
+    this.fov = x;
+    this.updateProjection();
+  }
+
+  setFar(x: number) {
+    this.far = x;
+    this.updateProjection();
+  }
+
+  setNear(x: number) {
+    this.near = x;
+    this.updateProjection();
+  }
+
+  setPerspectiveParams(fov: number, far: number, near: number) {
+    this.fov = fov;
+    this.far = far;
+    this.near = near;
+    this.updateProjection();
   }
 
   // Obtain model-view transform
   getViewTransform() {
-    return this.matrix.copy() as Matrix4;
+    return this.modelViewMatrix.copy() as Matrix4;
+  }
+
+  // Obtain projection transform
+  getProjectionTransform() {
+    return this.projectionMatrix.copy() as Matrix4;
   }
 
   // Sets the rotation on Y axis
@@ -65,7 +136,7 @@ class Camera {
     const diffAzimuth = azimuth - this.azimuth;
     // Update rotation angle constrained on [0, 360]
     this.azimuth = Angle.safeDegAngle(this.azimuth + diffAzimuth);
-    this.update();
+    this.updateModelView();
   }
 
   // Sets the rotation on X axis
@@ -74,7 +145,7 @@ class Camera {
     const diffElevation = elevation - this.elevation;
     // Update rotation angle constrained on [0, 360]
     this.elevation = Angle.safeDegAngle(this.elevation + diffElevation);
-    this.update();
+    this.updateModelView();
   }
 
   /**
@@ -84,9 +155,9 @@ class Camera {
    * The normal vector: Z axis
    */
   computeOrientation() {
-    this.right = this.matrix.rightVector();
-    this.up = this.matrix.upVector();
-    this.normal = this.matrix.normalVector();
+    this.right = this.modelViewMatrix.rightVector();
+    this.up = this.modelViewMatrix.upVector();
+    this.normal = this.modelViewMatrix.normalVector();
   }
 
   // Change camera position
@@ -101,7 +172,7 @@ class Camera {
   // Change camera initial position for reset
   setPosition(position: Vector) {
     this.position = position.copy();
-    this.update();
+    this.updateModelView();
   }
 
   // Moves backwards/towards on the space newSpace units
@@ -143,13 +214,14 @@ class Camera {
   reset() {
     this.elevation = 0;
     this.azimuth = 0;
+    this.fov = 45;
     this.setPosition(this.initialPosition);
     this.type = CAMERA_TYPE.TRACKING;
   }
 
   // Updates camera transformation matrix
-  update() {
-    this.matrix = Matrix4.identity();
+  updateModelView() {
+    this.modelViewMatrix = Matrix4.identity();
     // As you know the position of the camera
     // is obtained by moving the objects on the
     // world on the opposite direction
@@ -163,10 +235,10 @@ class Camera {
       // and then we move the objects on the opposite direction to
       // where the camera is. This makes the illusion we are
       // "moving the camera"
-      this.matrix = this.matrix.rotateVecDeg(
+      this.modelViewMatrix = this.modelViewMatrix.rotateVecDeg(
         new Vector([this.elevation, this.azimuth, 0])
       );
-      this.matrix = this.matrix.translate(negatedPosition);
+      this.modelViewMatrix = this.modelViewMatrix.translate(negatedPosition);
     } else {
       // On the other hand if you want the camera to not move, and move
       // the objects on the scene (or at least make it seem like so). You have
@@ -176,13 +248,37 @@ class Camera {
       // are being rotated with respect to the origin, and it seems you
       // are moving the objects instead of the camera (the camera never moves!!,
       // i know sorry this does not make much sense)
-      this.matrix = this.matrix.translate(negatedPosition);
-      this.matrix = this.matrix.rotateVecDeg(
+      this.modelViewMatrix = this.modelViewMatrix.translate(negatedPosition);
+      this.modelViewMatrix = this.modelViewMatrix.rotateVecDeg(
         new Vector([this.elevation, this.azimuth, 0])
       );
     }
 
     this.computeOrientation();
+  }
+
+  /**
+   * Updates the projection matrix taking into account the type
+   * of projection: perspective or orthographic.
+   */
+  updateProjection() {
+    if (this.projection == PROJECTION_TYPE.PERSPECTIVE) {
+      this.projectionMatrix = Matrix4.perspective(
+        this.fov,
+        this.aspectRatio,
+        this.near,
+        this.far
+      );
+    } else if (this.projection == PROJECTION_TYPE.ORTHOGRAPHIC) {
+      this.projectionMatrix = Matrix4.ortho(
+        -this.width / this.fov,
+        this.width / this.fov,
+        -this.height / this.fov,
+        this.height / this.fov,
+        -this.far,
+        this.far
+      );
+    }
   }
 }
 

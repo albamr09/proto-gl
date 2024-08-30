@@ -13,14 +13,16 @@ import {
   createCheckboxInputForm,
 } from "../../lib/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
-import { Matrix4 } from "../../lib/math/matrix.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
   autoResizeCanvas,
   configureCanvas,
   getGLContext,
 } from "../../lib/web-gl.js";
-import Camera, { CAMERA_TYPE } from "../../lib/webgl/camera.js";
+import Camera, {
+  CAMERA_TYPE,
+  PROJECTION_TYPE,
+} from "../../lib/webgl/camera.js";
 import Controller from "../../lib/webgl/controller.js";
 import Axis from "../../lib/webgl/models/axis.js";
 import Floor from "../../lib/webgl/models/floor.js";
@@ -47,9 +49,11 @@ let scene: Scene<typeof attributes, typeof uniforms>;
 let camera: Camera;
 let controller: Controller;
 let cameraType = CAMERA_TYPE.TRACKING;
+let porjectionType = PROJECTION_TYPE.PERSPECTIVE;
 let modelTranslation = [0, 25, 120];
 let modelRotation = [0, 0, 0];
 let dollyValue = 0;
+let fovValue = 45;
 let useStaticLight = false;
 
 const initProgram = () => {
@@ -67,7 +71,7 @@ const initProgram = () => {
     uniforms
   );
   scene = new Scene(gl, program);
-  camera = new Camera(cameraType);
+  camera = new Camera(cameraType, porjectionType, gl);
   controller = new Controller(camera, canvas);
   camera.setInitialPosition(new Vector(modelTranslation));
 };
@@ -177,12 +181,7 @@ const draw = () => {
 const updateTransformations = () => {
   const modelViewMatrix = camera.getViewTransform();
   const normalMatrix = computeNormalMatrix(modelViewMatrix);
-  const projectionMatrix = Matrix4.perspective(
-    45,
-    gl.canvas.width / gl.canvas.height,
-    0.1,
-    5000
-  );
+  const projectionMatrix = camera.getProjectionTransform();
 
   updateMatrixElement(camera.getViewTransform().toFloatArray());
 
@@ -218,6 +217,15 @@ const initControls = () => {
     onChange: (v) => {
       cameraType = v;
       camera.setType(v);
+    },
+  });
+  const projectionTypeSelector = createSelectorForm({
+    label: "Projection Type",
+    value: porjectionType,
+    options: Object.values(PROJECTION_TYPE),
+    onChange: (v) => {
+      porjectionType = v;
+      camera.setProjection(v);
     },
   });
   const translateSelectors = createVector3dSliders({
@@ -261,6 +269,19 @@ const initControls = () => {
       camera.dolly(v);
     },
   });
+  const fovSlider = createSliderInputForm({
+    label: "FOV",
+    value: fovValue,
+    min: 1,
+    max: 200,
+    step: 0.1,
+    onInit: (v) => {
+      camera.setFov(v);
+    },
+    onChange: (v) => {
+      camera.setFov(v);
+    },
+  });
   const checkboxInput = createCheckboxInputForm({
     label: "Static Light",
     value: useStaticLight,
@@ -274,6 +295,8 @@ const initControls = () => {
       camera.reset();
       dollySlider.sliderInput.value = "0";
       dollySlider.textInput.innerHTML = "0";
+      fovSlider.sliderInput.value = "45";
+      fovSlider.textInput.innerHTML = "45";
       translateSelectors.forEach((s, i) => {
         s.sliderInput.value = camera.getPosition().at(i).toString();
         s.textInput.value = camera.getPosition().at(i).toString();
@@ -285,6 +308,7 @@ const initControls = () => {
       checkboxInput.checked = false;
       useStaticLight = false;
       cameraTypeSelector.value = CAMERA_TYPE.TRACKING;
+      projectionTypeSelector.value = PROJECTION_TYPE.PERSPECTIVE;
     },
   });
 };

@@ -332,6 +332,38 @@ export class Matrix4 extends Matrix {
     ]);
   }
 
+  /**
+   * Generates a orthogonal projection matrix with the given bounds.
+   * The near/far clip planes correspond to a normalized device coordinate Z range of [-1, 1],
+   * which matches WebGL/OpenGL's clip volume.
+   *
+   * @param left Left bound of the frustum
+   * @param right Right bound of the frustum
+   * @param bottom Bottom bound of the frustum
+   * @param top Top bound of the frustum
+   * @param near Near bound of the frustum
+   * @param far Far bound of the frustum
+   */
+  static ortho(
+    left: number,
+    right: number,
+    bottom: number,
+    top: number,
+    near: number,
+    far: number
+  ) {
+    const lr = 1 / (left - right);
+    const bt = 1 / (bottom - top);
+    const nf = 1 / (near - far);
+
+    return new Matrix4([
+      [-2 * lr, 0, 0, 0],
+      [0, -2 * bt, 0, 0],
+      [0, 0, 2 * nf, 0],
+      [(left + right) * lr, (top + bottom) * bt, (far + near) * nf, 1],
+    ]);
+  }
+
   submatrix(i: number, j: number) {
     return new Matrix3(this.filterRowAndCol(i, j));
   }
