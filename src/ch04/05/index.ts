@@ -51,6 +51,15 @@ let modelTranslation = [0, 25, 120];
 let modelRotation = [0, 0, 0];
 let dollyValue = 0;
 let useStaticLight = false;
+let followMouse = false;
+let rotateSelectors: {
+  textInput: HTMLInputElement;
+  sliderInput: HTMLInputElement;
+}[];
+let dollySelector: {
+  textInput: HTMLInputElement;
+  sliderInput: HTMLInputElement;
+};
 
 const initProgram = () => {
   // Background colors :)
@@ -68,7 +77,20 @@ const initProgram = () => {
   );
   scene = new Scene(gl, program);
   camera = new Camera(cameraType);
-  controller = new Controller(camera, canvas);
+  controller = new Controller({
+    camera,
+    canvas,
+    onAngleChange: (v) => {
+      v.elements.forEach((r, idx) => {
+        rotateSelectors[idx].sliderInput.value = `${r}`;
+        rotateSelectors[idx].textInput.value = `${r}`;
+      });
+    },
+    onDollyChange: (dolly) => {
+      dollySelector.sliderInput.value = `${dolly}`;
+      dollySelector.textInput.value = `${dolly}`;
+    },
+  });
   camera.setInitialPosition(new Vector(modelTranslation));
 };
 
@@ -233,7 +255,7 @@ const initControls = () => {
       camera.setPosition(new Vector(v));
     },
   });
-  const rotateSelectors = createVector3dSliders({
+  rotateSelectors = createVector3dSliders({
     labels: ["Rotate X", "Rotate Y", "Rotate Z"],
     value: modelRotation,
     min: -360,
@@ -248,7 +270,7 @@ const initControls = () => {
       camera.setAzimuth(v[1]);
     },
   });
-  const dollySlider = createSliderInputForm({
+  dollySelector = createSliderInputForm({
     label: "Dolly",
     value: dollyValue,
     min: -100,
@@ -261,19 +283,29 @@ const initControls = () => {
       camera.dolly(v);
     },
   });
-  const checkboxInput = createCheckboxInputForm({
+  const usetStaticLightCheck = createCheckboxInputForm({
     label: "Static Light",
     value: useStaticLight,
     onChange: (v) => {
       scene.updateUniform("uStaticLight", v);
     },
   });
+  const followMouseCheck = createCheckboxInputForm({
+    label: "Follow mouse (TRACKING)",
+    value: followMouse,
+    onInit: (v) => {
+      controller.setFollowMouse(v);
+    },
+    onChange: (v) => {
+      controller.setFollowMouse(v);
+    },
+  });
   createButtonForm({
     label: "Reset",
     onClick: () => {
       camera.reset();
-      dollySlider.sliderInput.value = "0";
-      dollySlider.textInput.innerHTML = "0";
+      dollySelector.sliderInput.value = "0";
+      dollySelector.textInput.innerHTML = "0";
       translateSelectors.forEach((s, i) => {
         s.sliderInput.value = camera.getPosition().at(i).toString();
         s.textInput.value = camera.getPosition().at(i).toString();
@@ -282,7 +314,8 @@ const initControls = () => {
         s.sliderInput.value = "0";
         s.textInput.value = "0";
       });
-      checkboxInput.checked = false;
+      usetStaticLightCheck.checked = false;
+      followMouseCheck.checked = false;
       useStaticLight = false;
       cameraTypeSelector.value = CAMERA_TYPE.TRACKING;
     },

@@ -1,18 +1,35 @@
+import { Vector } from "../math/vector.js";
 import Camera from "./camera.js";
 
 class Controller {
   private camera: Camera;
-  private dolly: number;
-  private isDragging: boolean;
+  // Config
+  private motionFactor: number;
+  private followMouse: boolean;
+  // State
   private x: number;
   private y: number;
   private lastX: number;
   private lastY: number;
-  private motionFactor: number;
+  private dolly: number;
   private prevDiff: number;
+  private isDragging: boolean;
   private isTouchZoom: boolean;
+  // Callbacks
+  public onDollyChange: (dolly: number) => void;
+  public onAngleChange: (angle: Vector) => void;
 
-  constructor(camera: Camera, canvas: HTMLCanvasElement) {
+  constructor({
+    camera,
+    canvas,
+    onDollyChange = () => {},
+    onAngleChange = () => {},
+  }: {
+    camera: Camera;
+    canvas: HTMLCanvasElement;
+    onDollyChange?: (dolly: number) => void;
+    onAngleChange?: (angle: Vector) => void;
+  }) {
     this.camera = camera;
     this.dolly = 0;
     this.isDragging = false;
@@ -23,6 +40,9 @@ class Controller {
     this.motionFactor = 0.1;
     this.prevDiff = -1;
     this.isTouchZoom = false;
+    this.followMouse = true;
+    this.onAngleChange = onAngleChange;
+    this.onDollyChange = onDollyChange;
 
     // Mouse events
     canvas.addEventListener(
@@ -63,8 +83,9 @@ class Controller {
     const dx = this.x - this.lastX;
     const dy = this.y - this.lastY;
 
-    this.camera.setAzimuth(this.camera.azimuth + dx * this.motionFactor);
-    this.camera.setElevation(this.camera.elevation + -dy * this.motionFactor);
+    const azimuth = this.camera.azimuth + dx * this.motionFactor;
+    const elevation = this.camera.elevation + -dy * this.motionFactor;
+    this.setRotation(elevation, azimuth);
   }
 
   /**
@@ -74,17 +95,18 @@ class Controller {
     const { width, height } = e.target as HTMLCanvasElement;
     this.x = e.clientX;
     this.y = e.clientY;
-    this.camera.setAzimuth((this.x - width / 2.0) * this.motionFactor);
-    this.camera.setElevation(-(this.y - height / 2.0) * this.motionFactor);
+    const azimuth = (this.x - width / 2.0) * this.motionFactor;
+    const elevation = -(this.y - height / 2.0) * this.motionFactor;
+    this.setRotation(elevation, azimuth);
   }
 
   /**
    * Handles zoom event
    */
   zoom(e: TouchEvent | WheelEvent) {
+    let dolly = this.dolly;
     if (e instanceof WheelEvent) {
-      this.dolly += e.deltaY * this.motionFactor;
-      this.camera.dolly(this.dolly);
+      dolly += -e.deltaY * this.motionFactor;
     } else if (e instanceof TouchEvent) {
       const curDiff = Math.sqrt(
         Math.pow(e.touches[0].pageX - e.touches[1].pageX, 2) +
@@ -92,14 +114,14 @@ class Controller {
       );
       // Zoom out: distance between fingers is bigger
       if (curDiff > this.prevDiff) {
-        this.dolly -= curDiff * this.motionFactor * 0.5;
+        dolly -= curDiff * this.motionFactor * 0.5;
       } else {
         // Zoom in: distance between fingers is lower
-        this.dolly += curDiff * this.motionFactor * 0.5;
+        dolly += curDiff * this.motionFactor * 0.5;
       }
-      this.camera.dolly(this.dolly);
       this.prevDiff = curDiff;
     }
+    this.setDolly(dolly);
   }
 
   onWheel(e: WheelEvent) {
@@ -147,34 +169,61 @@ class Controller {
   onMouseMove(e: MouseEvent) {
     if (this.isDragging) {
       this.drag(e);
-    } else if (this.camera.isTracking()) {
+    } else if (this.camera.isTracking() && this.followMouse) {
       this.look(e);
     }
   }
 
   onKeyDown(e: KeyboardEvent) {
+    let dolly = this.dolly;
+    let azimuth = this.camera.azimuth;
     // Emulate first person movement
     if (this.camera.isTracking()) {
       switch (e.key) {
         case "ArrowRight":
         case "d":
-          this.camera.setAzimuth(this.camera.azimuth + 1);
+          azimuth += 1;
           break;
         case "ArrowLeft":
         case "a":
-          this.camera.setAzimuth(this.camera.azimuth - 1);
+          azimuth -= 1;
           break;
         case "ArrowUp":
         case "w":
-          this.dolly += 1;
+          dolly += 1;
           break;
         case "ArrowDown":
         case "s":
-          this.dolly -= 1;
+          dolly -= 1;
           break;
       }
-      this.camera.dolly(this.dolly);
+      this.setDolly(dolly);
+      this.setRotation(this.camera.elevation, azimuth);
     }
+  }
+
+  setDolly(dolly: number) {
+    if (dolly != this.dolly) {
+      this.dolly = dolly;
+      this.camera.dolly(this.dolly);
+      this.onDollyChange(this.dolly);
+    }
+  }
+
+  setRotation(x: number, y: number) {
+    if (x != this.camera.elevation || y != this.camera.azimuth) {
+      this.camera.setElevation(x);
+      this.camera.setAzimuth(y);
+      this.onAngleChange(new Vector([x, y, 0]));
+    }
+  }
+
+  setFollowMouse(x: boolean) {
+    this.followMouse = x;
+  }
+
+  setMotionFactor(factor: number) {
+    this.motionFactor = factor;
   }
 }
 

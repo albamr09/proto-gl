@@ -13,8 +13,10 @@ export enum PROJECTION_TYPE {
 }
 
 class Camera {
+  // Camera config
   public type: CAMERA_TYPE;
   public projection: PROJECTION_TYPE;
+  // Camera state
   private modelViewMatrix: Matrix4;
   private projectionMatrix: Matrix4;
   private position: Vector;
@@ -201,9 +203,11 @@ class Camera {
       // where to look because it naturally points towards the object it's orbiting.
       //
       // So the camera only need to know how far away it is from the object, and
-      // this is stored on the z component
+      // this is stored on the z component. Note a positive z points to outside
+      // of the screen, so in order to go forward we must substract, and to go
+      // backwards we must sum the value of step
       newPosition = this.position.copy();
-      newPosition.set(2, 0, this.position.at(2) + step);
+      newPosition.set(2, 0, this.position.at(2) - step);
     }
 
     this.steps = newSteps;
