@@ -314,6 +314,8 @@ export class Matrix4 extends Matrix {
 
   /**
    * Create a perspective projection matrix using a field-of-view and an aspect ratio.
+   *
+   * Reference: https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04/02_01_perspective.html
    * @param fovy   Number The angle between the upper and lower sides of the viewing frustum.
    * @param aspect Number The aspect ratio of the viewing window. (width/height).
    * @param near   Number Distance to the near clipping plane along the -Z axis.
@@ -321,15 +323,18 @@ export class Matrix4 extends Matrix {
    */
   static perspective(fovy: number, aspect: number, near: number, far: number) {
     const rad = Angle.toRadians(fovy);
-    const f = 1.0 / Math.tan(rad / 2);
-    const nf = 1.0 / (near - far);
+    const t = Math.tan(rad / 2) * near;
+    const b = -t;
+    const r = t * aspect;
+    const l = b * aspect;
 
+    // TODO: figure out why do i need to transpose :(
     return new Matrix4([
-      [f / aspect, 0, 0, 0],
-      [0, f, 0, 0],
-      [0, 0, (far + near) * nf, -1],
-      [0, 0, 2 * far * near * nf, 0],
-    ]);
+      [(2 * near) / (r - l), 0, (r + l) / (r - l), 0],
+      [0, (2 * near) / (t - b), (t + b) / (t - b), 0],
+      [0, 0, -(far + near) / (far - near), (-2 * far * near) / (far - near)],
+      [0, 0, -1, 0],
+    ]).transpose() as Matrix4;
   }
 
   /**

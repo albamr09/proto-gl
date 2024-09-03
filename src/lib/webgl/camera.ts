@@ -8,7 +8,7 @@ export enum CAMERA_TYPE {
 }
 
 export enum PROJECTION_TYPE {
-  PERSPECTIVE = "Perpective",
+  PERSPECTIVE = "Perspective",
   ORTHOGRAPHIC = "Orthographic",
 }
 

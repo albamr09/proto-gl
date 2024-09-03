@@ -349,7 +349,7 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "This example renders a complex object (a car) and defines a camera that can be interacted with using the mouse."
+    "On this example you can interact with the scene using your mouse or your keyboard, this will make the camera 'move'. Also you are able to switch between projection modes using the controller on your right, so you can choose between perspective or orthographic mode."
   );
 
   canvas = configureCanvas();

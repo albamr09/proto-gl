@@ -402,7 +402,7 @@ export const createCheckboxInputForm = ({
 
   // Create a label for the input
   const labelElement = document.createElement("label");
-  labelElement.setAttribute("for", "userCheckbox");
+  labelElement.setAttribute("for", label);
   const labelSpan = document.createElement("span");
   labelSpan.innerHTML = label;
   labelElement.appendChild(labelSpan);
@@ -410,8 +410,8 @@ export const createCheckboxInputForm = ({
   // Create an input element of type "checkbox"
   const checkboxInput = document.createElement("input");
   checkboxInput.setAttribute("type", "checkbox");
-  checkboxInput.setAttribute("id", "userCheckbox");
-  checkboxInput.setAttribute("name", "userCheckbox");
+  checkboxInput.setAttribute("id", label);
+  checkboxInput.setAttribute("name", label);
 
   // Set the initial value of the checkbox input
   checkboxInput.checked = value;
