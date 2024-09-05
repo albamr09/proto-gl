@@ -316,57 +316,78 @@ export class Matrix4 extends Matrix {
    * Create a perspective projection matrix using a field-of-view and an aspect ratio.
    *
    * Reference: https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04/02_01_perspective.html
-   * @param fovy   Number The angle between the upper and lower sides of the viewing frustum.
-   * @param aspect Number The aspect ratio of the viewing window. (width/height).
-   * @param near   Number Distance to the near clipping plane along the -Z axis.
-   * @param far    Number Distance to the far clipping plane along the -Z axis.
+   *
+   * @param fovy      Number The angle between the upper and lower sides of the viewing frustum.
+   * @param aspect    Number The aspect ratio of the viewing window. (width/height).
+   * @param near      Number Distance to the near clipping plane along the -Z axis.
+   * @param far       Number Distance to the far clipping plane along the -Z axis.
+   * @param transpose Boolean Whether we transpose the resulting perspective matrix.
    */
-  static perspective(fovy: number, aspect: number, near: number, far: number) {
+  static perspective(
+    fovy: number,
+    aspect: number,
+    near: number,
+    far: number,
+    transpose = true
+  ) {
     const rad = Angle.toRadians(fovy);
     const t = Math.tan(rad / 2) * near;
     const b = -t;
     const r = t * aspect;
     const l = b * aspect;
 
-    // TODO: figure out why do i need to transpose :(
-    return new Matrix4([
+    const m = new Matrix4([
       [(2 * near) / (r - l), 0, (r + l) / (r - l), 0],
       [0, (2 * near) / (t - b), (t + b) / (t - b), 0],
       [0, 0, -(far + near) / (far - near), (-2 * far * near) / (far - near)],
       [0, 0, -1, 0],
-    ]).transpose() as Matrix4;
+    ]);
+
+    if (transpose) {
+      // See https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04/01_transformations.html#Transformations-Transposing Transformation or Projection Matrices
+      // to know why we would have to transpose this matrix
+      return m.transpose() as Matrix4;
+    } else {
+      return m;
+    }
   }
 
   /**
    * Generates a orthogonal projection matrix with the given bounds.
-   * The near/far clip planes correspond to a normalized device coordinate Z range of [-1, 1],
-   * which matches WebGL/OpenGL's clip volume.
    *
-   * @param left Left bound of the frustum
-   * @param right Right bound of the frustum
-   * @param bottom Bottom bound of the frustum
-   * @param top Top bound of the frustum
-   * @param near Near bound of the frustum
-   * @param far Far bound of the frustum
+   * Reference: https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04/02_02_orthographic.html
+   *
+   * @param l         Left bound of the frustum
+   * @param r         Right bound of the frustum
+   * @param b         Bottom bound of the frustum
+   * @param t         Top bound of the frustum
+   * @param n         Near bound of the frustum
+   * @param f         Far bound of the frustum
+   * @param transpose Boolean Whether we transpose the resulting perspective matrix.
    */
   static ortho(
-    left: number,
-    right: number,
-    bottom: number,
-    top: number,
-    near: number,
-    far: number
+    l: number,
+    r: number,
+    b: number,
+    t: number,
+    n: number,
+    f: number,
+    transpose = true
   ) {
-    const lr = 1 / (left - right);
-    const bt = 1 / (bottom - top);
-    const nf = 1 / (near - far);
-
-    return new Matrix4([
-      [-2 * lr, 0, 0, 0],
-      [0, -2 * bt, 0, 0],
-      [0, 0, 2 * nf, 0],
-      [(left + right) * lr, (top + bottom) * bt, (far + near) * nf, 1],
+    const m = new Matrix4([
+      [2 / (r - l), 0, 0, -(r + l) / (r - l)],
+      [0, 2 / (t - b), 0, -(t + b) / (t - b)],
+      [0, 0, -2 / (f - n), -(n + f) / (n - f)],
+      [0, 0, 0, 1],
     ]);
+
+    if (transpose) {
+      // See https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04/01_transformations.html#Transformations-Transposing Transformation or Projection Matrices
+      // to know why we would have to transpose this matrix
+      return m.transpose() as Matrix4;
+    } else {
+      return m;
+    }
   }
 
   submatrix(i: number, j: number) {

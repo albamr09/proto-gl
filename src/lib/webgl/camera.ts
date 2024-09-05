@@ -37,6 +37,7 @@ class Camera {
   public fov: number;
   public far: number;
   public near: number;
+  public transposeProjection: boolean;
 
   constructor(
     type: CAMERA_TYPE,
@@ -69,6 +70,7 @@ class Camera {
     this.fov = 45;
     this.far = 5000;
     this.near = 0.1;
+    this.transposeProjection = true;
     this.updateProjectionParams(gl);
     window.addEventListener("resize", () => {
       this.updateProjectionParams(gl);
@@ -113,6 +115,15 @@ class Camera {
   setNear(x: number) {
     this.near = x;
     this.updateProjection();
+  }
+
+  setTransposeProjection(x: boolean) {
+    this.transposeProjection = x;
+    this.updateProjection();
+  }
+
+  isProjectionTransposed() {
+    return this.transposeProjection;
   }
 
   setPerspectiveParams(fov: number, far: number, near: number) {
@@ -271,7 +282,8 @@ class Camera {
         this.fov,
         this.aspectRatio,
         this.near,
-        this.far
+        this.far,
+        this.transposeProjection
       );
     } else if (this.projection == PROJECTION_TYPE.ORTHOGRAPHIC) {
       this.projectionMatrix = Matrix4.ortho(
@@ -280,7 +292,8 @@ class Camera {
         -this.height / this.fov,
         this.height / this.fov,
         -this.far,
-        this.far
+        this.far,
+        this.transposeProjection
       );
     }
   }

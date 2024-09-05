@@ -96,6 +96,7 @@ const initProgram = () => {
     },
   });
   camera.setInitialPosition(new Vector(modelTranslation));
+  camera.setTransposeProjection(false);
 };
 
 const initData = () => {
@@ -219,7 +220,9 @@ const updateTransformations = () => {
   );
   gl.uniformMatrix4fv(
     program.uniforms.uProjectionMatrix,
-    false,
+    // Transpose matrix only if the projection
+    // was not manully transposed before
+    !camera.isProjectionTransposed(),
     projectionMatrix.toFloatArray()
   );
 };
