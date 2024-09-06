@@ -11,6 +11,7 @@ import {
   updateMatrixElement,
   createMatrixElement,
   createCheckboxInputForm,
+  createNumericInput,
 } from "../../lib/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
 import { Vector } from "../../lib/math/vector.js";
@@ -64,6 +65,8 @@ let dollySelector: {
   textInput: HTMLInputElement;
   sliderInput: HTMLInputElement;
 };
+let widthFactor = 1,
+  heightFactor = 1;
 
 const initProgram = () => {
   // Background colors :)
@@ -198,7 +201,8 @@ const initLightUniforms = () => {
 };
 
 const draw = () => {
-  scene.render();
+  scene.clear(heightFactor, widthFactor);
+  scene.render(() => {}, false);
 };
 
 const updateTransformations = () => {
@@ -264,6 +268,26 @@ const initControls = () => {
     },
     onChange: (v) => {
       camera.setPosition(new Vector(v));
+    },
+  });
+  createNumericInput({
+    label: "Width Factor",
+    value: widthFactor,
+    min: 0,
+    max: 1,
+    step: 0.1,
+    onChange: (v) => {
+      widthFactor = v;
+    },
+  });
+  createNumericInput({
+    label: "Height Factor",
+    value: heightFactor,
+    min: 0,
+    max: 1,
+    step: 0.1,
+    onChange: (v) => {
+      heightFactor = v;
     },
   });
   rotateSelectors = createVector3dSliders({
@@ -352,7 +376,7 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example you can interact with the scene using your mouse or your keyboard, this will make the camera 'move'. Also you are able to switch between projection modes using the controller on your right, so you can choose between perspective or orthographic mode."
+    "Challenge: On this example you can test how changing the size of the viewport using gl.viewport changes how you render the scene."
   );
 
   canvas = configureCanvas();

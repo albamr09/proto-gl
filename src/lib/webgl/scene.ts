@@ -1,4 +1,5 @@
 import Program from "./program.js";
+import { Uniform } from "./uniforms.js";
 
 type DataObject<U extends readonly string[]> = {
   ibo: WebGLBuffer | null;
@@ -6,7 +7,7 @@ type DataObject<U extends readonly string[]> = {
   renderingMode?: GLenum;
   len: number;
   uniforms?: {
-    [P in U[number]]?: UniformDefinition;
+    [P in U[number]]?: Uniform;
   };
 };
 
@@ -99,13 +100,35 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
     );
     const len = indices.length;
 
+    // Uniforms
+    const extractedUniforms = (
+      Object.keys(uniforms ?? {}) as U[number][]
+    ).reduce(
+      (dict, k) => {
+        const uniform = uniforms?.[k] as UniformDefinition;
+        const location = this.program.uniforms[k];
+        if (uniform == null || uniform == undefined || !location) return dict;
+        dict[k] = new Uniform(
+          k,
+          uniform.type,
+          uniform.size,
+          uniform.data,
+          location
+        );
+        return dict;
+      },
+      {} as {
+        [P in U[number]]?: Uniform;
+      }
+    );
+
     // Add to list of objects
     this.objects.push({
       vao,
       ibo,
       len,
       renderingMode,
-      uniforms: { ...uniforms },
+      uniforms: extractedUniforms,
     });
 
     // Clean
@@ -119,107 +142,21 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
       // It if exists update
       const uniform = o?.uniforms?.[uniformName];
       if (uniform !== undefined && uniform !== null) {
-        uniform.data = value;
+        uniform.setData(value);
       }
     });
   }
 
-  bindUniformForType(
-    location: WebGLUniformLocation,
-    uniform: UniformDefinition
-  ) {
-    switch (uniform.type) {
-      case UniformType.INT:
-        if (uniform.size == 1) {
-          this.gl.uniform1i(location, uniform.data);
-        } else if (uniform.size == 2) {
-          this.gl.uniform2i(location, uniform.data[0], uniform.data[1]);
-        } else if (uniform.size == 3) {
-          this.gl.uniform3i(
-            location,
-            uniform.data[0],
-            uniform.data[1],
-            uniform.data[2]
-          );
-        } else if (uniform.size == 4) {
-          this.gl.uniform4i(
-            location,
-            uniform.data[0],
-            uniform.data[1],
-            uniform.data[2],
-            uniform.data[3]
-          );
-        }
-        break;
-      case UniformType.FLOAT:
-        if (uniform.size == 1) {
-          this.gl.uniform1f(location, uniform.data);
-        } else if (uniform.size == 2) {
-          this.gl.uniform2f(location, uniform.data[0], uniform.data[1]);
-        } else if (uniform.size == 3) {
-          this.gl.uniform3f(
-            location,
-            uniform.data[0],
-            uniform.data[1],
-            uniform.data[2]
-          );
-        } else if (uniform.size == 4) {
-          this.gl.uniform4f(
-            location,
-            uniform.data[0],
-            uniform.data[1],
-            uniform.data[2],
-            uniform.data[3]
-          );
-        }
-        break;
-      case UniformType.VECTOR_INT:
-        if (uniform.size == 1) {
-          this.gl.uniform1iv(location, uniform.data);
-        } else if (uniform.size == 2) {
-          this.gl.uniform2iv(location, uniform.data);
-        } else if (uniform.size == 3) {
-          this.gl.uniform3iv(location, uniform.data);
-        } else if (uniform.size == 4) {
-          this.gl.uniform4iv(location, uniform.data);
-        }
-        break;
-      case UniformType.VECTOR_FLOAT:
-        if (uniform.size == 1) {
-          this.gl.uniform1fv(location, uniform.data);
-        } else if (uniform.size == 2) {
-          this.gl.uniform2fv(location, uniform.data);
-        } else if (uniform.size == 3) {
-          this.gl.uniform3fv(location, uniform.data);
-        } else if (uniform.size == 4) {
-          this.gl.uniform4fv(location, uniform.data);
-        }
-        break;
-      case UniformType.MATRIX:
-        if (uniform.size == 2) {
-          this.gl.uniformMatrix2fv(location, false, uniform.data);
-        } else if (uniform.size == 3) {
-          this.gl.uniformMatrix3fv(location, false, uniform.data);
-        } else if (uniform.size == 4) {
-          this.gl.uniformMatrix4fv(location, false, uniform.data);
-        }
-        break;
-    }
-  }
-
-  render(cb: (o: DataObject<U>) => void = () => {}) {
-    this.clear();
+  render(cb: (o: DataObject<U>) => void = () => {}, clear = true) {
+    clear && this.clear();
     this.objects.forEach((o) => {
       // Bind vertices and indices
       this.gl.bindVertexArray(o.vao);
       this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, o.ibo);
       // Populate uniforms
-      for (const k of Object.keys(o?.uniforms ?? {})) {
-        const typedK = k as U[number];
-        const uniform = o?.uniforms?.[typedK];
-        const location = this.program.uniforms[typedK];
-        if (uniform == null || uniform == undefined || !location) continue;
-        this.bindUniformForType(location, uniform);
+      for (const uniform of Object.values(o?.uniforms ?? {}) as Uniform[]) {
+        if (uniform == null || uniform == undefined) continue;
+        uniform.bindUniformForType(this.gl);
       }
 
       // Callback
@@ -239,9 +176,19 @@ class Scene<A extends readonly string[], U extends readonly string[]> {
     });
   }
 
-  clear = () => {
+  /**
+   * Setups scene to render
+   */
+  clear = (heightFactor = 1, widthFactor = 1) => {
+    // Define the viewport geometry, this is used internally to map NDC coordinates
+    // to the final drawing space
+    this.gl.viewport(
+      0,
+      0,
+      this.gl.canvas.width * widthFactor,
+      this.gl.canvas.height * heightFactor
+    );
     // Clear the scene
-    this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   };
 }
