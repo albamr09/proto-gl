@@ -18,10 +18,12 @@ import {
   configureCanvas,
   getGLContext,
 } from "../../lib/web-gl.js";
+import Instance from "../../lib/webgl/instance.js";
 import Axis from "../../lib/webgl/models/axis.js";
 import Floor from "../../lib/webgl/models/floor.js";
 import Program from "../../lib/webgl/program.js";
-import Scene, { UniformType } from "../../lib/webgl/scene.js";
+import Scene from "../../lib/webgl/scene.js";
+import { UniformType } from "../../lib/webgl/uniforms.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
 
@@ -42,7 +44,7 @@ const uniforms = [
 
 let gl: WebGL2RenderingContext;
 let program: Program<typeof attributes, typeof uniforms>;
-let scene: Scene<typeof attributes, typeof uniforms>;
+let scene: Scene;
 let modelViewMatrix: Matrix4,
   normalMatrix: Matrix4,
   cameraMatrix: Matrix4,
@@ -67,7 +69,7 @@ const initProgram = () => {
     attributes,
     uniforms
   );
-  scene = new Scene(gl, program);
+  scene = new Scene(gl);
 };
 
 const initData = async () => {
@@ -76,84 +78,96 @@ const initData = async () => {
   );
   const floorModel = new Floor(80, 2);
   const axisModel = new Axis(82);
-  scene.addObject({
-    attributes: {
-      aPosition: {
-        data: vertices,
-        size: 3,
-        type: gl.FLOAT,
+  scene.add(
+    new Instance({
+      gl,
+      program,
+      attributes: {
+        aPosition: {
+          data: vertices,
+          size: 3,
+          type: gl.FLOAT,
+        },
+        aNormal: {
+          data: calculateNormals(vertices, indices, 3),
+          size: 3,
+          type: gl.FLOAT,
+        },
       },
-      aNormal: {
-        data: calculateNormals(vertices, indices, 3),
-        size: 3,
-        type: gl.FLOAT,
+      uniforms: {
+        uMaterialDiffuse: {
+          data: diffuse,
+          size: 4,
+          type: UniformType.VECTOR_FLOAT,
+        },
+        uMaterialAmbient: {
+          data: [0.2, 0.2, 0.2, 1],
+          size: 4,
+          type: UniformType.VECTOR_FLOAT,
+        },
+        uWireFrame: {
+          data: false,
+          size: 1,
+          type: UniformType.INT,
+        },
       },
-    },
-    uniforms: {
-      uMaterialDiffuse: {
-        data: diffuse,
-        size: 4,
-        type: UniformType.VECTOR_FLOAT,
+      indices,
+    })
+  );
+  scene.add(
+    new Instance({
+      gl,
+      program,
+      attributes: {
+        aPosition: {
+          data: floorModel.vertices,
+          size: 3,
+          type: gl.FLOAT,
+        },
       },
-      uMaterialAmbient: {
-        data: [0.2, 0.2, 0.2, 1],
-        size: 4,
-        type: UniformType.VECTOR_FLOAT,
+      uniforms: {
+        uWireFrame: {
+          data: floorModel.wireframe,
+          size: 1,
+          type: UniformType.INT,
+        },
+        uMaterialDiffuse: {
+          data: floorModel.color,
+          size: 4,
+          type: UniformType.VECTOR_FLOAT,
+        },
       },
-      uWireFrame: {
-        data: false,
-        size: 1,
-        type: UniformType.INT,
+      renderingMode: gl.LINES,
+      indices: floorModel.indices,
+    })
+  );
+  scene.add(
+    new Instance({
+      gl,
+      program,
+      attributes: {
+        aPosition: {
+          data: axisModel.vertices,
+          size: 3,
+          type: gl.FLOAT,
+        },
       },
-    },
-    indices,
-  });
-  scene.addObject({
-    attributes: {
-      aPosition: {
-        data: floorModel.vertices,
-        size: 3,
-        type: gl.FLOAT,
+      uniforms: {
+        uWireFrame: {
+          data: axisModel.wireframe,
+          size: 1,
+          type: UniformType.INT,
+        },
+        uMaterialDiffuse: {
+          data: axisModel.color,
+          size: 4,
+          type: UniformType.VECTOR_FLOAT,
+        },
       },
-    },
-    uniforms: {
-      uWireFrame: {
-        data: floorModel.wireframe,
-        size: 1,
-        type: UniformType.INT,
-      },
-      uMaterialDiffuse: {
-        data: floorModel.color,
-        size: 4,
-        type: UniformType.VECTOR_FLOAT,
-      },
-    },
-    renderingMode: gl.LINES,
-    indices: floorModel.indices,
-  });
-  scene.addObject({
-    attributes: {
-      aPosition: {
-        data: axisModel.vertices,
-        size: 3,
-        type: gl.FLOAT,
-      },
-    },
-    uniforms: {
-      uWireFrame: {
-        data: axisModel.wireframe,
-        size: 1,
-        type: UniformType.INT,
-      },
-      uMaterialDiffuse: {
-        data: axisModel.color,
-        size: 4,
-        type: UniformType.VECTOR_FLOAT,
-      },
-    },
-    renderingMode: gl.LINES,
-    indices: axisModel.indices,
-  });
+      renderingMode: gl.LINES,
+      indices: axisModel.indices,
+    })
+  );
 };
 
 const initLightUniforms = () => {

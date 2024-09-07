@@ -1,178 +1,38 @@
-import Program from "./program.js";
-import { Uniform } from "./uniforms.js";
+import Instance from "./instance.js";
 
-type DataObject<U extends readonly string[]> = {
-  ibo: WebGLBuffer | null;
-  vao: WebGLVertexArrayObject | null;
-  renderingMode?: GLenum;
-  len: number;
-  uniforms?: {
-    [P in U[number]]?: Uniform;
-  };
-};
-
-export enum UniformType {
-  INT,
-  FLOAT,
-  VECTOR_FLOAT,
-  VECTOR_INT,
-  MATRIX,
-}
-
-type AttributeDefinition = {
-  data: number[];
-  size: number;
-  type: GLenum;
-  stride?: number;
-  offset?: number;
-};
-
-type UniformDefinition = {
-  data: any;
-  size: number;
-  type: UniformType;
-};
-
-class Scene<A extends readonly string[], U extends readonly string[]> {
+class Scene {
   private gl: WebGL2RenderingContext;
-  private program: Program<A, U>;
-  private objects: DataObject<U>[];
+  private objects: Instance<any, any>[];
 
-  constructor(gl: WebGL2RenderingContext, program: Program<A, U>) {
+  constructor(gl: WebGL2RenderingContext) {
     this.gl = gl;
-    this.program = program;
     this.objects = [];
+    this.setUp();
   }
 
-  addObject({
-    attributes,
-    indices,
-    renderingMode,
-    uniforms,
-  }: {
-    attributes: {
-      [P in A[number]]?: AttributeDefinition;
-    };
-    indices: number[];
-    renderingMode?: GLenum;
-    uniforms?:
-      | DataObject<U>["uniforms"]
-      | {
-          [P in U[number]]?: UniformDefinition;
-        };
-  }) {
-    const vao = this.gl.createVertexArray();
-    this.gl.bindVertexArray(vao);
-
-    // Attributes
-    for (const attribute of Object.keys(attributes)) {
-      const attributeLocation = this.program.getAttribute(attribute);
-      const attributeData = attributes[attribute as A[number]];
-      if (!attributeData) return;
-      const { data, size, type, stride, offset } = attributeData;
-      // If attribute location does not exist
-      if (attributeLocation < 0) continue;
-      const buffer = this.gl.createBuffer();
-      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-      this.gl.bufferData(
-        this.gl.ARRAY_BUFFER,
-        new Float32Array(data),
-        this.gl.STATIC_DRAW
-      );
-      this.gl.vertexAttribPointer(
-        attributeLocation,
-        size,
-        type,
-        false,
-        stride ?? 0,
-        offset ?? 0
-      );
-      this.gl.enableVertexAttribArray(attributeLocation);
-    }
-
-    // Indices
-    const ibo = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, ibo);
-    this.gl.bufferData(
-      this.gl.ELEMENT_ARRAY_BUFFER,
-      new Uint16Array(indices),
-      this.gl.STATIC_DRAW
-    );
-    const len = indices.length;
-
-    // Uniforms
-    const extractedUniforms = (
-      Object.keys(uniforms ?? {}) as U[number][]
-    ).reduce(
-      (dict, k) => {
-        const uniform = uniforms?.[k] as UniformDefinition;
-        const location = this.program.uniforms[k];
-        if (uniform == null || uniform == undefined || !location) return dict;
-        dict[k] = new Uniform(
-          k,
-          uniform.type,
-          uniform.size,
-          uniform.data,
-          location
-        );
-        return dict;
-      },
-      {} as {
-        [P in U[number]]?: Uniform;
-      }
-    );
-
-    // Add to list of objects
-    this.objects.push({
-      vao,
-      ibo,
-      len,
-      renderingMode,
-      uniforms: extractedUniforms,
-    });
-
-    // Clean
-    this.gl.bindVertexArray(null);
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+  setUp() {
+    // Background colors :)
+    this.gl.clearColor(0.9, 0.9, 0.9, 1);
+    // Depth testing
+    this.gl.clearDepth(1);
+    this.gl.enable(this.gl.DEPTH_TEST);
+    this.gl.depthFunc(this.gl.LEQUAL);
   }
 
-  updateUniform(uniformName: U[number], value: unknown) {
+  updateUniform(uniformName: any[number], value: unknown) {
     this.objects.forEach((o) => {
-      // It if exists update
-      const uniform = o?.uniforms?.[uniformName];
-      if (uniform !== undefined && uniform !== null) {
-        uniform.setData(value);
-      }
+      o.updateUniform(uniformName, value);
     });
   }
 
-  render(cb: (o: DataObject<U>) => void = () => {}, clear = true) {
+  add(o: Instance<any, any>) {
+    this.objects.push(o);
+  }
+
+  render(cb: (o: Instance<any, any>) => void = () => {}, clear = true) {
     clear && this.clear();
     this.objects.forEach((o) => {
-      // Bind vertices and indices
-      this.gl.bindVertexArray(o.vao);
-      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, o.ibo);
-      // Populate uniforms
-      for (const uniform of Object.values(o?.uniforms ?? {}) as Uniform[]) {
-        if (uniform == null || uniform == undefined) continue;
-        uniform.bindUniformForType(this.gl);
-      }
-
-      // Callback
-      cb(o);
-
-      // Draw
-      this.gl.drawElements(
-        o.renderingMode ?? this.gl.TRIANGLES,
-        o.len,
-        this.gl.UNSIGNED_SHORT,
-        0
-      );
-
-      // Unbind
-      this.gl.bindVertexArray(null);
-      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+      o.render({ cb });
     });
   }
 
