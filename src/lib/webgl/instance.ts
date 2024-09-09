@@ -1,9 +1,14 @@
 import Axis from "./models/axis.js";
 import Floor from "./models/floor.js";
-import Program from "./program.js";
-import { Uniform, UniformType } from "./uniforms.js";
+import Program, { Uniforms } from "./program.js";
+import {
+  Uniform,
+  UniformType,
+  transformUniformsDefinition,
+  TransformUniforms,
+} from "./uniforms.js";
 
-type AttributeDefinition = {
+export type AttributeDefinition = {
   data: number[];
   size: number;
   type: GLenum;
@@ -11,18 +16,15 @@ type AttributeDefinition = {
   offset?: number;
 };
 
-type UniformDefinition = {
+export type UniformDefinition = {
   data: any;
-  size: number;
   type: UniformType;
 };
 
 class Instance<A extends readonly string[], U extends readonly string[]> {
   private gl: WebGL2RenderingContext;
   private program: Program<A, U>;
-  private uniforms?: {
-    [P in U[number]]?: Uniform;
-  };
+  private uniforms?: Uniforms<U, Uniform>;
   private vao!: WebGLVertexArrayObject | null;
   private ibo!: WebGLBuffer | null;
   private len!: number;
@@ -139,24 +141,19 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     };
   }) {
     // Uniforms
-    this.uniforms = (Object.keys(uniforms ?? {}) as U[number][]).reduce(
-      (dict, k) => {
-        const uniform = uniforms?.[k] as UniformDefinition;
-        const location = this.program.uniforms[k];
-        if (uniform == null || uniform == undefined || !location) return dict;
-        dict[k] = new Uniform(
-          k,
-          uniform.type,
-          uniform.size,
-          uniform.data,
-          location
-        );
-        return dict;
-      },
-      {} as {
-        [P in U[number]]?: Uniform;
-      }
-    );
+    const mergedUniforms = {
+      ...uniforms,
+      ...transformUniformsDefinition,
+    } as Uniforms<U, UniformDefinition>;
+    this.uniforms = (
+      Object.keys(mergedUniforms) as (U[number] | TransformUniforms[number])[]
+    ).reduce((dict, k) => {
+      const uniform = mergedUniforms[k] as UniformDefinition;
+      const location = this.program.uniforms[k];
+      if (uniform == null || uniform == undefined || !location) return dict;
+      dict[k] = new Uniform(k, uniform.type, uniform.data, location);
+      return dict;
+    }, {} as Uniforms<U, Uniform>);
   }
 
   updateUniform(uniformName: U[number], value: unknown) {
@@ -173,6 +170,7 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     // Bind vertices and indices
     this.gl.bindVertexArray(this.vao);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo);
+
     // Populate uniforms
     for (const uniform of Object.values(this?.uniforms ?? {}) as Uniform[]) {
       if (uniform == null || uniform == undefined) continue;
@@ -224,12 +222,10 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
       uniforms: {
         uMaterialDiffuse: {
           data: model.color,
-          size: 4,
           type: UniformType.VECTOR_FLOAT,
         },
         uWireFrame: {
           data: model.wireframe,
-          size: 1,
           type: UniformType.INT,
         },
       },

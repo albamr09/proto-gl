@@ -97,17 +97,14 @@ const initData = async () => {
       uniforms: {
         uMaterialDiffuse: {
           data: diffuse,
-          size: 4,
           type: UniformType.VECTOR_FLOAT,
         },
         uMaterialAmbient: {
           data: [0.2, 0.2, 0.2, 1],
-          size: 4,
           type: UniformType.VECTOR_FLOAT,
         },
         uWireFrame: {
           data: false,
-          size: 1,
           type: UniformType.INT,
         },
       },
@@ -128,12 +125,10 @@ const initData = async () => {
       uniforms: {
         uWireFrame: {
           data: floorModel.wireframe,
-          size: 1,
           type: UniformType.INT,
         },
         uMaterialDiffuse: {
           data: floorModel.color,
-          size: 4,
           type: UniformType.VECTOR_FLOAT,
         },
       },
@@ -155,12 +150,10 @@ const initData = async () => {
       uniforms: {
         uWireFrame: {
           data: axisModel.wireframe,
-          size: 1,
           type: UniformType.INT,
         },
         uMaterialDiffuse: {
           data: axisModel.color,
-          size: 4,
           type: UniformType.VECTOR_FLOAT,
         },
       },

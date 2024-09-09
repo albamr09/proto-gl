@@ -5,24 +5,26 @@ export enum PROGRAM_TYPE {
   FRAGMENT,
 }
 
-type Uniforms<U extends readonly string[]> = {
-  [P in TransformUniforms[number] | U[number]]: WebGLUniformLocation | null;
+export type Uniforms<U extends readonly string[], T> = {
+  [P in TransformUniforms[number] | U[number]]: T | null;
 };
 
-type Attributes<A extends readonly string[]> = {
+export type Attributes<A extends readonly string[]> = {
   [P in A[number]]: number;
 };
 
-class Program<A extends readonly string[], U extends readonly string[]> {
+class Program<
+  A extends readonly string[] = [],
+  U extends readonly string[] = []
+> {
   private gl: WebGLRenderingContext | WebGL2RenderingContext;
   private _program: WebGLProgram | null;
   public attributes: Attributes<A>;
-  public uniforms: Uniforms<U>;
+  public uniforms: Uniforms<U, WebGLUniformLocation>;
 
   /**
    * Creates a program that is made up of a vertex shader and a fragment shader
    */
-
   constructor(
     gl: WebGL2RenderingContext,
     vertexShaderSource: string,

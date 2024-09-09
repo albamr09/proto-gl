@@ -122,22 +122,18 @@ const initData = () => {
         uniforms: {
           uMaterialAmbient: {
             data: [...data.Ka, 1.0],
-            size: 4,
             type: UniformType.VECTOR_FLOAT,
           },
           uMaterialDiffuse: {
             data: [...data.Kd, 1.0],
-            size: 4,
             type: UniformType.VECTOR_FLOAT,
           },
           uWireFrame: {
             data: false,
-            size: 1,
             type: UniformType.INT,
           },
           uStaticLight: {
             data: useStaticLight,
-            size: 1,
             type: UniformType.INT,
           },
         },
@@ -163,12 +159,10 @@ const initData = () => {
       uniforms: {
         uWireFrame: {
           data: floorModel.wireframe,
-          size: 1,
           type: UniformType.INT,
         },
         uMaterialDiffuse: {
           data: floorModel.color,
-          size: 4,
           type: UniformType.VECTOR_FLOAT,
         },
       },
@@ -190,12 +184,10 @@ const initData = () => {
       uniforms: {
         uWireFrame: {
           data: axisModel.wireframe,
-          size: 1,
           type: UniformType.INT,
         },
         uMaterialDiffuse: {
           data: axisModel.color,
-          size: 4,
           type: UniformType.VECTOR_FLOAT,
         },
       },

@@ -117,22 +117,18 @@ const initData = () => {
         uniforms: {
           uMaterialAmbient: {
             data: [...data.Ka, 1.0],
-            size: 4,
             type: UniformType.VECTOR_FLOAT,
           },
           uMaterialDiffuse: {
             data: [...data.Kd, 1.0],
-            size: 4,
             type: UniformType.VECTOR_FLOAT,
           },
           uWireFrame: {
             data: false,
-            size: 1,
             type: UniformType.INT,
           },
           uStaticLight: {
             data: useStaticLight,
-            size: 1,
             type: UniformType.INT,
           },
         },

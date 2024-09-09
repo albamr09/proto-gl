@@ -1,11 +1,15 @@
+import { computeNormalMatrix } from "../math/3d.js";
+import Camera from "./camera.js";
 import Instance from "./instance.js";
 
 class Scene {
   private gl: WebGL2RenderingContext;
+  private camera?: Camera;
   private objects: Instance<any, any>[];
 
-  constructor(gl: WebGL2RenderingContext) {
+  constructor(gl: WebGL2RenderingContext, camera?: Camera) {
     this.gl = gl;
+    this.camera = camera;
     this.objects = [];
     this.setUp();
   }
@@ -30,9 +34,26 @@ class Scene {
   }
 
   render(cb: (o: Instance<any, any>) => void = () => {}, clear = true) {
+    this.camera?.setTransposeProjection(true);
+    const modelViewMatrix = this.camera?.getViewTransform();
+    const normalMatrix = modelViewMatrix
+      ? computeNormalMatrix(modelViewMatrix)
+      : null;
+    const projectionMatrix = this.camera?.getProjectionTransform();
+
     clear && this.clear();
     this.objects.forEach((o) => {
-      o.render({ cb });
+      modelViewMatrix &&
+        o.updateUniform("uModelViewMatrix", modelViewMatrix.toFloatArray());
+      normalMatrix &&
+        o.updateUniform("uNormalMatrix", normalMatrix.toFloatArray());
+      projectionMatrix &&
+        o.updateUniform("uProjectionMatrix", projectionMatrix.toFloatArray());
+      o.render({
+        cb: (o) => {
+          cb(o);
+        },
+      });
     });
   }
 
