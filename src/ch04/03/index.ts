@@ -19,8 +19,8 @@ import {
   getGLContext,
 } from "../../lib/web-gl.js";
 import Instance from "../../lib/webgl/instance.js";
-import Axis from "../../lib/webgl/models/axis.js";
-import Floor from "../../lib/webgl/models/floor.js";
+import Axis from "../../lib/webgl/models/axis/index.js";
+import Floor from "../../lib/webgl/models/floor/index.js";
 import Program from "../../lib/webgl/program.js";
 import Scene from "../../lib/webgl/scene.js";
 import { UniformType } from "../../lib/webgl/uniforms.js";
@@ -73,8 +73,6 @@ const initData = async () => {
   const { vertices, indices, diffuse } = await loadData(
     "/data/models/geometries/cone3.json"
   );
-  const floorModel = new Floor(82, 2);
-  const axisModel = new Axis(82);
 
   scene.add(
     new Instance({
@@ -109,56 +107,8 @@ const initData = async () => {
       indices,
     })
   );
-  scene.add(
-    new Instance({
-      gl,
-      program,
-      attributes: {
-        aPosition: {
-          data: floorModel.vertices,
-          size: 3,
-          type: gl.FLOAT,
-        },
-      },
-      uniforms: {
-        uWireFrame: {
-          data: floorModel.wireframe,
-          type: UniformType.INT,
-        },
-        uMaterialDiffuse: {
-          data: floorModel.color,
-          type: UniformType.VECTOR_FLOAT,
-        },
-      },
-      renderingMode: gl.LINES,
-      indices: floorModel.indices,
-    })
-  );
-  scene.add(
-    new Instance({
-      gl,
-      program,
-      attributes: {
-        aPosition: {
-          data: axisModel.vertices,
-          size: 3,
-          type: gl.FLOAT,
-        },
-      },
-      uniforms: {
-        uWireFrame: {
-          data: axisModel.wireframe,
-          type: UniformType.INT,
-        },
-        uMaterialDiffuse: {
-          data: axisModel.color,
-          type: UniformType.VECTOR_FLOAT,
-        },
-      },
-      renderingMode: gl.LINES,
-      indices: axisModel.indices,
-    })
-  );
+  scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
+  scene.add(new Axis({ gl, dimension: 82 }));
 };
 
 const initLightUniforms = () => {

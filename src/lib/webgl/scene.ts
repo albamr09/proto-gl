@@ -1,15 +1,19 @@
 import { computeNormalMatrix } from "../math/3d.js";
-import Camera from "./camera.js";
+import { Matrix4 } from "../math/matrix.js";
 import Instance from "./instance.js";
 
 class Scene {
   private gl: WebGL2RenderingContext;
-  private camera?: Camera;
   private objects: Instance<any, any>[];
+  private modelViewMatrix: Matrix4;
+  private normalMatrix: Matrix4;
+  private projectionMatrix: Matrix4;
 
-  constructor(gl: WebGL2RenderingContext, camera?: Camera) {
+  constructor(gl: WebGL2RenderingContext) {
     this.gl = gl;
-    this.camera = camera;
+    this.modelViewMatrix = Matrix4.identity();
+    this.normalMatrix = Matrix4.identity();
+    this.projectionMatrix = Matrix4.identity();
     this.objects = [];
     this.setUp();
   }
@@ -29,26 +33,28 @@ class Scene {
     });
   }
 
+  updateModelViewMatrix(modelViewMatrix: Matrix4) {
+    this.modelViewMatrix = modelViewMatrix.copy() as Matrix4;
+    this.normalMatrix = computeNormalMatrix(this.modelViewMatrix);
+  }
+
+  updateProjectionMatrix(projectionMatrix: Matrix4) {
+    this.projectionMatrix = projectionMatrix.copy() as Matrix4;
+  }
+
   add(o: Instance<any, any>) {
     this.objects.push(o);
   }
 
   render(cb: (o: Instance<any, any>) => void = () => {}, clear = true) {
-    this.camera?.setTransposeProjection(true);
-    const modelViewMatrix = this.camera?.getViewTransform();
-    const normalMatrix = modelViewMatrix
-      ? computeNormalMatrix(modelViewMatrix)
-      : null;
-    const projectionMatrix = this.camera?.getProjectionTransform();
-
     clear && this.clear();
     this.objects.forEach((o) => {
-      modelViewMatrix &&
-        o.updateUniform("uModelViewMatrix", modelViewMatrix.toFloatArray());
-      normalMatrix &&
-        o.updateUniform("uNormalMatrix", normalMatrix.toFloatArray());
-      projectionMatrix &&
-        o.updateUniform("uProjectionMatrix", projectionMatrix.toFloatArray());
+      o.updateUniform("uModelViewMatrix", this.modelViewMatrix.toFloatArray());
+      o.updateUniform("uNormalMatrix", this.normalMatrix.toFloatArray());
+      o.updateUniform(
+        "uProjectionMatrix",
+        this.projectionMatrix.toFloatArray()
+      );
       o.render({
         cb: (o) => {
           cb(o);

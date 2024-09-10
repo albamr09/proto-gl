@@ -16,8 +16,6 @@ uniform vec4 uMaterialAmbient;
 uniform vec4 uMaterialSpecular;
 uniform vec4 uMaterialDiffuse;
 
-uniform bool uWireFrame;
-
 in vec3 aPosition;
 in vec3 aNormal;
 
@@ -25,11 +23,6 @@ out vec4 vColor;
 
 void main(void) {
   gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
-
-  if (uWireFrame) {
-    vColor = uMaterialDiffuse;
-    return;
-  } 
 
   // Normal
   vec3 N = vec3(uNormalMatrix * vec4(aNormal, 0.0));
@@ -47,7 +40,6 @@ void main(void) {
   vec4 Id = uLightDiffuse * uMaterialDiffuse * lambertTerm;
 
   vColor = vec4((Ia + Id).xyz, 1.0);
-
 }
 `;
 

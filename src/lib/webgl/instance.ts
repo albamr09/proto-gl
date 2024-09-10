@@ -1,5 +1,3 @@
-import Axis from "./models/axis.js";
-import Floor from "./models/floor.js";
 import Program, { Uniforms } from "./program.js";
 import {
   Uniform,
@@ -171,14 +169,14 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     this.gl.bindVertexArray(this.vao);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo);
 
+    // Callback
+    cb(this);
+
     // Populate uniforms
     for (const uniform of Object.values(this?.uniforms ?? {}) as Uniform[]) {
       if (uniform == null || uniform == undefined) continue;
       uniform.bindUniformForType(this.gl);
     }
-
-    // Callback
-    cb(this);
 
     // Draw
     this.gl.drawElements(
@@ -191,46 +189,6 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     // Unbind
     this.gl.bindVertexArray(null);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
-  }
-
-  static fromModel({
-    model,
-    gl,
-    program,
-    vertexShaderSource,
-    fragmentShaderSource,
-  }: {
-    model: Floor | Axis;
-    gl: WebGL2RenderingContext;
-    program?: Program<any, any>;
-    vertexShaderSource?: string;
-    fragmentShaderSource?: string;
-  }) {
-    return new Instance({
-      gl,
-      program,
-      vertexShaderSource,
-      fragmentShaderSource,
-      attributes: {
-        aPosition: {
-          data: model.vertices,
-          size: 3,
-          type: gl.FLOAT,
-        },
-      },
-      indices: model.indices,
-      uniforms: {
-        uMaterialDiffuse: {
-          data: model.color,
-          type: UniformType.VECTOR_FLOAT,
-        },
-        uWireFrame: {
-          data: model.wireframe,
-          type: UniformType.INT,
-        },
-      },
-      renderingMode: gl.LINES,
-    });
   }
 }
 

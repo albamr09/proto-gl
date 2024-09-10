@@ -16,7 +16,9 @@ import Camera, {
   PROJECTION_TYPE,
 } from "../../lib/webgl/camera.js";
 import Controller from "../../lib/webgl/controller.js";
-import Cone from "../../lib/webgl/models/cone/cone.js";
+import Axis from "../../lib/webgl/models/axis/index.js";
+import Floor from "../../lib/webgl/models/floor/index.js";
+import Mesh from "../../lib/webgl/models/mesh/index.js";
 import Scene from "../../lib/webgl/scene.js";
 import { UniformType } from "../../lib/webgl/uniforms.js";
 
@@ -30,8 +32,8 @@ let projectionType = PROJECTION_TYPE.PERSPECTIVE;
 let initialPosition = new Vector([0, 2, 50]);
 
 const initProgram = () => {
-  camera = new Camera(cameraType, projectionType, gl);
-  scene = new Scene(gl, camera);
+  scene = new Scene(gl);
+  camera = new Camera(cameraType, projectionType, gl, scene);
   camera.setPosition(initialPosition);
   camera.setInitialPosition(initialPosition);
   controller = new Controller({ camera, canvas });
@@ -49,7 +51,7 @@ const initData = () => {
   loadData("/data/models/geometries/sphere2.json").then((data) => {
     const { vertices, indices, diffuse } = data;
     scene.add(
-      new Cone({
+      new Mesh({
         gl,
         attributes: {
           aPosition: {
@@ -75,7 +77,7 @@ const initData = () => {
   loadData("/data/models/geometries/cone3.json").then((data) => {
     const { vertices, indices, diffuse } = data;
     scene.add(
-      new Cone({
+      new Mesh({
         gl,
         attributes: {
           aPosition: {
@@ -94,20 +96,8 @@ const initData = () => {
       })
     );
   });
-  // scene.add(
-  //   Instance.fromModel({
-  //     model: new Floor(80, 2),
-  //     gl,
-  //     program,
-  //   })
-  // );
-  // scene.add(
-  //   Instance.fromModel({
-  //     model: new Axis(82),
-  //     gl,
-  //     program,
-  //   })
-  // );
+  scene.add(new Floor({ gl, dimension: 80, lines: 2 }));
+  scene.add(new Axis({ gl, dimension: 80 }));
 };
 
 const draw = () => {

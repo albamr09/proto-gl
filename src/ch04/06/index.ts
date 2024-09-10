@@ -25,8 +25,8 @@ import Camera, {
 } from "../../lib/webgl/camera.js";
 import Controller from "../../lib/webgl/controller.js";
 import Instance from "../../lib/webgl/instance.js";
-import Axis from "../../lib/webgl/models/axis.js";
-import Floor from "../../lib/webgl/models/floor.js";
+import Axis from "../../lib/webgl/models/axis/index.js";
+import Floor from "../../lib/webgl/models/floor/index.js";
 import Program from "../../lib/webgl/program.js";
 import Scene from "../../lib/webgl/scene.js";
 import { UniformType } from "../../lib/webgl/uniforms.js";
@@ -142,59 +142,8 @@ const initData = () => {
     );
   });
 
-  const floorModel = new Floor(2000, 100);
-  const axisModel = new Axis(2000);
-
-  scene.add(
-    new Instance({
-      gl,
-      program,
-      attributes: {
-        aPosition: {
-          data: floorModel.vertices,
-          size: 3,
-          type: gl.FLOAT,
-        },
-      },
-      uniforms: {
-        uWireFrame: {
-          data: floorModel.wireframe,
-          type: UniformType.INT,
-        },
-        uMaterialDiffuse: {
-          data: floorModel.color,
-          type: UniformType.VECTOR_FLOAT,
-        },
-      },
-      indices: floorModel.indices,
-      renderingMode: gl.LINES,
-    })
-  );
-  scene.add(
-    new Instance({
-      gl,
-      program,
-      attributes: {
-        aPosition: {
-          data: axisModel.vertices,
-          size: 3,
-          type: gl.FLOAT,
-        },
-      },
-      uniforms: {
-        uWireFrame: {
-          data: axisModel.wireframe,
-          type: UniformType.INT,
-        },
-        uMaterialDiffuse: {
-          data: axisModel.color,
-          type: UniformType.VECTOR_FLOAT,
-        },
-      },
-      indices: axisModel.indices,
-      renderingMode: gl.LINES,
-    })
-  );
+  scene.add(new Floor({ gl, dimension: 2000, lines: 100 }));
+  scene.add(new Axis({ gl, dimension: 2000 }));
 };
 
 const initLightUniforms = () => {

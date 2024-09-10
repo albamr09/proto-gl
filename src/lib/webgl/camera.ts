@@ -1,6 +1,7 @@
 import { Angle } from "../math/angle.js";
 import { Matrix4 } from "../math/matrix.js";
 import { Vector } from "../math/vector.js";
+import Scene from "./scene.js";
 
 export enum CAMERA_TYPE {
   TRACKING = "Tracking",
@@ -38,12 +39,15 @@ class Camera {
   public far: number;
   public near: number;
   public transposeProjection: boolean;
+  private scene?: Scene;
 
   constructor(
     type: CAMERA_TYPE,
     projection = PROJECTION_TYPE.PERSPECTIVE,
-    gl?: WebGL2RenderingContext
+    gl?: WebGL2RenderingContext,
+    scene?: Scene
   ) {
+    this.scene = scene;
     this.type = type;
     this.projection = projection;
     this.modelViewMatrix = Matrix4.identity();
@@ -270,6 +274,7 @@ class Camera {
     }
 
     this.computeOrientation();
+    this.scene?.updateModelViewMatrix(this.modelViewMatrix);
   }
 
   /**
@@ -296,6 +301,7 @@ class Camera {
         this.transposeProjection
       );
     }
+    this.scene?.updateProjectionMatrix(this.projectionMatrix);
   }
 }
 

@@ -23,8 +23,8 @@ import {
 import Camera, { CAMERA_TYPE } from "../../lib/webgl/camera.js";
 import Controller from "../../lib/webgl/controller.js";
 import Instance from "../../lib/webgl/instance.js";
-import Axis from "../../lib/webgl/models/axis.js";
-import Floor from "../../lib/webgl/models/floor.js";
+import Axis from "../../lib/webgl/models/axis/index.js";
+import Floor from "../../lib/webgl/models/floor/index.js";
 import Program from "../../lib/webgl/program.js";
 import Scene from "../../lib/webgl/scene.js";
 import { UniformType } from "../../lib/webgl/uniforms.js";
@@ -137,8 +137,8 @@ const initData = () => {
     );
   });
 
-  scene.add(Instance.fromModel({ model: new Floor(2000, 100), gl, program }));
-  scene.add(Instance.fromModel({ model: new Axis(2000), gl, program }));
+  scene.add(new Floor({ gl, dimension: 2000, lines: 100 }));
+  //scene.add(Instance.fromModel({ model: new Axis(2000), gl, program }));
 };
 
 const initLightUniforms = () => {

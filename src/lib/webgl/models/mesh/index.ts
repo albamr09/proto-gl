@@ -16,12 +16,13 @@ const DefaultUniforms = [
   "uShininess",
 ] as const;
 
-class Cone<
+class Mesh<
   A extends readonly string[] = [],
   U extends readonly string[] = []
 > extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
   /**
-   * Creates an object with its own program
+   * Creates an instance that renders any mesh with the given
+   * primitives
    */
   constructor({
     gl,
@@ -54,4 +55,4 @@ class Cone<
   }
 }
 
-export default Cone;
+export default Mesh;
