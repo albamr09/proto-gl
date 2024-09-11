@@ -11,7 +11,6 @@ uniform vec3 uLightPosition;
 uniform vec4 uLightAmbient;
 uniform vec4 uLightDiffuse;
 
-uniform bool uWireFrame;
 uniform bool uStaticLight;
 
 in vec3 aPosition;
@@ -21,11 +20,6 @@ out vec4 vColor;
 
 void main(void) {
   gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
-
-  if (uWireFrame) {
-    vColor = uMaterialDiffuse;
-    return;
-  }
 
   vec3 N = vec3(uNormalMatrix * vec4(aNormal, 1.0));
   vec3 L = vec3(0.0);

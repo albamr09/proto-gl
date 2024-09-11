@@ -11,7 +11,7 @@ import {
   initGUI,
   updateMatrixElement,
 } from "../../lib/gui/index.js";
-import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
+import { calculateNormals } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
@@ -31,7 +31,6 @@ import vertexShaderSource from "./vs.gl.js";
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
-  "uWireFrame",
   "uMaterialDiffuse",
   "uMaterialAmbient",
   "uLightDiffuse",
@@ -94,10 +93,6 @@ const initData = () => {
             data: [0.2, 0.2, 0.2, 1],
             type: UniformType.VECTOR_FLOAT,
           },
-          uWireFrame: {
-            data: false,
-            type: UniformType.INT,
-          },
         },
         indices: data.indices,
       })
@@ -108,6 +103,7 @@ const initData = () => {
 };
 
 const initLightUniforms = () => {
+  program.use();
   gl.uniform3fv(program.uniforms.uLightPosition, [0, 120, 120]);
   gl.uniform4fv(program.uniforms.uLightAmbient, [1.0, 1.0, 1.0, 1.0]);
   gl.uniform4fv(program.uniforms.uLightDiffuse, [1.0, 1.0, 1.0, 1.0]);
@@ -119,7 +115,6 @@ const draw = () => {
 
 const updateTransforms = () => {
   modelViewMatrix = camera.getViewTransform();
-  const normalMatrix = computeNormalMatrix(modelViewMatrix);
   const projectionMatrix = Matrix4.perspective(
     45,
     gl.canvas.width / gl.canvas.height,
@@ -127,21 +122,8 @@ const updateTransforms = () => {
     1000
   );
 
-  gl.uniformMatrix4fv(
-    program.uniforms.uModelViewMatrix,
-    false,
-    modelViewMatrix.toFloatArray()
-  );
-  gl.uniformMatrix4fv(
-    program.uniforms.uNormalMatrix,
-    false,
-    normalMatrix.toFloatArray()
-  );
-  gl.uniformMatrix4fv(
-    program.uniforms.uProjectionMatrix,
-    false,
-    projectionMatrix.toFloatArray()
-  );
+  scene.updateModelViewMatrix(modelViewMatrix);
+  scene.updateProjectionMatrix(projectionMatrix);
 };
 
 const updateGUI = () => {

@@ -10,7 +10,7 @@ import {
   updateMatrixElement,
   updatePanelTitle,
 } from "../../lib/gui/index.js";
-import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
+import { calculateNormals } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
@@ -39,7 +39,6 @@ const uniforms = [
   "uLightAmbient",
   "uMaterialDiffuse",
   "uMaterialAmbient",
-  "uWireFrame",
 ] as const;
 
 let gl: WebGL2RenderingContext;

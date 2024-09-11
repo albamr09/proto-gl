@@ -13,7 +13,7 @@ import {
   createCheckboxInputForm,
   createNumericInput,
 } from "../../lib/gui/index.js";
-import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
+import { calculateNormals } from "../../lib/math/3d.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
   autoResizeCanvas,
@@ -41,7 +41,6 @@ const uniforms = [
   "uLightDiffuse",
   "uMaterialAmbient",
   "uMaterialDiffuse",
-  "uWireFrame",
   "uStaticLight",
 ] as const;
 
@@ -101,7 +100,7 @@ const initProgram = () => {
     },
   });
   camera.setInitialPosition(new Vector(modelTranslation));
-  camera.setTransposeProjection(false);
+  // camera.setTransposeProjection(false);
 };
 
 const initData = () => {
@@ -131,10 +130,6 @@ const initData = () => {
             data: [...data.Kd, 1.0],
             type: UniformType.VECTOR_FLOAT,
           },
-          uWireFrame: {
-            data: false,
-            type: UniformType.INT,
-          },
           uStaticLight: {
             data: useStaticLight,
             type: UniformType.INT,
@@ -150,6 +145,7 @@ const initData = () => {
 };
 
 const initLightUniforms = () => {
+  program.use();
   gl.uniform4fv(program.uniforms.uLightAmbient, [0.1, 0.1, 0.1, 1]);
   gl.uniform3fv(program.uniforms.uLightPosition, [0, 0, 2120]);
   gl.uniform4fv(program.uniforms.uLightDiffuse, [0.7, 0.7, 0.7, 1]);
@@ -162,28 +158,19 @@ const draw = () => {
 
 const updateTransformations = () => {
   const modelViewMatrix = camera.getViewTransform();
-  const normalMatrix = computeNormalMatrix(modelViewMatrix);
   const projectionMatrix = camera.getProjectionTransform();
+  scene.updateModelViewMatrix(modelViewMatrix);
+  scene.updateProjectionMatrix(projectionMatrix);
 
   updateMatrixElement(camera.getViewTransform().toFloatArray());
 
-  gl.uniformMatrix4fv(
-    program.uniforms.uModelViewMatrix,
-    false,
-    modelViewMatrix.toFloatArray()
-  );
-  gl.uniformMatrix4fv(
-    program.uniforms.uNormalMatrix,
-    false,
-    normalMatrix.toFloatArray()
-  );
-  gl.uniformMatrix4fv(
-    program.uniforms.uProjectionMatrix,
-    // Transpose matrix only if the projection
-    // was not manully transposed before
-    !camera.isProjectionTransposed(),
-    projectionMatrix.toFloatArray()
-  );
+  // gl.uniformMatrix4fv(
+  //   program.uniforms.uProjectionMatrix,
+  //   // Transpose matrix only if the projection
+  //   // was not manully transposed before
+  //   !camera.isProjectionTransposed(),
+  //   projectionMatrix.toFloatArray()
+  // );
 };
 
 const render = () => {
