@@ -5,6 +5,7 @@ import {
   initController,
   initGUI,
 } from "../../lib/gui/index.js";
+import { calculateNormals } from "../../lib/math/3d.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
   configureCanvas,
@@ -39,15 +40,29 @@ const initProgram = () => {
   controller = new Controller({ camera, canvas });
 };
 
-const initLights = () => {
-  // gl.uniform3fv(program.uLightPosition, [0, 120, 120]);
-  //       gl.uniform4fv(program.uLightAmbient, [0.2, 0.2, 0.2, 1]);
-  //       gl.uniform4fv(program.uLightDiffuse, [1, 1, 1, 1]);
-  //       gl.uniform4fv(program.uLightSpecular, [1, 1, 1, 1]);
-  //       gl.uniform1f(program.uShininess, 230);
-};
-
 const initData = () => {
+  const lightUniforms = {
+    uLightPosition: {
+      data: [0, 120, 120],
+      type: UniformType.VECTOR_FLOAT,
+    },
+    uLightAmbient: {
+      data: [0.2, 0.2, 0.2, 1],
+      type: UniformType.VECTOR_FLOAT,
+    },
+    uLightDiffuse: {
+      data: [1, 1, 1, 1],
+      type: UniformType.VECTOR_FLOAT,
+    },
+    uLightSpecular: {
+      data: [1, 1, 1, 1],
+      type: UniformType.VECTOR_FLOAT,
+    },
+    uShininess: {
+      data: 230,
+      type: UniformType.FLOAT,
+    },
+  };
   loadData("/data/models/geometries/sphere2.json").then((data) => {
     const { vertices, indices, diffuse } = data;
     scene.add(
@@ -59,16 +74,18 @@ const initData = () => {
             size: 3,
             type: gl.FLOAT,
           },
+          aNormal: {
+            data: calculateNormals(vertices, indices, 3),
+            size: 3,
+            type: gl.FLOAT,
+          },
         },
         uniforms: {
           uMaterialDiffuse: {
             data: diffuse,
             type: UniformType.VECTOR_FLOAT,
           },
-          uWireFrame: {
-            data: false,
-            type: UniformType.INT,
-          },
+          ...lightUniforms,
         },
         indices,
       })
@@ -85,12 +102,18 @@ const initData = () => {
             size: 3,
             type: gl.FLOAT,
           },
+          aNormal: {
+            data: calculateNormals(vertices, indices, 3),
+            size: 3,
+            type: gl.FLOAT,
+          },
         },
         uniforms: {
           uMaterialDiffuse: {
             data: diffuse,
             type: UniformType.VECTOR_FLOAT,
           },
+          ...lightUniforms,
         },
         indices,
       })

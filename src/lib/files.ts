@@ -13,3 +13,9 @@ export const loadDataFromFolder = async (
       .then(cb);
   });
 };
+
+export const loadAllDataFromFolder = (folderPath: string, size: number) => {
+  return Array.from({ length: size }, (_, i) => i).map(async (i) => {
+    return fetch(`${folderPath}/part${i + 1}.json`).then((res) => res.json());
+  });
+};

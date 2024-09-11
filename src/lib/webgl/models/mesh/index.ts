@@ -5,7 +5,7 @@ import Instance, {
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
-const DefaultAttributes = ["aPosition"] as const;
+const DefaultAttributes = ["aPosition", "aNormal"] as const;
 const DefaultUniforms = [
   "uMaterialDiffuse",
   "uWireFrame",
@@ -35,7 +35,7 @@ class Mesh<
     attributes: {
       [P in
         | (typeof DefaultAttributes)[number]
-        | A[number]]?: AttributeDefinition;
+        | A[number]]: AttributeDefinition;
     };
     indices: number[];
     uniforms?: {

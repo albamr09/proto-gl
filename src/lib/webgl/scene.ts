@@ -27,7 +27,7 @@ class Scene {
     this.gl.depthFunc(this.gl.LEQUAL);
   }
 
-  updateUniform(uniformName: any[number], value: unknown) {
+  updateUniform(uniformName: any, value: unknown) {
     this.objects.forEach((o) => {
       o.updateUniform(uniformName, value);
     });
