@@ -1,3 +1,4 @@
+import { Matrix4 } from "../math/matrix.js";
 import Program, { Uniforms } from "./program.js";
 import {
   Uniform,
@@ -20,6 +21,7 @@ export type UniformDefinition = {
 };
 
 class Instance<A extends readonly string[], U extends readonly string[]> {
+  private id?: string;
   private gl: WebGL2RenderingContext;
   private program: Program<A, U>;
   private uniforms?: Uniforms<U, Uniform>;
@@ -27,11 +29,13 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
   private ibo!: WebGLBuffer | null;
   private len!: number;
   private renderingMode!: GLenum;
+  private localTransform: Matrix4;
 
   /**
    * Creates an object with its own program
    */
   constructor({
+    id,
     gl,
     program,
     vertexShaderSource,
@@ -43,6 +47,7 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
   }: {
     gl: WebGL2RenderingContext;
     program?: Program<A, U>;
+    id?: string;
     vertexShaderSource?: string;
     fragmentShaderSource?: string;
     attributes: {
@@ -54,6 +59,7 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     };
     renderingMode?: GLenum;
   }) {
+    this.id = id ?? Date.now().toString();
     this.gl = gl;
 
     // Create program
@@ -72,6 +78,7 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     }
 
     this.renderingMode = renderingMode ?? this.gl.TRIANGLES;
+    this.localTransform = Matrix4.identity();
 
     this.setupAttributes({ attributes, indices });
     this.setupUniforms({ uniforms });
@@ -154,12 +161,31 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     }, {} as Uniforms<U, Uniform>);
   }
 
-  updateUniform(uniformName: U[number], value: unknown) {
+  updateUniform<T>(
+    uniformName: U[number] | TransformUniforms[number],
+    value: T
+  ) {
     // It if exists update
     const uniform = this.uniforms?.[uniformName];
     if (uniform !== undefined && uniform !== null) {
       uniform.setData(value);
     }
+  }
+
+  getUniform(uniformName: U[number] | TransformUniforms[number]) {
+    return this.uniforms?.[uniformName];
+  }
+
+  setId(id: string) {
+    this.id = id;
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  setLocalTransform(localTransform: Matrix4) {
+    this.localTransform = localTransform;
   }
 
   render({ cb = () => {} }: { cb?: (o: Instance<A, U>) => void }) {
@@ -171,6 +197,19 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
 
     // Callback
     cb(this);
+
+    // Apply local transformation if it exists
+    if (this.localTransform) {
+      let modelViewMatrix = this.uniforms![
+        "uModelViewMatrix"
+      ]?.getData() as Matrix4;
+      modelViewMatrix = Matrix4.fromFloatArray(
+        modelViewMatrix as unknown as Float32Array
+      );
+      this.uniforms!["uModelViewMatrix"]?.setData(
+        this.localTransform.multiply(modelViewMatrix).toFloatArray()
+      );
+    }
 
     // Populate uniforms
     for (const uniform of Object.values(this?.uniforms ?? {}) as Uniform[]) {

@@ -423,6 +423,15 @@ export class Matrix4 extends Matrix {
   normalVector() {
     return new Vector(this.col(2).elements.slice(0, 3));
   }
+
+  static fromFloatArray(data: Float32Array) {
+    return new Matrix4([
+      [data[0], data[1], data[2], data[3]],
+      [data[4], data[5], data[6], data[7]],
+      [data[8], data[9], data[10], data[11]],
+      [data[12], data[13], data[14], data[15]],
+    ]);
+  }
 }
 
 export class Matrix3 extends Matrix {

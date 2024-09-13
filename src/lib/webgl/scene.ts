@@ -4,7 +4,7 @@ import Instance from "./instance.js";
 
 class Scene {
   private gl: WebGL2RenderingContext;
-  private objects: Instance<any, any>[];
+  private objects: Record<string, Instance<any, any>>;
   private modelViewMatrix: Matrix4;
   private normalMatrix: Matrix4;
   private projectionMatrix: Matrix4;
@@ -14,7 +14,7 @@ class Scene {
     this.modelViewMatrix = Matrix4.identity();
     this.normalMatrix = Matrix4.identity();
     this.projectionMatrix = Matrix4.identity();
-    this.objects = [];
+    this.objects = {};
     this.setUp();
   }
 
@@ -27,10 +27,22 @@ class Scene {
     this.gl.depthFunc(this.gl.LEQUAL);
   }
 
-  updateUniform(uniformName: any, value: unknown) {
-    this.objects.forEach((o) => {
+  getUniform(id: string, uniformName: any) {
+    return this.objects[id]?.getUniform(uniformName);
+  }
+
+  updateUniform<T>(uniformName: any, value: T, id?: string) {
+    if (id) {
+      this.objects[id]?.updateUniform(uniformName, value);
+      return;
+    }
+    Object.values(this.objects).forEach((o) => {
       o.updateUniform(uniformName, value);
     });
+  }
+
+  setLocalTransform(id: string, localTransform: Matrix4) {
+    this.objects[id]?.setLocalTransform(localTransform);
   }
 
   updateModelViewMatrix(modelViewMatrix: Matrix4) {
@@ -43,12 +55,14 @@ class Scene {
   }
 
   add(o: Instance<any, any>) {
-    this.objects.push(o);
+    const id = o.getId() ?? Date.now().toString();
+    o.setId(id);
+    this.objects[id] = o;
   }
 
   render(cb: (o: Instance<any, any>) => void = () => {}, clear = true) {
     clear && this.clear();
-    this.objects.forEach((o) => {
+    Object.values(this.objects).forEach((o) => {
       o.updateUniform("uModelViewMatrix", this.modelViewMatrix.toFloatArray());
       o.updateUniform("uNormalMatrix", this.normalMatrix.toFloatArray());
       o.updateUniform(

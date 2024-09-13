@@ -1,11 +1,13 @@
 import { loadData } from "../../lib/files.js";
 import {
+  createCheckboxInputForm,
   createDescriptionPanel,
   createSelectorForm,
   initController,
   initGUI,
 } from "../../lib/gui/index.js";
 import { calculateNormals } from "../../lib/math/3d.js";
+import { Matrix4 } from "../../lib/math/matrix.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
   configureCanvas,
@@ -31,6 +33,10 @@ let controller: Controller;
 let cameraType = CAMERA_TYPE.ORBITING;
 let projectionType = PROJECTION_TYPE.PERSPECTIVE;
 let initialPosition = new Vector([0, 2, 50]);
+let dxSphere = 0.5;
+let dxCone = 0.5;
+let sphereZ = 0;
+let coneX = 0;
 
 const initProgram = () => {
   scene = new Scene(gl);
@@ -67,6 +73,7 @@ const initData = () => {
     const { vertices, indices, diffuse } = data;
     scene.add(
       new Mesh({
+        id: "sphere",
         gl,
         attributes: {
           aPosition: {
@@ -95,6 +102,7 @@ const initData = () => {
     const { vertices, indices, diffuse } = data;
     scene.add(
       new Mesh({
+        id: "cone",
         gl,
         attributes: {
           aPosition: {
@@ -123,12 +131,42 @@ const initData = () => {
   scene.add(new Axis({ gl, dimension: 80 }));
 };
 
+const animateObjects = () => {
+  sphereZ += dxSphere;
+
+  if (sphereZ >= 30 || sphereZ <= -30) {
+    dxSphere = -dxSphere;
+  }
+
+  coneX += dxCone;
+  if (coneX >= 35 || coneX <= -35) {
+    dxCone = -dxCone;
+  }
+  // Sphere
+  let transformUniform = scene.getUniform("sphere", "uModelViewMatrix");
+  if (transformUniform) {
+    scene.setLocalTransform(
+      "sphere",
+      Matrix4.identity().translate(new Vector([0, 0, sphereZ]))
+    );
+  }
+  // Cone
+  transformUniform = scene.getUniform("cone", "uModelViewMatrix");
+  if (transformUniform) {
+    scene.setLocalTransform(
+      "cone",
+      Matrix4.identity().translate(new Vector([coneX, 0, 0]))
+    );
+  }
+};
+
 const draw = () => {
   scene.render();
 };
 
 const render = () => {
   requestAnimationFrame(render);
+  animateObjects();
   draw();
 };
 

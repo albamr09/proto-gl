@@ -40,7 +40,7 @@ class Controller {
     this.motionFactor = 0.1;
     this.prevDiff = -1;
     this.isTouchZoom = false;
-    this.followMouse = true;
+    this.followMouse = false;
     this.onAngleChange = onAngleChange;
     this.onDollyChange = onDollyChange;
 

@@ -62,6 +62,10 @@ export class Uniform {
     this.data = data;
   }
 
+  getData() {
+    return this.data;
+  }
+
   bindUniformForType(gl: WebGL2RenderingContext) {
     if (!this.location)
       throw Error(`Uniform ${this.name} does not have a location assigned`);

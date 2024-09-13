@@ -25,12 +25,14 @@ class Mesh<
    * primitives
    */
   constructor({
+    id,
     gl,
     attributes,
     indices,
     uniforms,
     renderingMode,
   }: {
+    id: string;
     gl: WebGL2RenderingContext;
     attributes: {
       [P in
@@ -44,6 +46,7 @@ class Mesh<
     renderingMode?: GLenum;
   }) {
     super({
+      id,
       gl,
       vertexShaderSource,
       fragmentShaderSource,
