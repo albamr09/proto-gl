@@ -1,5 +1,6 @@
 import { computeNormalMatrix } from "../math/3d.js";
 import { Matrix4 } from "../math/matrix.js";
+import { uuidv4 } from "../utils.js";
 import Instance from "./instance.js";
 
 class Scene {
@@ -55,7 +56,7 @@ class Scene {
   }
 
   add(o: Instance<any, any>) {
-    const id = o.getId() ?? Date.now().toString();
+    const id = o.getId() ?? uuidv4();
     o.setId(id);
     this.objects[id] = o;
   }

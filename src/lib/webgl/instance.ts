@@ -1,4 +1,5 @@
 import { Matrix4 } from "../math/matrix.js";
+import { uuidv4 } from "../utils.js";
 import Program, { Uniforms } from "./program.js";
 import {
   Uniform,
@@ -59,7 +60,7 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     };
     renderingMode?: GLenum;
   }) {
-    this.id = id ?? Date.now().toString();
+    this.id = id ?? uuidv4();
     this.gl = gl;
 
     // Create program
