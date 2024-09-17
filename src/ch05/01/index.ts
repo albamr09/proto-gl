@@ -1,6 +1,5 @@
 import { loadData } from "../../lib/files.js";
 import {
-  createCheckboxInputForm,
   createDescriptionPanel,
   createSelectorForm,
   initController,
