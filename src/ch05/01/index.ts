@@ -91,6 +91,10 @@ const initData = () => {
             data: diffuse,
             type: UniformType.VECTOR_FLOAT,
           },
+          uTranslation: {
+            data: [0, 0, 0],
+            type: UniformType.VECTOR_FLOAT,
+          },
           ...lightUniforms,
         },
         indices,
@@ -120,6 +124,10 @@ const initData = () => {
             data: diffuse,
             type: UniformType.VECTOR_FLOAT,
           },
+          uTranslation: {
+            data: [0, 0, 0],
+            type: UniformType.VECTOR_FLOAT,
+          },
           ...lightUniforms,
         },
         indices,
@@ -141,22 +149,11 @@ const animateObjects = () => {
   if (coneX >= 35 || coneX <= -35) {
     dxCone = -dxCone;
   }
+
   // Sphere
-  let transformUniform = scene.getUniform("sphere", "uModelViewMatrix");
-  if (transformUniform) {
-    scene.setLocalTransform(
-      "sphere",
-      Matrix4.identity().translate(new Vector([0, 0, sphereZ]))
-    );
-  }
+  scene.updateUniform("uTranslation", [0, 0, sphereZ], "sphere");
   // Cone
-  transformUniform = scene.getUniform("cone", "uModelViewMatrix");
-  if (transformUniform) {
-    scene.setLocalTransform(
-      "cone",
-      Matrix4.identity().translate(new Vector([coneX, 0, 0]))
-    );
-  }
+  scene.updateUniform("uTranslation", [coneX, 0, 0], "cone");
 };
 
 const draw = () => {

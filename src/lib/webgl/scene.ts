@@ -42,10 +42,6 @@ class Scene {
     });
   }
 
-  setLocalTransform(id: string, localTransform: Matrix4) {
-    this.objects[id]?.setLocalTransform(localTransform);
-  }
-
   updateModelViewMatrix(modelViewMatrix: Matrix4) {
     this.modelViewMatrix = modelViewMatrix.copy() as Matrix4;
     this.normalMatrix = computeNormalMatrix(this.modelViewMatrix);

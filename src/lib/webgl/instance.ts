@@ -185,10 +185,6 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     return this.id;
   }
 
-  setLocalTransform(localTransform: Matrix4) {
-    this.localTransform = localTransform;
-  }
-
   render({ cb = () => {} }: { cb?: (o: Instance<A, U>) => void }) {
     // Use this program instance
     this.program.use();

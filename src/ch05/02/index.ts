@@ -1,8 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
 import { calculateNormals } from "../../lib/math/3d.js";
-import { Matrix4 } from "../../lib/math/matrix.js";
-import { Vector } from "../../lib/math/vector.js";
 import {
   autoResizeCanvas,
   configureCanvas,
@@ -26,7 +24,7 @@ let camera: Camera;
 const gravity = 9.8;
 let bouncingBalls: BouncingBall[] = [];
 let sceneTime = 0;
-const nBalls = 100;
+const nBalls = 500;
 
 // Generate a random position
 const generatePosition = () => {
@@ -140,6 +138,10 @@ const initData = () => {
               data: [Math.random(), Math.random(), Math.random(), 1],
               type: UniformType.FLOAT,
             },
+            uTranslation: {
+              data: [0, 0, 0],
+              type: UniformType.VECTOR_FLOAT,
+            },
             ...lightUniforms,
           },
           indices,
@@ -155,10 +157,7 @@ const initData = () => {
 const animate = () => {
   bouncingBalls.forEach((b) => {
     b.update(sceneTime);
-    let localTransform = Matrix4.identity().translate(
-      new Vector(b.getPosition())
-    );
-    scene.setLocalTransform(b.getId(), localTransform);
+    scene.updateUniform("uTranslation", b.getPosition(), b.getId());
   });
   sceneTime += 33 / 1000;
 };
