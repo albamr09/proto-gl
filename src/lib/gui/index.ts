@@ -112,11 +112,13 @@ export const createSelectorForm = <T>({
   label,
   value,
   options,
+  onInit = () => {},
   onChange,
 }: {
   label: string;
   value: T;
   options: T[];
+  onInit?: (v: T) => void;
   onChange: (v: T) => void;
 }) => {
   // Create a div container
@@ -150,6 +152,7 @@ export const createSelectorForm = <T>({
   // Set the initial value of the select element
   if (value) {
     select.value = `${value}`;
+    onInit(value);
   }
 
   // Add an event listener for the "change" event on the select element

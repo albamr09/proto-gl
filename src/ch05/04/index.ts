@@ -1,7 +1,16 @@
 import { loadData } from "../../lib/files.js";
-import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
+import {
+  createDescriptionPanel,
+  createNumericInput,
+  createSelectorForm,
+  initController,
+  initGUI,
+} from "../../lib/gui/index.js";
 import { calculateNormals } from "../../lib/math/3d.js";
-import { linearInterpolation } from "../../lib/math/interpolation.js";
+import {
+  lagrangeInterpolation,
+  linearInterpolation,
+} from "../../lib/math/interpolation.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
   autoResizeCanvas,
@@ -19,6 +28,12 @@ import Mesh from "../../lib/webgl/models/mesh/index.js";
 import Scene from "../../lib/webgl/scene.js";
 import { UniformType } from "../../lib/webgl/uniforms.js";
 
+enum INTERPOLATION {
+  LINEAR = "linear",
+  POLYNOMIAL = "polynomial",
+  BSPLINE = "b-spline",
+}
+
 let canvas: HTMLCanvasElement;
 let gl: WebGL2RenderingContext;
 let scene: Scene;
@@ -30,6 +45,19 @@ let initialPosition = [-25, 0, 20] as [number, number, number],
   flagStartColor = [0, 1, 0, 1],
   flagEndColor = [0, 0, 1, 1];
 let interpolatedPositions: [number, number, number][] = [];
+let interpolationMethod = INTERPOLATION.LINEAR;
+
+const computeInterpolatedPositions = (method: INTERPOLATION, steps: number) => {
+  if (method == INTERPOLATION.LINEAR) {
+    interpolatedPositions = linearInterpolation(
+      initialPosition,
+      finalPosition,
+      steps
+    );
+  } else if (method == INTERPOLATION.POLYNOMIAL) {
+    lagrangeInterpolation([initialPosition, finalPosition], steps);
+  }
+};
 
 const initProgram = () => {
   scene = new Scene(gl);
@@ -136,11 +164,7 @@ const initData = () => {
   });
   scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
   scene.add(new Axis({ gl, dimension: 82 }));
-  interpolatedPositions = linearInterpolation(
-    initialPosition,
-    finalPosition,
-    interpolationSteps
-  );
+  linearInterpolation(initialPosition, finalPosition, interpolationSteps);
 };
 
 const animatePosition = (time: number) => {
@@ -161,6 +185,40 @@ const render = (time: number) => {
   draw();
 };
 
+const initControls = () => {
+  initController();
+
+  createSelectorForm({
+    label: "Interpolation Method",
+    value: interpolationMethod,
+    options: Object.values(INTERPOLATION),
+    onInit: (v) => {
+      interpolationMethod = v;
+      computeInterpolatedPositions(interpolationMethod, interpolationSteps);
+    },
+    onChange: (v) => {
+      interpolationMethod = v;
+      computeInterpolatedPositions(interpolationMethod, interpolationSteps);
+    },
+  });
+
+  createNumericInput({
+    label: "Interpolation Steps",
+    value: interpolationSteps,
+    min: 0,
+    max: 2000,
+    step: 1,
+    onInit: (v) => {
+      interpolationSteps = v;
+      computeInterpolatedPositions(interpolationMethod, interpolationSteps);
+    },
+    onChange: (v) => {
+      interpolationSteps = v;
+      computeInterpolatedPositions(interpolationMethod, interpolationSteps);
+    },
+  });
+};
+
 const init = () => {
   initGUI();
   createDescriptionPanel(
@@ -173,6 +231,7 @@ const init = () => {
   initProgram();
   initData();
   render(0);
+  initControls();
 };
 
 window.onload = init;
