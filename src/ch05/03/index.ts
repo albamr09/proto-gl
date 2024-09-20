@@ -1,6 +1,7 @@
 import { loadData } from "../../lib/files.js";
 import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
 import { calculateNormals } from "../../lib/math/3d.js";
+import { Vector } from "../../lib/math/vector.js";
 import {
   autoResizeCanvas,
   configureCanvas,
@@ -21,12 +22,29 @@ let canvas: HTMLCanvasElement;
 let gl: WebGL2RenderingContext;
 let scene: Scene;
 let camera: Camera;
-let initialPosition = [-25, 0, 20],
-  finalPosition = [40, 0, -20],
-  incrementSteps = 1000,
+let initialPosition = [-25, 0, 20] as [number, number, number],
+  finalPosition = [40, 0, -20] as [number, number, number],
+  interpolationSteps = 1000,
   ballColor = [1, 1, 0, 1],
   flagStartColor = [0, 1, 0, 1],
   flagEndColor = [0, 0, 1, 1];
+let interpolatedPositions: [number, number, number][] = [];
+
+const linearInterpolation = (
+  p1: [number, number, number],
+  p2: [number, number, number],
+  nSteps: number
+) => {
+  const [x1, y1, z1] = p1;
+  const [x2, y2, z2] = p2;
+  const dx = (x2 - x1) / nSteps;
+  const dy = (y2 - y1) / nSteps;
+  const dz = (z2 - z1) / nSteps;
+
+  interpolatedPositions = Array.from({ length: nSteps }).map((_, i) => {
+    return [x1 + dx * i, y1 + dy * i, z1 + dz * i];
+  });
+};
 
 const initProgram = () => {
   scene = new Scene(gl);
@@ -36,6 +54,8 @@ const initProgram = () => {
     gl,
     scene
   );
+  camera.setPosition(new Vector([0, 2, 80]));
+  camera.setElevation(-20);
   new Controller({ camera, canvas });
 };
 
@@ -96,23 +116,66 @@ const initData = () => {
       );
     });
   });
+  loadData("/data/models/geometries/ball.json").then((data) => {
+    const { vertices, indices } = data;
+    scene.add(
+      new Mesh({
+        id: `ball`,
+        gl,
+        attributes: {
+          aPosition: {
+            data: vertices,
+            type: gl.FLOAT,
+            size: 3,
+          },
+          aNormal: {
+            data: calculateNormals(vertices, indices, 3),
+            type: gl.FLOAT,
+            size: 3,
+          },
+        },
+        uniforms: {
+          uMaterialDiffuse: {
+            data: ballColor,
+            type: UniformType.VECTOR_FLOAT,
+          },
+          uTranslation: {
+            data: initialPosition,
+            type: UniformType.VECTOR_FLOAT,
+          },
+          ...lightUniforms,
+        },
+        indices,
+      })
+    );
+  });
   scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
   scene.add(new Axis({ gl, dimension: 82 }));
+  linearInterpolation(initialPosition, finalPosition, interpolationSteps);
+};
+
+const animatePosition = (time: number) => {
+  scene.updateUniform(
+    "uTranslation",
+    interpolatedPositions[time % interpolationSteps],
+    "ball"
+  );
 };
 
 const draw = () => {
   scene.render();
 };
 
-const render = () => {
+const render = (time: number) => {
   requestAnimationFrame(render);
+  animatePosition(Math.floor(time * 0.25));
   draw();
 };
 
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we showcase how the different interpolation methods work."
+    "On this example we showcase how the linear interpolation method work."
   );
   canvas = configureCanvas();
   autoResizeCanvas(canvas);
@@ -120,7 +183,7 @@ const init = () => {
 
   initProgram();
   initData();
-  render();
+  render(0);
 };
 
 window.onload = init;
