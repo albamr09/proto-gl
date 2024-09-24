@@ -38,24 +38,26 @@ let canvas: HTMLCanvasElement;
 let gl: WebGL2RenderingContext;
 let scene: Scene;
 let camera: Camera;
-let initialPosition = [-25, 0, 20] as [number, number, number],
-  finalPosition = [40, 0, -20] as [number, number, number],
-  interpolationSteps = 1000,
+let interpolationSteps = 1000,
   ballColor = [1, 1, 0, 1],
   flagStartColor = [0, 1, 0, 1],
-  flagEndColor = [0, 0, 1, 1];
+  flagEndColor = [0, 0, 1, 1],
+  flagColor = [0.5, 0.5, 0.5, 1],
+  controlPoints = [
+    [-25, 0, 20],
+    [-40, 0, -10],
+    [0, 0, 10],
+    [25, 0, -5],
+    [40, 0, -20],
+  ] as [number, number, number][];
 let interpolatedPositions: [number, number, number][] = [];
 let interpolationMethod = INTERPOLATION.LINEAR;
 
 const computeInterpolatedPositions = (method: INTERPOLATION, steps: number) => {
   if (method == INTERPOLATION.LINEAR) {
-    interpolatedPositions = linearInterpolation(
-      initialPosition,
-      finalPosition,
-      steps
-    );
+    interpolatedPositions = linearInterpolation(controlPoints, steps);
   } else if (method == INTERPOLATION.POLYNOMIAL) {
-    lagrangeInterpolation([initialPosition, finalPosition], steps);
+    interpolatedPositions = lagrangeInterpolation(controlPoints, steps) ?? [];
   }
 };
 
@@ -93,10 +95,7 @@ const initData = () => {
   };
   loadData("/data/models/geometries/flag.json").then((data) => {
     const { vertices, indices } = data;
-    [
-      { position: initialPosition, color: flagStartColor },
-      { position: finalPosition, color: flagEndColor },
-    ].forEach(({ position, color }, id) => {
+    controlPoints.forEach((position, id) => {
       scene.add(
         new Mesh({
           id: `flag-${id}`,
@@ -115,7 +114,12 @@ const initData = () => {
           },
           uniforms: {
             uMaterialDiffuse: {
-              data: color,
+              data:
+                id == 0
+                  ? flagStartColor
+                  : id == controlPoints.length - 1
+                  ? flagEndColor
+                  : flagColor,
               type: UniformType.VECTOR_FLOAT,
             },
             uTranslation: {
@@ -153,7 +157,7 @@ const initData = () => {
             type: UniformType.VECTOR_FLOAT,
           },
           uTranslation: {
-            data: initialPosition,
+            data: controlPoints[0],
             type: UniformType.VECTOR_FLOAT,
           },
           ...lightUniforms,
@@ -164,7 +168,6 @@ const initData = () => {
   });
   scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
   scene.add(new Axis({ gl, dimension: 82 }));
-  linearInterpolation(initialPosition, finalPosition, interpolationSteps);
 };
 
 const animatePosition = (time: number) => {

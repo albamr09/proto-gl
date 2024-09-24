@@ -137,8 +137,7 @@ const initData = () => {
   scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
   scene.add(new Axis({ gl, dimension: 82 }));
   interpolatedPositions = linearInterpolation(
-    initialPosition,
-    finalPosition,
+    [initialPosition, finalPosition],
     interpolationSteps
   );
 };
