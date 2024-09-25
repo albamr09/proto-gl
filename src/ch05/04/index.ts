@@ -43,15 +43,45 @@ let interpolationSteps = 1000,
   flagStartColor = [0, 1, 0, 1],
   flagEndColor = [0, 0, 1, 1],
   flagColor = [0.5, 0.5, 0.5, 1],
-  controlPoints = [
+  flagIds: string[] = [],
+  linearControlPoints = [
     [-25, 0, 20],
     [-40, 0, -10],
     [0, 0, 10],
     [25, 0, -5],
     [40, 0, -20],
-  ] as [number, number, number][];
+  ] as [number, number, number][],
+  polynomialControlPoints = [
+    [21, 0, 23],
+    [-3, 0, -10],
+    [-21, 0, -53],
+    [50, 0, -31],
+    [-24, 0, 2],
+  ] as [number, number, number][],
+  bSplineControlPoints = [
+    [-21, 0, 23],
+    [32, 0, -10],
+    [0, 0, -53],
+    [-32, 0, -10],
+    [21, 0, 23],
+  ] as [number, number, number][],
+  controlPoints: [number, number, number][] = [];
 let interpolatedPositions: [number, number, number][] = [];
-let interpolationMethod = INTERPOLATION.LINEAR;
+let interpolationMethod = INTERPOLATION.POLYNOMIAL;
+
+const updateControlPoints = () => {
+  switch (interpolationMethod) {
+    case INTERPOLATION.LINEAR:
+      controlPoints = linearControlPoints;
+      break;
+    case INTERPOLATION.POLYNOMIAL:
+      controlPoints = polynomialControlPoints;
+      break;
+    case INTERPOLATION.BSPLINE:
+      controlPoints = bSplineControlPoints;
+      break;
+  }
+};
 
 const computeInterpolatedPositions = (method: INTERPOLATION, steps: number) => {
   if (method == INTERPOLATION.LINEAR) {
@@ -96,6 +126,7 @@ const initData = () => {
   loadData("/data/models/geometries/flag.json").then((data) => {
     const { vertices, indices } = data;
     controlPoints.forEach((position, id) => {
+      flagIds.push(`flag-${id}`);
       scene.add(
         new Mesh({
           id: `flag-${id}`,
@@ -197,10 +228,18 @@ const initControls = () => {
     options: Object.values(INTERPOLATION),
     onInit: (v) => {
       interpolationMethod = v;
+      updateControlPoints();
+      flagIds.forEach((id, i) => {
+        scene.updateUniform("uTranslation", controlPoints[i], id);
+      });
       computeInterpolatedPositions(interpolationMethod, interpolationSteps);
     },
     onChange: (v) => {
       interpolationMethod = v;
+      updateControlPoints();
+      flagIds.forEach((id, i) => {
+        scene.updateUniform("uTranslation", controlPoints[i], id);
+      });
       computeInterpolatedPositions(interpolationMethod, interpolationSteps);
     },
   });
