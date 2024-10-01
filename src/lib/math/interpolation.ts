@@ -27,6 +27,7 @@ export const linearInterpolation = (
 };
 
 // Reference: https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter17.04-Lagrange-Polynomial-Interpolation.html
+// Also very simple introduction: https://rohangautam.github.io/blog/b_spline_intro
 export const lagrangeInterpolation = (
   points: [number, number, number][],
   nSteps: number
@@ -87,4 +88,12 @@ export const lagrangeInterpolation = (
       []
     );
   });
+};
+
+// Reference: https://rohangautam.github.io/blog/b_spline_intro
+export const bSplineInterpolation = (
+  points: [number, number, number][],
+  nSteps: number
+) => {
+  return points;
 };
