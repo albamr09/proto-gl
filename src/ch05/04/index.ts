@@ -52,10 +52,10 @@ let interpolationSteps = 1000,
     [40, 0, -20],
   ] as [number, number, number][],
   polynomialControlPoints = [
+    [50, 0, -31],
     [21, 0, 23],
     [-3, 0, -10],
     [-21, 0, -53],
-    [50, 0, -31],
     [-24, 0, 2],
   ] as [number, number, number][],
   bSplineControlPoints = [

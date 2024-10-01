@@ -40,7 +40,6 @@ export const lagrangeInterpolation = (
   const xPoints = points.map((p) => p[0]);
   const yPoints = points.map((p) => p[1]);
   const zPoints = points.map((p) => p[2]);
-  console.log(xPoints, zPoints);
 
   // Compute basis polynomials
   const P = (x: number, i: number, xPoints: number[]) => {
@@ -59,33 +58,33 @@ export const lagrangeInterpolation = (
     }, 0);
   };
 
-  const f = (x: number) => {
-    return (
-      2.96547e-4 * Math.pow(x, 4) +
-      -1.4458e-2 * Math.pow(x, 3) +
-      -2.0096e-1 * Math.pow(x, 2) +
-      8.18548 * x +
-      1.59507
+  const totalDist = xPoints.reduce((acc, p, i) => {
+    return acc + Math.abs(xPoints[(i + 1) % xPoints.length] - p);
+  }, 0);
+
+  // Compute a different step size depending on the distance
+  // between the points, this allows the speed of the animation
+  // to be constante in between checkpoints
+  const relativeStepSize = xPoints.map((p, i) => {
+    const d = Math.abs(xPoints[(i + 1) % xPoints.length] - p);
+    return (d / totalDist) * nSteps;
+  });
+
+  return relativeStepSize.flatMap((size, stepIdx) => {
+    return Array.from({ length: size }).reduce(
+      (acc: [number, number, number][], _, i) => {
+        const currentX = xPoints[stepIdx];
+        const nextX = xPoints[(stepIdx + 1) % nPoints];
+        const progress = i / size;
+        const x = currentX + (nextX - currentX) * progress;
+        // Evaluate the lagrange polynomial for the generated value
+        // for both y and z components
+        const interpolatedY = L(x, yPoints, xPoints);
+        const interpolatedZ = L(x, zPoints, xPoints);
+        acc.push([x, interpolatedY, interpolatedZ]);
+        return acc;
+      },
+      []
     );
-  };
-
-  // We generate intermediate values using linear interpolation
-  // this are then evaluated using our lagrange polynomial
-  const generatedValues = linearInterpolation(points, nSteps);
-
-  return Array.from({ length: nSteps }).reduce(
-    (acc: [number, number, number][], _, i) => {
-      const x = generatedValues[i][0];
-      const y = generatedValues[i][1];
-      const z = generatedValues[i][2];
-      // Evaluate the lagrange polynomial for the generated value
-      // for both y and z components
-      //const interpolatedY = L(x, yPoints, xPoints);
-      //const interpolatedZ = L(x, zPoints, xPoints);
-      const interpolatedZ = f(x);
-      acc.push([x, y, interpolatedZ]);
-      return acc;
-    },
-    []
-  );
+  });
 };
