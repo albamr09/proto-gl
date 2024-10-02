@@ -69,6 +69,7 @@ let interpolationSteps = 1000,
   controlPoints: [number, number, number][] = [];
 let interpolatedPositions: [number, number, number][] = [];
 let interpolationMethod = INTERPOLATION.POLYNOMIAL;
+const ANIMATION_DURATION = 3000;
 
 const updateControlPoints = () => {
   switch (interpolationMethod) {
@@ -204,21 +205,19 @@ const initData = () => {
   scene.add(new Axis({ gl, dimension: 82 }));
 };
 
-const animatePosition = (time: number) => {
-  scene.updateUniform(
-    "uTranslation",
-    interpolatedPositions[time % interpolationSteps],
-    "ball"
-  );
+const animatePosition = (progress: number) => {
+  const posIdx = Math.floor(interpolationSteps * progress);
+  scene.updateUniform("uTranslation", interpolatedPositions[posIdx], "ball");
 };
 
 const draw = () => {
   scene.render();
 };
 
-const render = (time: number) => {
+const render = (timestamp: number) => {
+  const progress = (timestamp % ANIMATION_DURATION) / ANIMATION_DURATION;
   requestAnimationFrame(render);
-  animatePosition(Math.floor(time * 0.25));
+  animatePosition(progress);
   draw();
 };
 
