@@ -93,7 +93,80 @@ export const lagrangeInterpolation = (
 // Reference: https://rohangautam.github.io/blog/b_spline_intro
 export const bSplineInterpolation = (
   points: [number, number, number][],
-  nSteps: number
+  nSteps: number,
+  degree = 3
 ) => {
-  return points;
+  const coxDeBoor = (u: number, i: number, k: number, knots: number[]) => {
+    /**
+     * u : x value of the point to be evaluated in the input domain
+     * i : index of the basis function to compute
+     * k : degree of the spline
+     * knots : values in the parameter domain that divide the spline into pieces
+     *
+     * returns -> a scalar value that calculates the influence of the i'th basis function on the point u in the input domain.
+     */
+    if (k === 0) {
+      return knots[i] <= u && u < knots[i + 1] ? 1.0 : 0.0;
+    }
+
+    let leftTerm = 0.0;
+    let rightTerm = 0.0;
+
+    if (knots[i + k] !== knots[i]) {
+      leftTerm =
+        ((u - knots[i]) / (knots[i + k] - knots[i])) *
+        coxDeBoor(u, i, k - 1, knots);
+    }
+
+    if (knots[i + k + 1] !== knots[i + 1]) {
+      rightTerm =
+        ((knots[i + k + 1] - u) / (knots[i + k + 1] - knots[i + 1])) *
+        coxDeBoor(u, i + 1, k - 1, knots);
+    }
+
+    return leftTerm + rightTerm;
+  };
+
+  // Initialize basis functions
+  const numBasisFunctions = points.length;
+  // Generate uniform knot vector (from 0 to n + degree + 1)
+  const knots = Array.from(
+    { length: numBasisFunctions + degree + 2 },
+    (_, i) => i
+  );
+
+  // Generate uniform u values in the range [knots[degree], knots[-degree - 1]]
+  const uValues = Array.from(
+    { length: 100 },
+    (_, i) =>
+      knots[degree] +
+      (i * (knots[numBasisFunctions] - knots[degree])) / (100 - 1)
+  );
+  const basisFunctions = Array(uValues.length)
+    .fill(0)
+    .map(() => Array(numBasisFunctions).fill(0));
+
+  // Calculate the basis functions
+  for (let i = 0; i < numBasisFunctions; i++) {
+    for (let j = 0; j < uValues.length; j++) {
+      basisFunctions[j][i] = coxDeBoor(uValues[j], i, degree, knots);
+    }
+  }
+
+  // Construct the B-spline curve
+  const curve = Array(uValues.length)
+    .fill(0)
+    .map(() => [0, 0, 0]);
+
+  for (let i = 0; i < numBasisFunctions; i++) {
+    for (let j = 0; j < uValues.length; j++) {
+      curve[j][0] += basisFunctions[j][i] * points[i][0]; // x-coordinate
+      curve[j][1] += basisFunctions[j][i] * points[i][1]; // y-coordinate
+      curve[j][2] += basisFunctions[j][i] * points[i][2]; // z-coordinate
+    }
+  }
+
+  console.log(points);
+
+  return curve as [number, number, number][];
 };

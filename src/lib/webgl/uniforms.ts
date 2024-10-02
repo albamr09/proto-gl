@@ -67,8 +67,9 @@ export class Uniform {
   }
 
   bindUniformForType(gl: WebGL2RenderingContext) {
-    if (!this.location)
+    if (!this.location) {
       throw Error(`Uniform ${this.name} does not have a location assigned`);
+    }
 
     switch (this.type) {
       case UniformType.INT:

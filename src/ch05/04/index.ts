@@ -206,7 +206,7 @@ const initData = () => {
 };
 
 const animatePosition = (progress: number) => {
-  const posIdx = Math.floor(interpolationSteps * progress);
+  const posIdx = Math.floor((interpolatedPositions.length - 1) * progress);
   scene.updateUniform("uTranslation", interpolatedPositions[posIdx], "ball");
 };
 
