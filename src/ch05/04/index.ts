@@ -60,11 +60,11 @@ let interpolationSteps = 1000,
     [-24, 0, 2],
   ] as [number, number, number][],
   bSplineControlPoints = [
-    [-32, 0, -10],
     [-21, 0, 23],
-    [0, 0, -53],
-    [21, 0, 23],
     [32, 0, -10],
+    [0, 0, -53],
+    [-32, 0, -10],
+    [21, 0, 23],
   ] as [number, number, number][],
   controlPoints: [number, number, number][] = [];
 let interpolatedPositions: [number, number, number][] = [];

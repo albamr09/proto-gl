@@ -90,12 +90,40 @@ export const lagrangeInterpolation = (
   });
 };
 
+// Function to generate evaluation points
+const linspace = (start: number, stop: number, num: number) => {
+  const step = (stop - start) / (num - 1);
+  return Array.from({ length: num }, (_, i) => start + step * i);
+};
+
 // Reference: https://rohangautam.github.io/blog/b_spline_intro
 export const bSplineInterpolation = (
   points: [number, number, number][],
   nSteps: number,
   degree = 3
 ) => {
+  const computeKnots = (degree: number, numControlPoints: number) => {
+    const numKnots = numControlPoints + degree + 1;
+    const knots = new Array(numKnots);
+
+    // Fill the first p+1 values with 0
+    for (let i = 0; i <= degree; i++) {
+      knots[i] = 0;
+    }
+
+    // Fill the middle values
+    for (let i = degree + 1; i < numControlPoints; i++) {
+      knots[i] = (i - degree) / (numControlPoints - degree);
+    }
+
+    // Fill the last p+1 values with 1
+    for (let i = numControlPoints; i < numKnots; i++) {
+      knots[i] = 1;
+    }
+
+    return knots;
+  };
+
   const coxDeBoor = (u: number, i: number, k: number, knots: number[]) => {
     /**
      * u : x value of the point to be evaluated in the input domain
@@ -127,20 +155,23 @@ export const bSplineInterpolation = (
     return leftTerm + rightTerm;
   };
 
-  // Initialize basis functions
-  const numBasisFunctions = points.length;
-  // Generate uniform knot vector (from 0 to n + degree + 1)
-  const knots = Array.from(
-    { length: numBasisFunctions + degree + 2 },
-    (_, i) => i
-  );
+  // Very intelligent way of forcing the spline to go throught the last point
+  const controlPoints = [
+    ...points,
+    points[points.length - 1],
+    points[points.length - 1],
+  ];
 
-  // Generate uniform u values in the range [knots[degree], knots[-degree - 1]]
-  const uValues = Array.from(
-    { length: 100 },
-    (_, i) =>
-      knots[degree] +
-      (i * (knots[numBasisFunctions] - knots[degree])) / (100 - 1)
+  // Initialize basis functions
+  const numBasisFunctions = controlPoints.length;
+  // Define the B-spline knots
+  const knots = computeKnots(degree, controlPoints.length);
+
+  // Generate evaluation points
+  const uValues = linspace(
+    knots[degree],
+    knots[knots.length - degree - 1],
+    nSteps
   );
   const basisFunctions = Array(uValues.length)
     .fill(0)
@@ -160,13 +191,11 @@ export const bSplineInterpolation = (
 
   for (let i = 0; i < numBasisFunctions; i++) {
     for (let j = 0; j < uValues.length; j++) {
-      curve[j][0] += basisFunctions[j][i] * points[i][0]; // x-coordinate
-      curve[j][1] += basisFunctions[j][i] * points[i][1]; // y-coordinate
-      curve[j][2] += basisFunctions[j][i] * points[i][2]; // z-coordinate
+      curve[j][0] += basisFunctions[j][i] * controlPoints[i][0]; // x-coordinate
+      curve[j][1] += basisFunctions[j][i] * controlPoints[i][1]; // y-coordinate
+      curve[j][2] += basisFunctions[j][i] * controlPoints[i][2]; // z-coordinate
     }
   }
-
-  console.log(points);
 
   return curve as [number, number, number][];
 };
