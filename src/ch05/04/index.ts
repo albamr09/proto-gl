@@ -53,10 +53,10 @@ let interpolationSteps = 1000,
     [40, 0, -20],
   ] as [number, number, number][],
   polynomialControlPoints = [
-    [50, 0, -31],
     [21, 0, 23],
     [-3, 0, -10],
     [-21, 0, -53],
+    [50, 0, -31],
     [-24, 0, 2],
   ] as [number, number, number][],
   bSplineControlPoints = [
@@ -69,20 +69,39 @@ let interpolationSteps = 1000,
   controlPoints: [number, number, number][] = [];
 let interpolatedPositions: [number, number, number][] = [];
 let interpolationMethod = INTERPOLATION.POLYNOMIAL;
+let highlightDistThreshold = 5;
 const ANIMATION_DURATION = 3000;
+
+const getColorFromIdx = (idx: number) => {
+  return idx == 0
+    ? flagStartColor
+    : idx == controlPoints.length - 1
+    ? flagEndColor
+    : flagColor;
+};
 
 const updateControlPoints = () => {
   switch (interpolationMethod) {
     case INTERPOLATION.LINEAR:
       controlPoints = linearControlPoints;
+      highlightDistThreshold = 5;
       break;
     case INTERPOLATION.POLYNOMIAL:
       controlPoints = polynomialControlPoints;
+      highlightDistThreshold = 20;
       break;
     case INTERPOLATION.BSPLINE:
       controlPoints = bSplineControlPoints;
+      highlightDistThreshold = 20;
       break;
   }
+  controlPoints.forEach((_, idx) => {
+    scene.updateUniform(
+      "uMaterialDiffuse",
+      getColorFromIdx(idx),
+      `flag-${idx}`
+    );
+  });
 };
 
 const computeInterpolatedPositions = (method: INTERPOLATION, steps: number) => {
@@ -149,12 +168,7 @@ const initData = () => {
           },
           uniforms: {
             uMaterialDiffuse: {
-              data:
-                id == 0
-                  ? flagStartColor
-                  : id == controlPoints.length - 1
-                  ? flagEndColor
-                  : flagColor,
+              data: getColorFromIdx(id),
               type: UniformType.VECTOR_FLOAT,
             },
             uTranslation: {
@@ -205,9 +219,25 @@ const initData = () => {
   scene.add(new Axis({ gl, dimension: 82 }));
 };
 
+const distance = (x: [number, number, number], y: [number, number, number]) => {
+  return Math.sqrt(
+    Math.pow(x[0] - y[0], 2) +
+      Math.pow(x[1] - y[1], 2) +
+      Math.pow(x[2] - y[2], 2)
+  );
+};
+
 const animatePosition = (progress: number) => {
   const posIdx = Math.floor((interpolatedPositions.length - 1) * progress);
   scene.updateUniform("uTranslation", interpolatedPositions[posIdx], "ball");
+  controlPoints.forEach((v, idx) => {
+    if (idx == 0 || idx == controlPoints.length - 1) return;
+    if (distance(v, interpolatedPositions[posIdx]) < highlightDistThreshold) {
+      scene.updateUniform("uMaterialDiffuse", [1, 0, 0, 1], `flag-${idx}`);
+    } else {
+      scene.updateUniform("uMaterialDiffuse", flagColor, `flag-${idx}`);
+    }
+  });
 };
 
 const draw = () => {
@@ -266,7 +296,7 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we showcase how the linear interpolation method work."
+    "On this example we showcase how different interpolation methods work."
   );
   canvas = configureCanvas();
   autoResizeCanvas(canvas);
