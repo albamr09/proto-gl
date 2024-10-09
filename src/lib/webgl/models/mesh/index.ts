@@ -2,7 +2,6 @@ import Instance, {
   AttributeDefinition,
   UniformDefinition,
 } from "../../instance.js";
-import { UniformType } from "../../uniforms.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 

@@ -19,13 +19,19 @@ class Scene {
     this.setUp();
   }
 
-  setUp() {
-    // Background colors :)
+  // Default setup, defining depth testing
+  private setUp() {
     this.gl.clearColor(0.9, 0.9, 0.9, 1);
-    // Depth testing
     this.gl.clearDepth(1);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.depthFunc(this.gl.LEQUAL);
+  }
+
+  setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
+    fn(this.gl);
+    Object.values(this.objects).forEach((o) => {
+      o.setGLParameters(fn);
+    });
   }
 
   getUniform(id: string, uniformName: any) {

@@ -21,7 +21,7 @@ export type UniformDefinition = {
   type: UniformType;
 };
 
-class Instance<A extends readonly string[], U extends readonly string[]> {
+class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private id?: string;
   private gl: WebGL2RenderingContext;
   private program: Program<A, U>;
@@ -30,7 +30,6 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
   private ibo!: WebGLBuffer | null;
   private len!: number;
   private renderingMode!: GLenum;
-  private localTransform: Matrix4;
 
   /**
    * Creates an object with its own program
@@ -79,7 +78,6 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     }
 
     this.renderingMode = renderingMode ?? this.gl.TRIANGLES;
-    this.localTransform = Matrix4.identity();
 
     this.setupAttributes({ attributes, indices });
     this.setupUniforms({ uniforms });
@@ -177,6 +175,11 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
     return this.uniforms?.[uniformName];
   }
 
+  setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
+    fn(this.gl);
+    this.program.setGLParameters(fn);
+  }
+
   setId(id: string) {
     this.id = id;
   }
@@ -194,19 +197,6 @@ class Instance<A extends readonly string[], U extends readonly string[]> {
 
     // Callback
     cb(this);
-
-    // Apply local transformation if it exists
-    if (this.localTransform) {
-      let modelViewMatrix = this.uniforms![
-        "uModelViewMatrix"
-      ]?.getData() as Matrix4;
-      modelViewMatrix = Matrix4.fromFloatArray(
-        modelViewMatrix as unknown as Float32Array
-      );
-      this.uniforms!["uModelViewMatrix"]?.setData(
-        this.localTransform.multiply(modelViewMatrix).toFloatArray()
-      );
-    }
 
     // Populate uniforms
     for (const uniform of Object.values(this?.uniforms ?? {}) as Uniform[]) {

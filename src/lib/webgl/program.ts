@@ -17,7 +17,7 @@ class Program<
   A extends readonly string[] = [],
   U extends readonly string[] = []
 > {
-  private gl: WebGLRenderingContext | WebGL2RenderingContext;
+  private gl: WebGL2RenderingContext;
   private _program: WebGLProgram | null;
   public attributes: Attributes<A>;
   public uniforms: Uniforms<U, WebGLUniformLocation>;
@@ -55,6 +55,10 @@ class Program<
 
   getProgram() {
     return this._program;
+  }
+
+  setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
+    fn(this.gl);
   }
 
   /**
