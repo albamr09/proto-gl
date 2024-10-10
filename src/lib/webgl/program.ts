@@ -57,6 +57,9 @@ class Program<
     return this._program;
   }
 
+  /**
+   * Updates WebGL configuration
+   */
   setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
     fn(this.gl);
   }

@@ -1,4 +1,3 @@
-import { Matrix4 } from "../math/matrix.js";
 import { uuidv4 } from "../utils.js";
 import Program, { Uniforms } from "./program.js";
 import {
@@ -28,7 +27,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private uniforms?: Uniforms<U, Uniform>;
   private vao!: WebGLVertexArrayObject | null;
   private ibo!: WebGLBuffer | null;
-  private len!: number;
+  private size!: number;
   private renderingMode!: GLenum;
 
   /**
@@ -43,6 +42,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     attributes,
     indices,
     uniforms,
+    size,
     renderingMode,
   }: {
     gl: WebGL2RenderingContext;
@@ -53,10 +53,11 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     attributes: {
       [P in A[number]]?: AttributeDefinition;
     };
-    indices: number[];
+    indices?: number[];
     uniforms?: {
       [P in U[number]]?: UniformDefinition;
     };
+    size?: number;
     renderingMode?: GLenum;
   }) {
     this.id = id ?? uuidv4();
@@ -79,18 +80,20 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
 
     this.renderingMode = renderingMode ?? this.gl.TRIANGLES;
 
-    this.setupAttributes({ attributes, indices });
+    this.setupAttributes({ attributes, indices, size });
     this.setupUniforms({ uniforms });
   }
 
   setupAttributes({
     attributes,
     indices,
+    size,
   }: {
     attributes: {
       [P in A[number]]?: AttributeDefinition;
     };
-    indices: number[];
+    indices?: number[];
+    size?: number;
   }) {
     this.vao = this.gl.createVertexArray();
     this.gl.bindVertexArray(this.vao);
@@ -122,14 +125,22 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     }
 
     // Indices
-    this.ibo = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo);
-    this.gl.bufferData(
-      this.gl.ELEMENT_ARRAY_BUFFER,
-      new Uint16Array(indices),
-      this.gl.STATIC_DRAW
-    );
-    this.len = indices.length;
+    if (indices) {
+      this.ibo = this.gl.createBuffer();
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo);
+      this.gl.bufferData(
+        this.gl.ELEMENT_ARRAY_BUFFER,
+        new Uint16Array(indices),
+        this.gl.STATIC_DRAW
+      );
+      this.size = indices.length;
+    } else {
+      // If we do not have indices, then we use the size supplied by the user
+      if (!size) {
+        throw Error("No indices or size for the data were provided");
+      }
+      this.size = size;
+    }
 
     // Clean
     this.gl.bindVertexArray(null);
@@ -193,7 +204,9 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     this.program.use();
     // Bind vertices and indices
     this.gl.bindVertexArray(this.vao);
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo);
+    if (this.ibo) {
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo);
+    }
 
     // Callback
     cb(this);
@@ -204,13 +217,18 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       uniform.bindUniformForType(this.gl);
     }
 
-    // Draw
-    this.gl.drawElements(
-      this.renderingMode ?? this.gl.TRIANGLES,
-      this.len,
-      this.gl.UNSIGNED_SHORT,
-      0
-    );
+    // If we have IBO defined draw using index information
+    if (this.ibo) {
+      this.gl.drawElements(
+        this.renderingMode ?? this.gl.TRIANGLES,
+        this.size,
+        this.gl.UNSIGNED_SHORT,
+        0
+      );
+    } else {
+      // Else draw using vertex order directly
+      this.gl.drawArrays(this.renderingMode ?? this.gl.TRIANGLES, 0, this.size);
+    }
 
     // Unbind
     this.gl.bindVertexArray(null);
