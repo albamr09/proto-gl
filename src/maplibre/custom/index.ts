@@ -7,12 +7,14 @@ import { UniformType } from "../../lib/webgl/uniforms.js";
 import { Vector } from "../../lib/math/vector.js";
 
 const attributes = ["aPos"] as const;
+const uniforms = ["uRotation"] as const;
+let rotation = 0;
 
 interface CustomLayerInterface {
   id: string;
   type: string;
-  program?: Program<typeof attributes>;
-  instance?: Instance<typeof attributes>;
+  program?: Program<typeof attributes, typeof uniforms>;
+  instance?: Instance<typeof attributes, typeof uniforms>;
   onAdd: (map: any, gl: WebGL2RenderingContext) => void;
   render: (gl: WebGL2RenderingContext, matrix: Float32Array) => void;
 }
@@ -38,7 +40,7 @@ const transformVertices = (
 
 const initData = (
   gl: WebGL2RenderingContext,
-  program: Program<typeof attributes>,
+  program: Program<typeof attributes, typeof uniforms>,
   map: any
 ) => {
   const vertices = transformVertices(
@@ -60,6 +62,12 @@ const initData = (
         type: gl.FLOAT,
       },
     },
+    uniforms: {
+      uRotation: {
+        data: Matrix4.identity().toFloatArray(),
+        type: UniformType.MATRIX,
+      },
+    },
     size: 3,
   });
 
@@ -72,11 +80,12 @@ const initLayer = () => {
     type: "custom",
     onAdd(map: any, gl: WebGL2RenderingContext) {
       try {
-        this.program = new Program<typeof attributes>(
+        this.program = new Program<typeof attributes, typeof uniforms>(
           gl,
           vertexShaderSource,
           fragmentShaderSource,
-          attributes
+          attributes,
+          uniforms
         );
         this.instance = initData(gl, this.program, map);
       } catch (e) {
