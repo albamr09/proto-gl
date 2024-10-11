@@ -193,7 +193,7 @@ const initControls = () => {
     },
     onChange: (v) => {
       useLambert = v;
-      scene.updateUniform("uUseLambert", v, "cube-simple");
+      scene.updateUniform("uUseLambert", v);
     },
   });
   createCheckboxInputForm({
@@ -204,7 +204,7 @@ const initControls = () => {
     },
     onChange: (v) => {
       usePerVertex = v;
-      scene.updateUniform("uUsePerVertexColoring", v, "cube-simple");
+      scene.updateUniform("uUsePerVertexColoring", v);
     },
   });
   createCheckboxInputForm({
@@ -227,11 +227,10 @@ const initControls = () => {
     step: 0.05,
     onInit: (v) => {
       alphaValue = v;
-      scene.updateUniform("uAlpha", v, "cube-simple");
     },
     onChange: (v) => {
       alphaValue = v;
-      scene.updateUniform("uAlpha", v, "cube-simple");
+      scene.updateUniform("uAlpha", v);
       // Allow translucency
       if (v < 1) {
         scene.setGLParameters((gl) => {
