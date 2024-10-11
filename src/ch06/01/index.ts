@@ -73,6 +73,57 @@ const initData = () => {
       type: UniformType.VECTOR_FLOAT,
     },
   };
+  loadData("/data/models/geometries/cube-complex.json").then((data) => {
+    const { indices, diffuse, vertices, scalars } = data;
+    scene.add(
+      new Instance<typeof attributes, typeof uniforms>({
+        id: "cube-complex",
+        gl,
+        vertexShaderSource,
+        fragmentShaderSource,
+        attributes: {
+          aPosition: {
+            data: vertices,
+            size: 3,
+            type: gl.FLOAT,
+          },
+          aNormal: {
+            data: calculateNormals(vertices, indices, 3),
+            size: 3,
+            type: gl.FLOAT,
+          },
+          aColor: {
+            data: scalars,
+            size: 4,
+            type: gl.FLOAT,
+          },
+        },
+        uniforms: {
+          uMaterialDiffuse: {
+            data: diffuse,
+            type: UniformType.VECTOR_FLOAT,
+          },
+          uUseLambert: {
+            data: useLambert,
+            type: UniformType.INT,
+          },
+          uUsePerVertexColoring: {
+            data: usePerVertex,
+            type: UniformType.INT,
+          },
+          uAlpha: {
+            data: alphaValue,
+            type: UniformType.FLOAT,
+          },
+          ...lightUniforms,
+        },
+        indices,
+        configuration: {
+          visible: false,
+        },
+      })
+    );
+  });
   loadData("/data/models/geometries/cube-simple.json").then((data) => {
     const { indices, vertices, diffuse, scalars } = data;
     scene.add(
@@ -164,6 +215,8 @@ const initControls = () => {
     },
     onChange: (v) => {
       showComplexCube = v;
+      scene.setConfigurationValue("visible", v, "cube-complex");
+      scene.setConfigurationValue("visible", !v, "cube-simple");
     },
   });
   createNumericInput({

@@ -1,7 +1,7 @@
 import { computeNormalMatrix } from "../math/3d.js";
 import { Matrix4 } from "../math/matrix.js";
 import { uuidv4 } from "../utils.js";
-import Instance from "./instance.js";
+import Instance, { Configuration } from "./instance.js";
 
 class Scene {
   private gl: WebGL2RenderingContext;
@@ -45,6 +45,16 @@ class Scene {
     }
     Object.values(this.objects).forEach((o) => {
       o.updateUniform(uniformName, value);
+    });
+  }
+
+  setConfigurationValue<T>(key: keyof Configuration, value: T, id?: string) {
+    if (id) {
+      this.objects[id]?.setConfigurationValue(key, value);
+      return;
+    }
+    Object.values(this.objects).forEach((o) => {
+      o.setConfigurationValue(key, value);
     });
   }
 

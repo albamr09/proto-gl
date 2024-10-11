@@ -1,5 +1,6 @@
 import Instance, {
   AttributeDefinition,
+  Configuration,
   UniformDefinition,
 } from "../../instance.js";
 import fragmentShaderSource from "./fs.glsl.js";
@@ -31,7 +32,7 @@ class Mesh<
     attributes,
     indices,
     uniforms,
-    renderingMode,
+    configuration,
   }: {
     id: string;
     gl: WebGL2RenderingContext;
@@ -44,7 +45,7 @@ class Mesh<
     uniforms?: {
       [P in (typeof DefaultUniforms)[number] | U[number]]?: UniformDefinition;
     };
-    renderingMode?: GLenum;
+    configuration?: Configuration;
   }) {
     super({
       id,
@@ -54,7 +55,7 @@ class Mesh<
       attributes,
       indices,
       uniforms,
-      renderingMode,
+      configuration,
     });
   }
 }

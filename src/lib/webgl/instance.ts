@@ -20,6 +20,20 @@ export type UniformDefinition = {
   type: UniformType;
 };
 
+export interface Configuration {
+  pickable?: boolean;
+  visible?: boolean;
+  renderingMode?: GLenum;
+}
+
+const defaultConfiguration: Configuration = {
+  pickable: true,
+  visible: true,
+  // TODO: this kinda sucks, we are setting a
+  // random number instead of the actual default
+  renderingMode: 0,
+};
+
 class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private id?: string;
   private gl: WebGL2RenderingContext;
@@ -28,7 +42,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private vao!: WebGLVertexArrayObject | null;
   private ibo!: WebGLBuffer | null;
   private size!: number;
-  private renderingMode!: GLenum;
+  private configuration!: Configuration;
 
   /**
    * Creates an object with its own program
@@ -43,7 +57,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     indices,
     uniforms,
     size,
-    renderingMode,
+    configuration,
   }: {
     gl: WebGL2RenderingContext;
     program?: Program<A, U>;
@@ -58,7 +72,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       [P in U[number]]?: UniformDefinition;
     };
     size?: number;
-    renderingMode?: GLenum;
+    configuration?: Configuration;
   }) {
     this.id = id ?? uuidv4();
     this.gl = gl;
@@ -78,10 +92,22 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       throw Error("Could not create the instance");
     }
 
-    this.renderingMode = renderingMode ?? this.gl.TRIANGLES;
+    this.configuration = {
+      ...defaultConfiguration,
+      renderingMode: this.gl.TRIANGLES,
+      ...configuration,
+    };
 
     this.setupAttributes({ attributes, indices, size });
     this.setupUniforms({ uniforms });
+  }
+
+  setId(id: string) {
+    this.id = id;
+  }
+
+  getId() {
+    return this.id;
   }
 
   /**
@@ -218,12 +244,9 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     this.program.setGLParameters(fn);
   }
 
-  setId(id: string) {
-    this.id = id;
-  }
-
-  getId() {
-    return this.id;
+  // TODO: type this?
+  setConfigurationValue(key: keyof Configuration, value: any) {
+    this.configuration[key] = value;
   }
 
   render({
@@ -231,6 +254,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   }: {
     cb?: (o: Instance<A, U>, gl: WebGL2RenderingContext) => void;
   }) {
+    if (!this.configuration.visible) return;
     // Use this program instance
     this.program.use();
     // Bind vertices and indices
@@ -251,14 +275,14 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     // If we have IBO defined draw using index information
     if (this.ibo) {
       this.gl.drawElements(
-        this.renderingMode ?? this.gl.TRIANGLES,
+        this.configuration.renderingMode!,
         this.size,
         this.gl.UNSIGNED_SHORT,
         0
       );
     } else {
       // Else draw using vertex order directly
-      this.gl.drawArrays(this.renderingMode ?? this.gl.TRIANGLES, 0, this.size);
+      this.gl.drawArrays(this.configuration.renderingMode!, 0, this.size);
     }
 
     // Unbind

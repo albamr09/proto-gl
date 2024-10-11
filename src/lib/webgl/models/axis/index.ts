@@ -34,7 +34,9 @@ class Axis extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
         },
       },
       indices,
-      renderingMode: gl.LINES,
+      configuration: {
+        renderingMode: gl.LINES,
+      },
     });
   }
 
