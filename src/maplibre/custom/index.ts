@@ -4,56 +4,60 @@ import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
 import { UniformType } from "../../lib/webgl/uniforms.js";
+import { Vector } from "../../lib/math/vector.js";
 
-const attributes = ["a_pos"] as const;
-const uniforms = ["u_matrix"] as const;
+const attributes = ["aPos"] as const;
 
 interface CustomLayerInterface {
   id: string;
   type: string;
-  program?: Program<typeof attributes, typeof uniforms>;
-  instance?: Instance<typeof attributes, typeof uniforms>;
+  program?: Program<typeof attributes>;
+  instance?: Instance<typeof attributes>;
   onAdd: (map: any, gl: WebGL2RenderingContext) => void;
   render: (gl: WebGL2RenderingContext, matrix: Float32Array) => void;
 }
 
 let layer: CustomLayerInterface;
 
+const transformVertices = (
+  lnglats: number[][],
+  mercatorMatrix: Float32Array
+) => {
+  const matrix = Matrix4.fromFloatArray(mercatorMatrix).transpose() as Matrix4;
+  return lnglats.flatMap((coords) => {
+    // @ts-ignore
+    const mercatorCoords = maplibregl.MercatorCoordinate.fromLngLat({
+      lng: coords[0],
+      lat: coords[1],
+    });
+    return matrix.multiply(
+      new Vector([mercatorCoords.x, mercatorCoords.y, 0, 1])
+    ).elements;
+  });
+};
+
 const initData = (
   gl: WebGL2RenderingContext,
-  program: Program<typeof attributes, typeof uniforms>
+  program: Program<typeof attributes>,
+  map: any
 ) => {
-  // define vertices of the triangle to be rendered in the custom style layer
-  // @ts-ignore
-  const helsinki = maplibregl.MercatorCoordinate.fromLngLat({
-    lng: 25.004,
-    lat: 60.239,
-  });
-  // @ts-ignore
-  const berlin = maplibregl.MercatorCoordinate.fromLngLat({
-    lng: 13.403,
-    lat: 52.562,
-  });
-  // @ts-ignore
-  const kyiv = maplibregl.MercatorCoordinate.fromLngLat({
-    lng: 30.498,
-    lat: 50.541,
-  });
+  const vertices = transformVertices(
+    [
+      [25.004, 60.239],
+      [13.403, 52.562],
+      [30.498, 50.541],
+    ],
+    map.transform.mercatorMatrix
+  );
   const instance = new Instance({
     id: "position",
     gl,
     program,
     attributes: {
-      a_pos: {
-        data: [helsinki.x, helsinki.y, berlin.x, berlin.y, kyiv.x, kyiv.y],
-        size: 2,
+      aPos: {
+        data: vertices,
+        size: 4,
         type: gl.FLOAT,
-      },
-    },
-    uniforms: {
-      u_matrix: {
-        data: Matrix4.identity().toFloatArray(),
-        type: UniformType.MATRIX,
       },
     },
     size: 3,
@@ -66,23 +70,43 @@ const initLayer = () => {
   layer = {
     id: "highlight",
     type: "custom",
-    onAdd(_map: any, gl: WebGL2RenderingContext) {
-      this.program = new Program<typeof attributes, typeof uniforms>(
-        gl,
-        vertexShaderSource,
-        fragmentShaderSource,
-        attributes,
-        uniforms
-      );
-      this.instance = initData(gl, this.program);
+    onAdd(map: any, gl: WebGL2RenderingContext) {
+      try {
+        this.program = new Program<typeof attributes>(
+          gl,
+          vertexShaderSource,
+          fragmentShaderSource,
+          attributes
+        );
+        this.instance = initData(gl, this.program, map);
+      } catch (e) {
+        console.log(e);
+      }
     },
     render(_gl: WebGL2RenderingContext, matrix: Float32Array) {
-      this.instance?.setGLParameters((gl: WebGL2RenderingContext) => {
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      const vertices = transformVertices(
+        [
+          [25.004, 60.239],
+          [13.403, 52.562],
+          [30.498, 50.541],
+        ],
+        matrix
+      );
+      this.instance?.setAttributeData(
+        "aPos",
+        {
+          data: vertices,
+          size: 4,
+          type: _gl.FLOAT,
+        },
+        true
+      );
+      this.instance?.render({
+        cb: (_, gl) => {
+          gl.enable(gl.BLEND);
+          gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        },
       });
-      this.instance?.updateUniform("u_matrix", matrix);
-      this.instance?.render({});
     },
   };
 };

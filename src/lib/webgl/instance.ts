@@ -84,6 +84,54 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     this.setupUniforms({ uniforms });
   }
 
+  /**
+   * Set the data for a given attribute and associates the attribute
+   * with the instances VAO
+   */
+  setAttributeData(
+    attributeName: A[number],
+    attribute: AttributeDefinition,
+    bind = false
+  ) {
+    const { data, size, type, offset, stride } = attribute;
+    const attributeLocation = this.program.getAttribute(attributeName);
+    if (attributeLocation < 0) {
+      console.error(`Attribute "${attributeName}" does not exist`);
+      return;
+    }
+
+    // Bind the VAO
+    if (bind) {
+      this.gl.bindVertexArray(this.vao);
+    }
+
+    const buffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(data),
+      this.gl.STATIC_DRAW
+    );
+    this.gl.vertexAttribPointer(
+      attributeLocation,
+      size,
+      type,
+      false,
+      stride ?? 0,
+      offset ?? 0
+    );
+    this.gl.enableVertexAttribArray(attributeLocation);
+
+    // Clean up
+    if (bind) {
+      this.gl.bindVertexArray(null);
+    }
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+  }
+
+  /**
+   * Initializes all attributes and indices. It also enables the attributes.
+   */
   setupAttributes({
     attributes,
     indices,
@@ -100,28 +148,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
 
     // Attributes
     for (const attribute of Object.keys(attributes)) {
-      const attributeLocation = this.program.getAttribute(attribute);
-      const attributeData = attributes[attribute as A[number]];
-      if (!attributeData) return;
-      const { data, size, type, stride, offset } = attributeData;
-      // If attribute location does not exist
-      if (attributeLocation < 0) continue;
-      const buffer = this.gl.createBuffer();
-      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-      this.gl.bufferData(
-        this.gl.ARRAY_BUFFER,
-        new Float32Array(data),
-        this.gl.STATIC_DRAW
-      );
-      this.gl.vertexAttribPointer(
-        attributeLocation,
-        size,
-        type,
-        false,
-        stride ?? 0,
-        offset ?? 0
-      );
-      this.gl.enableVertexAttribArray(attributeLocation);
+      this.setAttributeData(attribute, attributes[attribute as A[number]]!);
     }
 
     // Indices
@@ -199,7 +226,11 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     return this.id;
   }
 
-  render({ cb = () => {} }: { cb?: (o: Instance<A, U>) => void }) {
+  render({
+    cb = () => {},
+  }: {
+    cb?: (o: Instance<A, U>, gl: WebGL2RenderingContext) => void;
+  }) {
     // Use this program instance
     this.program.use();
     // Bind vertices and indices
@@ -209,7 +240,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     }
 
     // Callback
-    cb(this);
+    cb(this, this.gl);
 
     // Populate uniforms
     for (const uniform of Object.values(this?.uniforms ?? {}) as Uniform[]) {
