@@ -39,10 +39,10 @@ void main(void) {
     float lambertTerm = max(dot(-L, N), 0.2);
     vec4 Ia = uLightAmbient * uMaterialAmbient;
     vec4 Id = uLightDiffuse * color * lambertTerm;
-    color = vec4(vec3(Ia + Id), uAlpha);
+    color = vec4(vec3(Ia + Id), 1.0);
   } 
 
-  vColor = color;
+  vColor = vec4(vec3(color), uAlpha);
 }
 `;
 
