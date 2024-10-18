@@ -37,7 +37,9 @@ let camera: Camera;
 const redColor = [1, 0, 0, 1];
 const redLightPosition = [0, 7, 3];
 const greenLightPosition = [2.5, 3, 3];
+const blueLightPosition = [1.5, 6, 3];
 const greenColor = [0, 1, 0, 1];
+const blueColor = [0, 0, 1, 1];
 const lightCutOff = 0.5;
 
 const LightAttributes = ["aPos"] as const;
@@ -53,6 +55,9 @@ const WallUniforms = [
   "uRedLightColor",
   "uGreenLightPosition",
   "uGreenLightColor",
+  "uBlueLightPosition",
+  "uBlueLightColor",
+  "uLightCutOff",
 ] as const;
 
 const initScene = () => {
@@ -120,14 +125,26 @@ const initData = () => {
             data: redLightPosition,
             type: UniformType.VECTOR_FLOAT,
           },
+          uBlueLightPosition: {
+            data: blueLightPosition,
+            type: UniformType.VECTOR_FLOAT,
+          },
           ...lightUniforms,
           uGreenLightColor: {
-            data: greenLightPosition,
+            data: greenColor,
             type: UniformType.VECTOR_FLOAT,
           },
           uRedLightColor: {
-            data: greenLightPosition,
+            data: redColor,
             type: UniformType.VECTOR_FLOAT,
+          },
+          uBlueLightColor: {
+            data: blueColor,
+            type: UniformType.VECTOR_FLOAT,
+          },
+          uLightCutOff: {
+            data: lightCutOff,
+            type: UniformType.FLOAT,
           },
         },
         indices,
@@ -137,19 +154,23 @@ const initData = () => {
   // Load lights
   loadData("/data/models/geometries/sphere3.json").then((data) => {
     const { vertices, indices } = data;
+    const commonArgs = {
+      gl,
+      vertexShaderSource,
+      fragmentShaderSource,
+      attributes: {
+        aPos: {
+          data: vertices,
+          size: 3,
+          type: gl.FLOAT,
+        },
+      },
+      indices,
+    };
     scene.add(
       new Instance<typeof LightAttributes, typeof LightUniforms>({
         id: "red-light",
-        gl,
-        vertexShaderSource,
-        fragmentShaderSource,
-        attributes: {
-          aPos: {
-            data: vertices,
-            size: 3,
-            type: gl.FLOAT,
-          },
-        },
+        ...commonArgs,
         uniforms: {
           uMaterialDiffuse: {
             data: redColor,
@@ -160,22 +181,12 @@ const initData = () => {
             type: UniformType.VECTOR_FLOAT,
           },
         },
-        indices,
       })
     );
     scene.add(
       new Instance<typeof LightAttributes, typeof LightUniforms>({
         id: "green-light",
-        gl,
-        vertexShaderSource,
-        fragmentShaderSource,
-        attributes: {
-          aPos: {
-            data: vertices,
-            size: 3,
-            type: gl.FLOAT,
-          },
-        },
+        ...commonArgs,
         uniforms: {
           uMaterialDiffuse: {
             data: greenColor,
@@ -186,7 +197,22 @@ const initData = () => {
             type: UniformType.VECTOR_FLOAT,
           },
         },
-        indices,
+      })
+    );
+    scene.add(
+      new Instance<typeof LightAttributes, typeof LightUniforms>({
+        id: "blue-light",
+        ...commonArgs,
+        uniforms: {
+          uMaterialDiffuse: {
+            data: blueColor,
+            type: UniformType.VECTOR_FLOAT,
+          },
+          uTranslate: {
+            data: blueLightPosition,
+            type: UniformType.VECTOR_FLOAT,
+          },
+        },
       })
     );
   });
@@ -221,6 +247,17 @@ const initControls = () => {
       scene.updateUniform("uGreenLightPosition", v, "wall");
     },
   });
+  createVector3dSliders({
+    labels: ["Blue Light X", "Blue Light Y", "Blue Light Z"],
+    value: blueLightPosition,
+    min: -100,
+    max: 100,
+    step: 1,
+    onChange(v) {
+      scene.updateUniform("uTranslate", v, "blue-light");
+      scene.updateUniform("uBlueLightPosition", v, "wall");
+    },
+  });
   createNumericInput({
     label: "Light Cutoff",
     value: lightCutOff,
@@ -236,7 +273,7 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will show how to render different light sources on the same scene"
+    "In this example we will show how to render different light sources on the same scene. Also we compute the color on the fragment shader, so we compute a color per pixel."
   );
 
   gl = getGLContext();
