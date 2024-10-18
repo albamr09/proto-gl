@@ -105,7 +105,7 @@ const draw = () => {
 
   let modelViewMatrix = Matrix4.identity();
   modelViewMatrix = modelViewMatrix.translate(new Vector([-10, 0, -100]));
-  modelViewMatrix = modelViewMatrix.rotateDeg(30, new Vector([1, 0, 0]));
+  modelViewMatrix = modelViewMatrix.rotateDeg(-30, new Vector([1, 0, 0]));
   modelViewMatrix = modelViewMatrix.rotateDeg(30, new Vector([0, 1, 0]));
 
   // Obtain uniforms
