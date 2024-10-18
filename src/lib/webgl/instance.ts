@@ -18,6 +18,7 @@ export type AttributeDefinition = {
 export type UniformDefinition = {
   data: any;
   type: UniformType;
+  size?: number;
 };
 
 export interface Configuration {
@@ -219,7 +220,13 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       const uniform = mergedUniforms[k] as UniformDefinition;
       const location = this.program.uniforms[k];
       if (uniform == null || uniform == undefined || !location) return dict;
-      dict[k] = new Uniform(k, uniform.type, uniform.data, location);
+      dict[k] = new Uniform(
+        k,
+        uniform.type,
+        uniform.data,
+        location,
+        uniform?.size
+      );
       return dict;
     }, {} as Uniforms<U, Uniform>);
   }

@@ -39,19 +39,23 @@ export const transformUniformsDefinition: {
 export class Uniform {
   private name: string;
   private type: UniformType;
+  // TODO: type this
   private data: any;
   private location?: WebGLUniformLocation;
+  private size?: number;
 
   constructor(
     name: string,
     type: UniformType,
     data: any,
-    location?: WebGLUniformLocation
+    location?: WebGLUniformLocation,
+    size?: number
   ) {
     this.name = name;
     this.type = type;
     this.data = data;
     this.location = location;
+    this.size = size;
   }
 
   setLocation(location: WebGLUniformLocation) {
@@ -66,6 +70,76 @@ export class Uniform {
     return this.data;
   }
 
+  private bindInt(gl: WebGL2RenderingContext, size: number) {
+    if (size == 1) {
+      gl.uniform1i(this.location!, this.data);
+    } else if (size == 2) {
+      gl.uniform2i(this.location!, this.data[0], this.data[1]);
+    } else if (size == 3) {
+      gl.uniform3i(this.location!, this.data[0], this.data[1], this.data[2]);
+    } else if (size == 4) {
+      gl.uniform4i(
+        this.location!,
+        this.data[0],
+        this.data[1],
+        this.data[2],
+        this.data[3]
+      );
+    }
+  }
+
+  private bindFloat(gl: WebGL2RenderingContext, size: number) {
+    if (size == 1) {
+      gl.uniform1f(this.location!, this.data);
+    } else if (size == 2) {
+      gl.uniform2f(this.location!, this.data[0], this.data[1]);
+    } else if (size == 3) {
+      gl.uniform3f(this.location!, this.data[0], this.data[1], this.data[2]);
+    } else if (size == 4) {
+      gl.uniform4f(
+        this.location!,
+        this.data[0],
+        this.data[1],
+        this.data[2],
+        this.data[3]
+      );
+    }
+  }
+
+  private bindVectorInt(gl: WebGL2RenderingContext, size: number) {
+    if (size == 1) {
+      gl.uniform1iv(this.location!, this.data);
+    } else if (size == 2) {
+      gl.uniform2iv(this.location!, this.data);
+    } else if (size == 3) {
+      gl.uniform3iv(this.location!, this.data);
+    } else if (size == 4) {
+      gl.uniform4iv(this.location!, this.data);
+    }
+  }
+
+  private bindVectorFloat(gl: WebGL2RenderingContext, size: number) {
+    if (size == 1) {
+      gl.uniform1fv(this.location!, this.data);
+    } else if (size == 2) {
+      gl.uniform2fv(this.location!, this.data);
+    } else if (size == 3) {
+      gl.uniform3fv(this.location!, this.data);
+    } else if (size == 4) {
+      gl.uniform4fv(this.location!, this.data);
+    }
+  }
+
+  private bindMatrix(gl: WebGL2RenderingContext, size: number) {
+    if (size == 4) {
+      gl.uniformMatrix2fv(this.location!, false, this.data);
+    } else if (size == 9) {
+      gl.uniformMatrix3fv(this.location!, false, this.data);
+    } else if (size == 16) {
+      gl.uniformMatrix4fv(this.location!, false, this.data);
+    }
+  }
+
   bindUniformForType(gl: WebGL2RenderingContext) {
     if (!this.location) {
       throw Error(`Uniform ${this.name} does not have a location assigned`);
@@ -73,69 +147,26 @@ export class Uniform {
 
     switch (this.type) {
       case UniformType.INT:
-        if (!Array.isArray(this.data)) {
-          gl.uniform1i(this.location, this.data);
-        } else if (this.data.length == 2) {
-          gl.uniform2i(this.location, this.data[0], this.data[1]);
-        } else if (this.data.length == 3) {
-          gl.uniform3i(this.location, this.data[0], this.data[1], this.data[2]);
-        } else if (this.data.length == 4) {
-          gl.uniform4i(
-            this.location,
-            this.data[0],
-            this.data[1],
-            this.data[2],
-            this.data[3]
-          );
-        }
+        this.bindInt(
+          gl,
+          this.size ?? ((!Array.isArray(this.data) && 1) || this.data.length)
+        );
         break;
       case UniformType.FLOAT:
-        if (!Array.isArray(this.data)) {
-          gl.uniform1f(this.location, this.data);
-        } else if (this.data.length == 2) {
-          gl.uniform2f(this.location, this.data[0], this.data[1]);
-        } else if (this.data.length == 3) {
-          gl.uniform3f(this.location, this.data[0], this.data[1], this.data[2]);
-        } else if (this.data.length == 4) {
-          gl.uniform4f(
-            this.location,
-            this.data[0],
-            this.data[1],
-            this.data[2],
-            this.data[3]
-          );
-        }
+        this.bindFloat(
+          gl,
+          this.size ?? ((!Array.isArray(this.data) && 1) || this.data.length)
+        );
         break;
       case UniformType.VECTOR_INT:
-        if (this.data.length == 1) {
-          gl.uniform1iv(this.location, this.data);
-        } else if (this.data.length == 2) {
-          gl.uniform2iv(this.location, this.data);
-        } else if (this.data.length == 3) {
-          gl.uniform3iv(this.location, this.data);
-        } else if (this.data.length == 4) {
-          gl.uniform4iv(this.location, this.data);
-        }
+        this.bindVectorInt(gl, this.size ?? this.data.length);
         break;
       case UniformType.VECTOR_FLOAT:
-        if (this.data.length == 1) {
-          gl.uniform1fv(this.location, this.data);
-        } else if (this.data.length == 2) {
-          gl.uniform2fv(this.location, this.data);
-        } else if (this.data.length == 3) {
-          gl.uniform3fv(this.location, this.data);
-        } else if (this.data.length == 4) {
-          gl.uniform4fv(this.location, this.data);
-        }
+        this.bindVectorFloat(gl, this.size ?? this.data.length);
         break;
+      // TODO: add transposition option
       case UniformType.MATRIX:
-        if (this.data.length == 4) {
-          gl.uniformMatrix2fv(this.location, false, this.data);
-        } else if (this.data.length == 9) {
-          gl.uniformMatrix3fv(this.location, false, this.data);
-        } else if (this.data.length == 16) {
-          gl.uniformMatrix4fv(this.location, false, this.data);
-        }
+        this.bindMatrix(gl, this.size ?? this.data.length);
         break;
     }
   }

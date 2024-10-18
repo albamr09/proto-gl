@@ -33,13 +33,14 @@ let gl: WebGL2RenderingContext;
 let scene: Scene;
 let camera: Camera;
 
-// TODO: create light objects?
+let redLightPosition = [0, 7, 3];
+let greenLightPosition = [2.5, 3, 3];
+let blueLightPosition = [1.5, 6, 3];
+let whiteLightPosition = [4, 8, 3];
 const redColor = [1, 0, 0, 1];
-const redLightPosition = [0, 7, 3];
-const greenLightPosition = [2.5, 3, 3];
-const blueLightPosition = [1.5, 6, 3];
 const greenColor = [0, 1, 0, 1];
 const blueColor = [0, 0, 1, 1];
+const whiteColor = [1, 1, 1, 1];
 const lightCutOff = 0.5;
 
 const LightAttributes = ["aPos"] as const;
@@ -51,12 +52,8 @@ const WallUniforms = [
   "uMaterialAmbient",
   "uLightAmbient",
   "uLightCutOff",
-  "uRedLightPosition",
-  "uRedLightColor",
-  "uGreenLightPosition",
-  "uGreenLightColor",
-  "uBlueLightPosition",
-  "uBlueLightColor",
+  "uLightPositions",
+  "uLightColors",
   "uLightCutOff",
 ] as const;
 
@@ -113,30 +110,21 @@ const initData = () => {
             data: ambient,
             type: UniformType.VECTOR_FLOAT,
           },
-          uGreenLightPosition: {
-            data: greenLightPosition,
+          uLightPositions: {
+            data: [
+              ...redLightPosition,
+              ...greenLightPosition,
+              ...blueLightPosition,
+              ...whiteLightPosition,
+            ],
             type: UniformType.VECTOR_FLOAT,
-          },
-          uRedLightPosition: {
-            data: redLightPosition,
-            type: UniformType.VECTOR_FLOAT,
-          },
-          uBlueLightPosition: {
-            data: blueLightPosition,
-            type: UniformType.VECTOR_FLOAT,
+            size: 3,
           },
           ...lightUniforms,
-          uGreenLightColor: {
-            data: greenColor,
+          uLightColors: {
+            data: [...redColor, ...greenColor, ...blueColor, ...whiteColor],
             type: UniformType.VECTOR_FLOAT,
-          },
-          uRedLightColor: {
-            data: redColor,
-            type: UniformType.VECTOR_FLOAT,
-          },
-          uBlueLightColor: {
-            data: blueColor,
-            type: UniformType.VECTOR_FLOAT,
+            size: 4,
           },
           uLightCutOff: {
             data: lightCutOff,
@@ -211,6 +199,22 @@ const initData = () => {
         },
       })
     );
+    scene.add(
+      new Instance<typeof LightAttributes, typeof LightUniforms>({
+        id: "white-light",
+        ...commonArgs,
+        uniforms: {
+          uMaterialDiffuse: {
+            data: whiteColor,
+            type: UniformType.VECTOR_FLOAT,
+          },
+          uTranslate: {
+            data: whiteLightPosition,
+            type: UniformType.VECTOR_FLOAT,
+          },
+        },
+      })
+    );
   });
 };
 
@@ -228,8 +232,18 @@ const initControls = () => {
     max: 100,
     step: 1,
     onChange(v) {
+      redLightPosition = v;
       scene.updateUniform("uTranslate", v, "red-light");
-      scene.updateUniform("uRedLightPosition", v, "wall");
+      scene.updateUniform(
+        "uLightPositions",
+        [
+          ...v,
+          ...greenLightPosition,
+          ...blueLightPosition,
+          ...whiteLightPosition,
+        ],
+        "wall"
+      );
     },
   });
   createVector3dSliders({
@@ -239,8 +253,18 @@ const initControls = () => {
     max: 100,
     step: 1,
     onChange(v) {
+      greenLightPosition = v;
       scene.updateUniform("uTranslate", v, "green-light");
-      scene.updateUniform("uGreenLightPosition", v, "wall");
+      scene.updateUniform(
+        "uLightPositions",
+        [
+          ...redLightPosition,
+          ...v,
+          ...blueLightPosition,
+          ...whiteLightPosition,
+        ],
+        "wall"
+      );
     },
   });
   createVector3dSliders({
@@ -250,8 +274,39 @@ const initControls = () => {
     max: 100,
     step: 1,
     onChange(v) {
+      blueLightPosition = v;
       scene.updateUniform("uTranslate", v, "blue-light");
-      scene.updateUniform("uBlueLightPosition", v, "wall");
+      scene.updateUniform(
+        "uBlueLightPosition",
+        [
+          ...redLightPosition,
+          ...greenLightPosition,
+          ...v,
+          ...whiteLightPosition,
+        ],
+        "wall"
+      );
+    },
+  });
+  createVector3dSliders({
+    labels: ["White Light X", "White Light Y", "White Light Z"],
+    value: whiteLightPosition,
+    min: -100,
+    max: 100,
+    step: 1,
+    onChange(v) {
+      whiteLightPosition = v;
+      scene.updateUniform("uTranslate", v, "white-light");
+      scene.updateUniform(
+        "uBlueLightPosition",
+        [
+          ...redLightPosition,
+          ...greenLightPosition,
+          ...blueLightPosition,
+          ...v,
+        ],
+        "wall"
+      );
     },
   });
   createNumericInput({
@@ -269,7 +324,7 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will show how to render different light sources on the same scene. Also we compute the color on the fragment shader, so we compute a color per pixel."
+    "In this example we will show how to render different light sources on the same scene by using uniform arrays instead of individual uniforms."
   );
 
   gl = getGLContext();
