@@ -1,7 +1,7 @@
 import { computeNormalMatrix } from "../math/3d.js";
 import { Matrix4 } from "../math/matrix.js";
 import { uuidv4 } from "../utils.js";
-import Instance, { Configuration } from "./instance.js";
+import Instance, { Configuration, UniformMetadata } from "./instance.js";
 
 class Scene {
   private gl: WebGL2RenderingContext;
@@ -38,13 +38,18 @@ class Scene {
     return this.objects[id]?.getUniform(uniformName);
   }
 
-  updateUniform<T>(uniformName: any, value: T, id?: string) {
+  updateUniform<T>(
+    uniformName: any,
+    value: T,
+    id?: string,
+    metadata?: UniformMetadata
+  ) {
     if (id) {
-      this.objects[id]?.updateUniform(uniformName, value);
+      this.objects[id]?.updateUniform(uniformName, value, metadata);
       return;
     }
     Object.values(this.objects).forEach((o) => {
-      o.updateUniform(uniformName, value);
+      o.updateUniform(uniformName, value, metadata);
     });
   }
 

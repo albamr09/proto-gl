@@ -15,10 +15,14 @@ export type AttributeDefinition = {
   offset?: number;
 };
 
-export type UniformDefinition = {
+export type UniformMetadata = {
+  size?: number;
+  transpose?: boolean;
+};
+
+export type UniformDefinition = UniformMetadata & {
   data: any;
   type: UniformType;
-  size?: number;
 };
 
 export interface Configuration {
@@ -225,7 +229,8 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
         uniform.type,
         uniform.data,
         location,
-        uniform?.size
+        uniform?.size,
+        uniform?.transpose
       );
       return dict;
     }, {} as Uniforms<U, Uniform>);
@@ -233,12 +238,16 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
 
   updateUniform<T>(
     uniformName: U[number] | TransformUniforms[number],
-    value: T
+    value: T,
+    metadata?: UniformMetadata
   ) {
     // It if exists update
     const uniform = this.uniforms?.[uniformName];
     if (uniform !== undefined && uniform !== null) {
+      // Update data
       uniform.setData(value);
+      // Update metadata
+      metadata && uniform.setMetadata(metadata);
     }
   }
 

@@ -1,4 +1,5 @@
 import { Matrix4 } from "../math/matrix.js";
+import { UniformMetadata } from "./instance.js";
 
 export const transformUniforms = [
   "uModelViewMatrix",
@@ -43,19 +44,22 @@ export class Uniform {
   private data: any;
   private location?: WebGLUniformLocation;
   private size?: number;
+  private transpose?: boolean;
 
   constructor(
     name: string,
     type: UniformType,
     data: any,
     location?: WebGLUniformLocation,
-    size?: number
+    size?: number,
+    transpose?: boolean
   ) {
     this.name = name;
     this.type = type;
     this.data = data;
     this.location = location;
     this.size = size;
+    this.transpose = transpose ?? false;
   }
 
   setLocation(location: WebGLUniformLocation) {
@@ -68,6 +72,15 @@ export class Uniform {
 
   getData() {
     return this.data;
+  }
+
+  setMetadata(metadata: UniformMetadata) {
+    if (metadata?.size) {
+      this.size = metadata.size;
+    }
+    if (metadata?.transpose) {
+      this.transpose = metadata.transpose;
+    }
   }
 
   private bindInt(gl: WebGL2RenderingContext, size: number) {
@@ -132,11 +145,11 @@ export class Uniform {
 
   private bindMatrix(gl: WebGL2RenderingContext, size: number) {
     if (size == 4) {
-      gl.uniformMatrix2fv(this.location!, false, this.data);
+      gl.uniformMatrix2fv(this.location!, this.transpose!, this.data);
     } else if (size == 9) {
-      gl.uniformMatrix3fv(this.location!, false, this.data);
+      gl.uniformMatrix3fv(this.location!, this.transpose!, this.data);
     } else if (size == 16) {
-      gl.uniformMatrix4fv(this.location!, false, this.data);
+      gl.uniformMatrix4fv(this.location!, this.transpose!, this.data);
     }
   }
 

@@ -97,8 +97,8 @@ const initProgram = () => {
     },
   });
   camera.setInitialPosition(new Vector(modelTranslation));
-  // Here for documentation purposes only
-  //camera.setTransposeProjection(false);
+  // Compute non-transposed version of the projection transform
+  camera.setTransposeProjection(false);
 };
 
 const initData = () => {
@@ -150,7 +150,15 @@ const initLightUniforms = () => {
 };
 
 const draw = () => {
-  scene.render();
+  scene.render((o) => {
+    o.updateUniform(
+      "uProjectionMatrix",
+      camera.getProjectionTransform().toFloatArray(),
+      // Transpose matrix only if the projection
+      // was not manully transposed before
+      { transpose: !camera.isProjectionTransposed() }
+    );
+  });
 };
 
 const updateTransformations = () => {
@@ -160,15 +168,6 @@ const updateTransformations = () => {
   scene.updateProjectionMatrix(projectionMatrix);
 
   updateMatrixElement(camera.getViewTransform().toFloatArray());
-
-  // Here for documentation purposes only
-  // gl.uniformMatrix4fv(
-  //   program.uniforms.uProjectionMatrix,
-  //   // Transpose matrix only if the projection
-  //   // was not manully transposed before
-  //   !camera.isProjectionTransposed(),
-  //   projectionMatrix.toFloatArray()
-  // );
 };
 
 const render = () => {
