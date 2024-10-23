@@ -2,7 +2,7 @@ const fragmentShaderSource = `#version 300 es
 
 precision mediump float;
 
-const int numLights = 4;
+const int numLights = 3;
 
 uniform vec4 uLightColors[numLights];
 uniform vec4 uMaterialAmbient;

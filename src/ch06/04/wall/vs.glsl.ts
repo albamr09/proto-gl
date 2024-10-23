@@ -1,6 +1,6 @@
 const vertexShaderSource = `#version 300 es
 
-const int numLights = 4;
+const int numLights = 3;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uNormalMatrix;
