@@ -33,7 +33,6 @@ let gl: WebGL2RenderingContext;
 let scene: Scene;
 let camera: Camera;
 
-// TODO: create light objects?
 const redColor = [1, 0, 0, 1];
 const redLightPosition = [0, 7, 3];
 const greenLightPosition = [2.5, 3, 3];

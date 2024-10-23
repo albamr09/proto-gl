@@ -277,7 +277,7 @@ const initControls = () => {
       blueLightPosition = v;
       scene.updateUniform("uTranslate", v, "blue-light");
       scene.updateUniform(
-        "uBlueLightPosition",
+        "uLightPositions",
         [
           ...redLightPosition,
           ...greenLightPosition,
@@ -298,7 +298,7 @@ const initControls = () => {
       whiteLightPosition = v;
       scene.updateUniform("uTranslate", v, "white-light");
       scene.updateUniform(
-        "uBlueLightPosition",
+        "uLightPositions",
         [
           ...redLightPosition,
           ...greenLightPosition,

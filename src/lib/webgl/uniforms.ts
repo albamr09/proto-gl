@@ -177,7 +177,6 @@ export class Uniform {
       case UniformType.VECTOR_FLOAT:
         this.bindVectorFloat(gl, this.size ?? this.data.length);
         break;
-      // TODO: add transposition option
       case UniformType.MATRIX:
         this.bindMatrix(gl, this.size ?? this.data.length);
         break;
