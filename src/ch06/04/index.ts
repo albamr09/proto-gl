@@ -35,14 +35,14 @@ let camera: Camera;
 
 let redLightPosition = [0, 7, 3];
 let greenLightPosition = [2.5, 3, 3];
-let blueLightPosition = [1.5, 6, 3];
+let blueLightPosition = [-2.5, 3, 3];
 const redColor = [1, 0, 0, 1];
 const greenColor = [0, 1, 0, 1];
 const blueColor = [0, 0, 1, 1];
-const lightCutOff = 0.5;
-const redLightDirection = [0, -2, -0.1];
-const greenLightDirection = [-0.5, 1, -0.1];
-const blueLightDirection = [0.5, 1, -0.1];
+const lightCutOff = 0.75;
+let redLightDirection = [0, -2, -0.1];
+let greenLightDirection = [-0.5, 1, -0.1];
+let blueLightDirection = [0.5, 1, -0.1];
 
 const LightAttributes = ["aPos"] as const;
 const LightUniforms = ["uMaterialDiffuse", "uTranslate"] as const;
@@ -67,9 +67,9 @@ const initScene = () => {
     gl,
     scene
   );
-  camera.setPosition(new Vector([0, 5, 30]));
+  camera.setPosition(new Vector([0, 5, 40]));
   camera.setAzimuth(0);
-  camera.setElevation(-3);
+  camera.setElevation(3);
   new Controller({ camera, canvas });
 };
 
@@ -263,6 +263,64 @@ const initControls = () => {
       scene.updateUniform(
         "uLightPositions",
         [...redLightPosition, ...greenLightPosition, ...v],
+        "wall"
+      );
+    },
+  });
+  createVector3dSliders({
+    labels: [
+      "Red Light Direction X",
+      "Red Light Direction Y",
+      "Red Light Direction Z",
+    ],
+    value: redLightDirection,
+    min: -100,
+    max: 100,
+    step: 1,
+    onChange(v) {
+      redLightDirection = v;
+      scene.updateUniform(
+        "uLightDirections",
+        [...v, ...greenLightDirection, ...blueLightDirection],
+        "wall"
+      );
+    },
+  });
+  createVector3dSliders({
+    labels: [
+      "Green Light Direction X",
+      "Green Light Direction Y",
+      "Green Light Direction Z",
+    ],
+    value: greenLightDirection,
+    min: -100,
+    max: 100,
+    step: 1,
+    onChange(v) {
+      greenLightDirection = v;
+      scene.updateUniform(
+        "uLightDirections",
+        [...redLightDirection, ...v, ...blueLightDirection],
+        "wall"
+      );
+    },
+  });
+  createVector3dSliders({
+    labels: [
+      "Blue Direction Light X",
+      "Blue Light Direction Y",
+      "Blue Light Direction Z",
+    ],
+    value: blueLightDirection,
+    min: -100,
+    max: 100,
+    step: 1,
+    onChange(v) {
+      blueLightDirection = v;
+      scene.updateUniform("uTranslate", v, "blue-light");
+      scene.updateUniform(
+        "uLightDirections",
+        [...redLightDirection, ...greenLightDirection, ...v],
         "wall"
       );
     },

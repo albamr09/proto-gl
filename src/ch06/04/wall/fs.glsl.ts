@@ -11,8 +11,8 @@ uniform vec4 uMaterialDiffuse;
 uniform vec4 uLightAmbient;
 uniform float uLightCutOff;
 
-in vec3 vNormal;
 in vec3 vRay[numLights];
+in vec3 vTransformedNormals[numLights];
 
 out vec4 fragColor;
 
@@ -20,11 +20,12 @@ void main(void) {
 
   vec4 Ia = uLightAmbient * uMaterialAmbient;
   vec4 Id = vec4(0.0);
-
-  vec3 N = normalize(vNormal);
   
   // Iterate over each light
   for(int i = 0; i < numLights; i++) {
+    // Define the normalized transformed normal per each light, as we 
+    // have modified the surface normal with the light's direction
+    vec3 N = normalize(vTransformedNormals[i]);
     vec3 L = normalize(vRay[i]);
     // Cosine of angle between light and surface
     float lambertTerm = max(dot(N, -L), 0.1);
