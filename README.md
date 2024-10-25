@@ -93,6 +93,23 @@ yarn test
 - [Camera Rotation](./src/ch04/02/): Renders a scene where you can rotate the camera/objects depending on the transformation matrix you choose.
 - [Camera Transformation](./src/ch04/03/): Renders a scene where you can translate or rotate the camera/objects depending on the transformation matrix you choose.
 - [Camera Types](./src/ch04/04/): Renders a scene that you can translate/rotate using the different camera types: tracking and orbiting.
+- [Camera Controller](./src/ch04/05/): renders a complex object (a car) and defines a camera that can be interacted with using the mouse.
+- [Camera Projections](./src/ch04/06/): interact with the scene using your mouse or your keyboard, this will make the camera 'move'. Also you are able to switch between projection modes using the controller on your right, so you can choose between perspective or orthographic mode.
+- [Canvas Size](./src/ch04/07/): test how changing the size of the viewport using gl.viewport changes how you render the scene.
+
+### Chapter 5: Animations
+
+- [Simple Animation](./src/ch05/01/): showcase a simple animation of two objects. Such that you can see how to apply both global and local transforms.
+- [Parametric Curves](./src/ch05/02/): show how to use parametric curves to control an animation.
+- [Linear Interpolation](./src/ch05/03/): showcase how the linear interpolation method work.
+- [Linear Interpolation](./src/ch05/04/): showcase how different interpolation methods work.
+
+### Chapter 6: Color, Depth Testing and Alpha Blending
+
+- [Per-Vertex Coloring](./src/ch06/01/): show the difference between constant coloring and per-vertex coloring.
+- [Multiple Lights](./src/ch06/02/): show how to render different light sources on the same scene.
+- [Uniform Arrays](./src/ch06/03/): show how to render different light sources on the same scene by using uniform arrays.
+- [Spot Lights](./src/ch06/04/): show how to use spotlights or what we call directional point lights.
 
 ---
 
