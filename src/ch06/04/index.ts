@@ -2,6 +2,7 @@ import { loadData } from "../../lib/files.js";
 import {
   createDescriptionPanel,
   createNumericInput,
+  createSliderInputForm,
   createVector3dSliders,
   initController,
   initGUI,
@@ -325,10 +326,10 @@ const initControls = () => {
       );
     },
   });
-  createNumericInput({
+  createSliderInputForm({
     label: "Light Cutoff",
     value: lightCutOff,
-    max: 100,
+    max: 1,
     min: 0,
     step: 0.1,
     onChange: (v) => {

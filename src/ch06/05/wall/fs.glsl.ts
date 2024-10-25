@@ -33,7 +33,7 @@ void main(void) {
     // threhsold imposed but that cutoff) then we update the 
     // sum of the diffuse color
     if (lambertTerm > uLightCutOff) {
-      Id += uLightColors[i] * uMaterialDiffuse * lambertTerm;
+      Id += uLightColors[i] * uMaterialDiffuse * pow(lambertTerm, 10.0 * uLightCutOff);
     }
   }
 

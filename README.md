@@ -110,6 +110,7 @@ yarn test
 - [Multiple Lights](./src/ch06/02/): show how to render different light sources on the same scene.
 - [Uniform Arrays](./src/ch06/03/): show how to render different light sources on the same scene by using uniform arrays.
 - [Spot Lights](./src/ch06/04/): show how to use spotlights or what we call directional point lights.
+- [Attenuated Lights](./src/ch06/05/): show how to use spotlights or what we call directional point lights. . But with a twist! We know add an attenuation factor based on the angle between the light and the surface that makes for a more realistic effect.
 
 ---
 
