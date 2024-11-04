@@ -206,9 +206,10 @@ export class Matrix4 extends Matrix {
     return Matrix.identity(4) as Matrix4;
   }
 
-  // Return a matrix that translates the matrix with and offset given by the
+  // Return a matrix that translates the matrix with an offset given by the
   // vector [x, y, z] Reference:
   // https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
+  // (See The Translation Matrix)
   translate(offset: Vector) {
     const translationMatrix = Matrix4.identity();
     if (offset.dimension() != 3) {
@@ -220,6 +221,23 @@ export class Matrix4 extends Matrix {
     translationMatrix.set(3, 2, offset.at(2));
 
     return translationMatrix.multiply(this);
+  }
+
+  // Returns a matrix that scales the original matrix by a factor given by the
+  // vector [x, y, z] Reference:
+  // https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
+  // (see The Scaling Matrix)
+  scale(scaleFactor: Vector) {
+    const scaleMatrix = Matrix4.identity();
+    if (scaleFactor.dimension() != 3) {
+      throw Error("Scale factor has incompatible dimensionality");
+    }
+
+    scaleMatrix.set(0, 0, scaleFactor.at(0));
+    scaleMatrix.set(1, 1, scaleFactor.at(1));
+    scaleMatrix.set(2, 2, scaleFactor.at(2));
+
+    return scaleMatrix.multiply(this);
   }
 
   /**

@@ -7,6 +7,8 @@ uniform mat4 uProjectionMatrix;
 uniform vec3 uTranslation;
 
 uniform vec4 uMaterialDiffuse;
+uniform vec4 uMaterialAmbient;
+
 uniform vec4 uLightAmbient;
 uniform vec4 uLightDiffuse;
 uniform vec4 uLightSpecular;
@@ -36,7 +38,7 @@ void main(void) {
   vec3 R = reflect(L, N);
   vec3 E = normalize(-vec3(uModelViewMatrix * vec4(aPosition, 1.0)));
 
-  vec4 Ia = uLightAmbient;
+  vec4 Ia = uLightAmbient * uMaterialAmbient;
 
   float lambertTerm = dot(-L, N);
   if (lambertTerm == 0.0) {
