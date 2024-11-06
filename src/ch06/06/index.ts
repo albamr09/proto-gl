@@ -9,6 +9,7 @@ import {
   createCheckboxInputForm,
   createColorInputForm,
   createDescriptionPanel,
+  createSelectorForm,
   createSliderInputForm,
   initController,
   initGUI,
@@ -34,6 +35,29 @@ import { UniformType } from "../../lib/webgl/uniforms.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
+enum BlendEquation {
+  FUNC_ADD = "FUNC_ADD",
+  FUNC_SUBTRACT = "FUNC_SUBTRACT",
+  FUNC_REVERSE_SUBTRACT = "FUNC_REVERSE_SUBTRACT",
+}
+
+enum BlendFunc {
+  ZERO = "ZERO",
+  ONE = "ONE",
+  SRC_COLOR = "SRC_COLOR",
+  DST_COLOR = "DST_COLOR",
+  SRC_ALPHA = "SRC_ALPHA",
+  DST_ALPHA = "DST_ALPHA",
+  CONSTANT_COLOR = "CONSTANT_COLOR",
+  CONSTANT_ALPHA = "CONSTANT_ALPHA",
+  ONE_MINUS_SRC_ALPHA = "ONE_MINUS_SRC_ALPHA",
+  ONE_MINUS_DST_ALPHA = "ONE_MINUS_DST_ALPHA",
+  ONE_MINUS_SRC_COLOR = "ONE_MINUS_SRC_COLOR",
+  ONE_MINUS_DST_COLOR = "ONE_MINUS_DST_COLOR",
+  ONE_MINUS_CONSTANT_COLOR = "ONE_MINUS_CONSTANT_COLOR",
+  ONE_MINUS_CONSTANT_ALPHA = "ONE_MINUS_CONSTANT_ALPHA",
+}
+
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
@@ -42,6 +66,10 @@ let sphereColor: number[];
 let sphereAlpha = 1;
 let coneColor: number[];
 let coneAlpha = 1;
+let sourceFunction = BlendFunc.SRC_ALPHA;
+let destinationFunction = BlendFunc.ONE_MINUS_SRC_ALPHA;
+let alphaValue = 1;
+let blendColor = [0, 0, 0];
 
 const initProgram = () => {
   scene = new Scene(gl);
@@ -180,42 +208,40 @@ const render = () => {
   requestAnimationFrame(render);
 };
 
+const getEnableOrDisable = (x: boolean) => {
+  return x ? "enable" : "disable";
+};
+
 const initControls = () => {
   initController();
   createCheckboxInputForm({
     label: "Blending",
     value: true,
     onInit: (v) => {
-      if (v) {
-        gl.enable(gl.BLEND);
-      } else {
-        gl.disable(gl.BLEND);
-      }
+      gl[getEnableOrDisable(v)](gl.BLEND);
     },
     onChange: (v) => {
-      if (v) {
-        gl.enable(gl.BLEND);
-      } else {
-        gl.disable(gl.BLEND);
-      }
+      gl[getEnableOrDisable(v)](gl.BLEND);
     },
   });
   createCheckboxInputForm({
     label: "Depth Test",
     value: true,
     onInit: (v) => {
-      if (v) {
-        gl.enable(gl.DEPTH_TEST);
-      } else {
-        gl.disable(gl.DEPTH_TEST);
-      }
+      gl[getEnableOrDisable(v)](gl.BLEND);
     },
     onChange: (v) => {
-      if (v) {
-        gl.enable(gl.DEPTH_TEST);
-      } else {
-        gl.disable(gl.DEPTH_TEST);
-      }
+      gl[getEnableOrDisable(v)](gl.BLEND);
+    },
+  });
+  createCheckboxInputForm({
+    label: "Face culling",
+    value: true,
+    onInit: (v) => {
+      gl[getEnableOrDisable(v)](gl.CULL_FACE);
+    },
+    onChange: (v) => {
+      gl[getEnableOrDisable(v)](gl.CULL_FACE);
     },
   });
   createCheckboxInputForm({
@@ -267,6 +293,66 @@ const initControls = () => {
     onChange: (v) => {
       coneAlpha = v;
       scene.updateUniform("uMaterialDiffuse", [...coneColor, v], "cone");
+    },
+  });
+  createSelectorForm({
+    label: "Blend Function",
+    value: BlendEquation.FUNC_ADD,
+    options: Object.values(BlendEquation),
+    onInit: (v) => {
+      gl.blendEquation(gl[v]);
+    },
+    onChange: (v) => {
+      gl.blendEquation(gl[v]);
+    },
+  });
+  createSelectorForm({
+    label: "Source Function",
+    value: sourceFunction,
+    options: Object.values(BlendFunc),
+    onInit: (v) => {
+      sourceFunction = v;
+      gl.blendFunc(gl[v], gl[destinationFunction]);
+    },
+    onChange: (v) => {
+      sourceFunction = v;
+      gl.blendFunc(gl[v], gl[destinationFunction]);
+    },
+  });
+  createSelectorForm({
+    label: "Destination Function",
+    value: destinationFunction,
+    options: Object.values(BlendFunc),
+    onInit: (v) => {
+      destinationFunction = v;
+      gl.blendFunc(gl[sourceFunction], gl[v]);
+    },
+    onChange: (v) => {
+      destinationFunction = v;
+      gl.blendFunc(gl[sourceFunction], gl[v]);
+    },
+  });
+  createColorInputForm({
+    label: "Blend color",
+    value: rgbToHex(denormalizeColor(blendColor)),
+    onInit: (v) => {
+      blendColor = normalizeColor(hexToRgb(v));
+      gl.blendColor(blendColor[0], blendColor[1], blendColor[2], alphaValue);
+    },
+    onChange: (v) => {
+      blendColor = normalizeColor(hexToRgb(v));
+      gl.blendColor(blendColor[0], blendColor[1], blendColor[2], alphaValue);
+    },
+  });
+  createSliderInputForm({
+    label: "Alpha Value",
+    value: alphaValue,
+    min: 0,
+    max: 1,
+    step: 0.1,
+    onChange: (v) => {
+      alphaValue = v;
+      gl.blendColor(blendColor[0], blendColor[1], blendColor[2], alphaValue);
     },
   });
 };
