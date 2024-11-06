@@ -360,7 +360,7 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will see how different blending configuration changes the scene"
+    "In this example we will see how different blending configuration changes the scene. Whenever blending is enabled, you can play with the transparency of the object by changing the values under its alpha channels (that is Sphere Alpha and Cone Alpha). You can also change how the source color and the destination color are computed by by the means of 'Source Function' and 'Destination Function'. And finally you may want to use the field 'Blend Function' to see different ways of merging the source and destination color."
   );
 
   gl = getGLContext();

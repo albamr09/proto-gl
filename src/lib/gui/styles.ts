@@ -10,7 +10,9 @@ html, body {
   position: fixed;
   top: 10px;
   right: 10px;
-  width: 300px;
+  width: fit-content;
+  max-width: 500px;
+  min-width: 300px;
   border: 1px solid #ccc;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   background-color: #fff;
@@ -20,6 +22,7 @@ html, body {
   flex-direction: column;
   gap: 10px;
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  overflow: hidden;
 }
 
 #control-container {
