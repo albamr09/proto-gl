@@ -1,0 +1,169 @@
+import { loadData } from "../../lib/files.js";
+import {
+  createDescriptionPanel,
+  initGUI,
+  initController,
+  createCheckboxInputForm,
+  createSliderInputForm,
+  createSelectorForm,
+} from "../../lib/gui/index.js";
+import { Vector } from "../../lib/math/vector.js";
+import {
+  autoResizeCanvas,
+  configureCanvas,
+  getGLContext,
+} from "../../lib/web-gl.js";
+import Camera, {
+  CAMERA_TYPE,
+  PROJECTION_TYPE,
+} from "../../lib/webgl/camera.js";
+import Controller from "../../lib/webgl/controller.js";
+import Instance from "../../lib/webgl/instance.js";
+import Scene from "../../lib/webgl/scene.js";
+import { UniformType } from "../../lib/webgl/uniforms.js";
+import fragmentShaderSource from "./fs.glsl.js";
+import vertexShaderSource from "./vs.glsl.js";
+
+enum CullingMode {
+  FRONT = "FRONT",
+  BACK = "BACK",
+}
+
+let gl: WebGL2RenderingContext;
+let canvas: HTMLCanvasElement;
+let scene: Scene;
+let camera: Camera;
+let alphaValue = 0.5;
+
+const attributes = ["aPosition", "aNormal", "aColor"] as const;
+const uniforms = ["uLightAmbient", "uLightDiffuse", "uAlpha"] as const;
+
+const initProgram = () => {
+  scene = new Scene(gl);
+  camera = new Camera(
+    CAMERA_TYPE.ORBITING,
+    PROJECTION_TYPE.PERSPECTIVE,
+    gl,
+    scene
+  );
+  camera.setPosition(new Vector([0, 0, 4]));
+  camera.setAzimuth(-50);
+  camera.setElevation(-30);
+  new Controller({ camera, canvas });
+};
+
+const initData = () => {
+  const lightUniforms = {
+    uLightAmbient: {
+      data: [1, 1, 1, 1],
+      type: UniformType.FLOAT,
+    },
+    uLightDiffuse: {
+      data: [1, 1, 1, 1],
+      type: UniformType.FLOAT,
+    },
+  };
+  loadData("/data/models/geometries/cube-complex.json").then((data) => {
+    const { vertices, indices, scalars } = data;
+    const model = new Instance<typeof attributes, typeof uniforms>({
+      id: "cube",
+      gl,
+      vertexShaderSource,
+      fragmentShaderSource,
+      attributes: {
+        aPosition: {
+          data: vertices,
+          size: 3,
+          type: gl.FLOAT,
+        },
+        aColor: {
+          data: scalars,
+          size: 4,
+          type: gl.FLOAT,
+        },
+      },
+      indices,
+      uniforms: {
+        uAlpha: {
+          data: alphaValue,
+          type: UniformType.FLOAT,
+        },
+        ...lightUniforms,
+      },
+    });
+    scene.add(model);
+  });
+};
+
+const draw = () => {
+  scene.render();
+};
+
+const render = () => {
+  draw();
+  requestAnimationFrame(render);
+};
+
+const getEnableDisable = (v: boolean) => (v ? "enable" : "disable");
+
+const initControls = () => {
+  initController();
+
+  createCheckboxInputForm({
+    label: "Alpha Blending",
+    value: true,
+    onInit: (v) => {
+      gl[getEnableDisable(v)](gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    },
+    onChange: (v) => {
+      gl[getEnableDisable(v)](gl.BLEND);
+    },
+  });
+  createCheckboxInputForm({
+    label: "Face culling",
+    value: true,
+    onInit: (v) => {
+      gl[getEnableDisable(v)](gl.CULL_FACE);
+    },
+    onChange: (v) => {
+      gl[getEnableDisable(v)](gl.CULL_FACE);
+    },
+  });
+  createSelectorForm({
+    label: "Culling Mode",
+    value: CullingMode.FRONT,
+    options: Object.values(CullingMode),
+    onChange: (v) => {
+      gl.cullFace(gl[v]);
+    },
+  });
+  createSliderInputForm({
+    label: "Alpha Value",
+    value: alphaValue,
+    min: 0,
+    max: 1,
+    step: 0.1,
+    onChange: (v) => {
+      scene.updateUniform("uAlpha", v, "cube");
+    },
+  });
+};
+
+const init = () => {
+  initGUI();
+  createDescriptionPanel(
+    "On this example we will showcase how face culling works by enabling/disabling this phase on the rendering line. When it is enabled we can also configure how face culling is applied. Either by rendering either the front face of each polygon or by rendering the back face. Back culling means we discard the faces not 'visible' by the user, while front culling means we discard the faces seen by the user."
+  );
+
+  gl = getGLContext();
+  canvas = configureCanvas();
+  autoResizeCanvas(canvas);
+
+  initProgram();
+  initData();
+  initControls();
+  render();
+};
+
+window.onload = init;
