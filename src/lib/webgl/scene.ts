@@ -78,6 +78,14 @@ class Scene {
     this.objects[id] = o;
   }
 
+  removeObjects() {
+    this.objects = {};
+  }
+
+  getObjects() {
+    return this.objects;
+  }
+
   render(cb: (o: Instance<any, any>) => void = () => {}, clear = true) {
     clear && this.clear();
     Object.values(this.objects).forEach((o) => {

@@ -35,6 +35,11 @@ import { UniformType } from "../../lib/webgl/uniforms.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
+enum Order {
+  SPHERE = "Sphere first",
+  CONE = "Cone first",
+}
+
 enum BlendEquation {
   FUNC_ADD = "FUNC_ADD",
   FUNC_SUBTRACT = "FUNC_SUBTRACT",
@@ -70,6 +75,7 @@ let sourceFunction = BlendFunc.SRC_ALPHA;
 let destinationFunction = BlendFunc.ONE_MINUS_SRC_ALPHA;
 let alphaValue = 1;
 let blendColor = [0, 0, 0];
+let renderingOrder = Order.SPHERE;
 
 const initProgram = () => {
   scene = new Scene(gl);
@@ -353,6 +359,28 @@ const initControls = () => {
     onChange: (v) => {
       alphaValue = v;
       gl.blendColor(blendColor[0], blendColor[1], blendColor[2], alphaValue);
+    },
+  });
+  createSelectorForm({
+    label: "Render order",
+    value: renderingOrder,
+    options: Object.values(Order),
+    onChange: (v) => {
+      const objects = scene.getObjects();
+      scene.removeObjects();
+      // Add any other objects that are not cone or sphere
+      Object.values(objects)
+        .filter((o) => o.getId() != "cone" && o.getId() != "sphere")
+        .forEach((o) => scene.add(o));
+      // Re-add cone and sphere but making sure they are in order
+      if (v == Order.CONE) {
+        scene.add(objects["cone"]);
+        scene.add(objects["sphere"]);
+      }
+      if (v == Order.SPHERE) {
+        scene.add(objects["sphere"]);
+        scene.add(objects["cone"]);
+      }
     },
   });
 };
