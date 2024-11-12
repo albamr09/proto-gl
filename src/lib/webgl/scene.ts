@@ -5,7 +5,8 @@ import Instance, { Configuration, UniformMetadata } from "./instance.js";
 
 class Scene {
   private gl: WebGL2RenderingContext;
-  private objects: Record<string, Instance<any, any>>;
+  private objects: Map<string, Instance<any, any>>;
+  private renderOrder: string[];
   private modelViewMatrix: Matrix4;
   private normalMatrix: Matrix4;
   private projectionMatrix: Matrix4;
@@ -15,7 +16,8 @@ class Scene {
     this.modelViewMatrix = Matrix4.identity();
     this.normalMatrix = Matrix4.identity();
     this.projectionMatrix = Matrix4.identity();
-    this.objects = {};
+    this.objects = new Map();
+    this.renderOrder = [];
     this.setUp();
   }
 
@@ -27,6 +29,106 @@ class Scene {
     this.gl.depthFunc(this.gl.LEQUAL);
   }
 
+  // Objects
+  add(o: Instance<any, any>) {
+    const id = o.getId() ?? uuidv4();
+    o.setId(id);
+    this.objects.set(id, o);
+    this.renderOrder.push(id);
+  }
+
+  removeObjects() {
+    this.renderOrder = [];
+    this.objects.clear();
+  }
+
+  // Renders an item first
+  renderFirst(id: string) {
+    const index = this.renderOrder.indexOf(id);
+    if (index == -1) {
+      console.error(`Object for id ${index} not found`);
+      return;
+    }
+    if (index === 0) return;
+
+    // Remove id from array
+    this.renderOrder.splice(index, 1);
+    // Append id to start of array
+    this.renderOrder.unshift(id);
+    this.printRenderOrder();
+  }
+
+  // Renders an item last
+  renderLast(id: string) {
+    const index = this.renderOrder.indexOf(id);
+    if (index == -1) {
+      console.error(`Object for id ${index} not found`);
+      return;
+    }
+    if (index === this.renderOrder.length - 1) return;
+
+    // Remove id from array
+    this.renderOrder.splice(index, 1);
+    // Append id to end of array
+    this.renderOrder.push(id);
+    this.printRenderOrder();
+  }
+
+  // Pushes an item up the render priority
+  renderSooner(id: string) {
+    const index = this.renderOrder.indexOf(id);
+    if (index == -1) {
+      console.error(`Object for id ${index} not found`);
+      return;
+    }
+    if (index == 0) {
+      console.warn(
+        `Object ${index} cannot be rendered sooner, as it is the first object to be rendered.`
+      );
+    }
+    // Remove id from array
+    this.renderOrder.splice(index, 1);
+    // Move one position up
+    this.renderOrder.splice(index - 1, 0, id);
+    this.printRenderOrder();
+  }
+
+  // Pushes an item down the render priority
+  renderLater(id: string) {
+    const index = this.renderOrder.indexOf(id);
+    if (index == -1) {
+      console.error(`Object for id ${index} not found`);
+      return;
+    }
+    if (index >= this.renderOrder.length) {
+      console.warn(
+        `Object ${index} cannot be rendered later, as it is the last object to be rendered.`
+      );
+    }
+
+    // Remove id from array
+    this.renderOrder.splice(index, 1);
+    // Move one position down
+    this.renderOrder.splice(index + 1, 0, id);
+    this.printRenderOrder();
+  }
+
+  // Prints the current render order by alias
+  printRenderOrder() {
+    console.log("Render Order:", this.renderOrder);
+  }
+
+  setConfigurationValue<T>(key: keyof Configuration, value: T, id?: string) {
+    if (id) {
+      this.objects.get(id)?.setConfigurationValue(key, value);
+      return;
+    }
+    Object.values(this.objects).forEach((o) => {
+      o.setConfigurationValue(key, value);
+    });
+  }
+
+  // Context
   setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
     fn(this.gl);
     Object.values(this.objects).forEach((o) => {
@@ -34,8 +136,9 @@ class Scene {
     });
   }
 
+  // Uniforms
   getUniform(id: string, uniformName: any) {
-    return this.objects[id]?.getUniform(uniformName);
+    return this.objects.get(id)?.getUniform(uniformName);
   }
 
   updateUniform<T>(
@@ -45,21 +148,11 @@ class Scene {
     metadata?: UniformMetadata
   ) {
     if (id) {
-      this.objects[id]?.updateUniform(uniformName, value, metadata);
+      this.objects.get(id)?.updateUniform(uniformName, value, metadata);
       return;
     }
     Object.values(this.objects).forEach((o) => {
       o.updateUniform(uniformName, value, metadata);
-    });
-  }
-
-  setConfigurationValue<T>(key: keyof Configuration, value: T, id?: string) {
-    if (id) {
-      this.objects[id]?.setConfigurationValue(key, value);
-      return;
-    }
-    Object.values(this.objects).forEach((o) => {
-      o.setConfigurationValue(key, value);
     });
   }
 
@@ -72,23 +165,14 @@ class Scene {
     this.projectionMatrix = projectionMatrix.copy() as Matrix4;
   }
 
-  add(o: Instance<any, any>) {
-    const id = o.getId() ?? uuidv4();
-    o.setId(id);
-    this.objects[id] = o;
-  }
-
-  removeObjects() {
-    this.objects = {};
-  }
-
-  getObjects() {
-    return this.objects;
-  }
-
   render(cb: (o: Instance<any, any>) => void = () => {}, clear = true) {
     clear && this.clear();
-    Object.values(this.objects).forEach((o) => {
+    this.renderOrder.forEach((id) => {
+      const o = this.objects.get(id);
+      if (!o) {
+        console.warn(`Object ${id} was not found while rendering`);
+        return;
+      }
       o.updateUniform("uModelViewMatrix", this.modelViewMatrix.toFloatArray());
       o.updateUniform("uNormalMatrix", this.normalMatrix.toFloatArray());
       o.updateUniform(

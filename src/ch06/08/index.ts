@@ -172,20 +172,16 @@ const initControls = () => {
     value: RenderingOrder.CONE,
     options: Object.values(RenderingOrder),
     onChange: (v) => {
-      const objects = scene.getObjects();
-      scene.removeObjects();
-      // Add any other objects that are not cone or sphere
-      Object.values(objects)
-        .filter((o) => o.getId() != "cone" && o.getId() != "wall")
-        .forEach((o) => scene.add(o));
-      // Re-add cone and sphere but making sure they are in order
       if (v == RenderingOrder.CONE) {
-        scene.add(objects["cone"]);
-        scene.add(objects["wall"]);
+        // Move cone to end of render order
+        scene.renderLast("cone");
+        // Move wall to end of render order, so it
+        // will be after cone
+        scene.renderLast("wall");
       }
       if (v == RenderingOrder.WALL) {
-        scene.add(objects["wall"]);
-        scene.add(objects["cone"]);
+        scene.renderLast("wall");
+        scene.renderLast("cone");
       }
     },
   });
