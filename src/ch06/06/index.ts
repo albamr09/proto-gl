@@ -371,7 +371,7 @@ const initControls = () => {
         scene.renderLast("cone");
         // Move sphere to end of render order, so it
         // will be after cone
-        scene.renderLast("spere");
+        scene.renderLast("sphere");
       }
       if (v == Order.SPHERE) {
         scene.renderLast("sphere");
