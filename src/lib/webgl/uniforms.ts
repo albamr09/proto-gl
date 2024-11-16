@@ -62,6 +62,10 @@ export class Uniform {
     this.transpose = transpose ?? false;
   }
 
+  getLocation() {
+    return this.location;
+  }
+
   setLocation(location: WebGLUniformLocation) {
     this.location = location;
   }

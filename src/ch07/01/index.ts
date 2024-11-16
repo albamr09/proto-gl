@@ -28,6 +28,7 @@ let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
+let texture: WebGLTexture | null;
 let useLambert = true,
   usePerVertex = false,
   alphaValue = 1.0;
@@ -59,6 +60,7 @@ const uniforms = [
   "uLightPosition",
   "uLightAmbient",
   "uLightDiffuse",
+  "uSampler",
 ] as const;
 
 const initData = () => {
@@ -118,16 +120,38 @@ const initData = () => {
             data: alphaValue,
             type: UniformType.FLOAT,
           },
+          uSampler: {
+            data: 0,
+            type: UniformType.INT,
+          },
           ...lightUniforms,
         },
         indices,
       })
     );
   });
+  // Texture
+  texture = gl.createTexture();
+  const image = new Image();
+  image.src = "/data/images/webgl.png";
+  image.onload = () => {
+    // Load texture
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+  };
 };
 
 const draw = () => {
-  scene.render();
+  scene.render(() => {
+    const uniform = scene.getUniform("cube", "uSampler");
+    if (!uniform) return;
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.uniform1i(uniform.getLocation()!, 0);
+  });
 };
 
 const render = () => {

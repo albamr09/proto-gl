@@ -9,7 +9,7 @@
     "typescript": "^5.2.2"
   },
   "scripts": {
-    "copy-files": "copyfiles -u 1 src/**/*.html build/ && copyfiles data/**/*.json build/ && copyfiles -u 1 src/public/* build",
+    "copy-files": "copyfiles -u 1 src/**/*.html build/ && copyfiles data/**/*.json build/ copyfiles data/**/*.png build/ && copyfiles -u 1 src/public/* build",
     "minify": "find ./build -name \"*.js\" -exec sh -c 'terser \"$1\" -o \"${1%.js}.js\"' _ {} \\;",
     "build": "rm -rf build && tsc && yarn minify && yarn copy-files",
     "serve": "cd build && serve",
