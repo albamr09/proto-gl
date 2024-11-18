@@ -49,9 +49,17 @@ const initProgram = () => {
   // Configure alpha blending
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  // Configure texture load
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 };
 
-const attributes = ["aPosition", "aNormal", "aColor"] as const;
+const attributes = [
+  "aPosition",
+  "aNormal",
+  "aColor",
+  "aTextureCoords",
+] as const;
 const uniforms = [
   "uMaterialDiffuse",
   "uUsePerVertexColoring",
@@ -78,8 +86,8 @@ const initData = () => {
       type: UniformType.VECTOR_FLOAT,
     },
   };
-  loadData("/data/models/geometries/cube-simple.json").then((data) => {
-    const { indices, vertices, diffuse, scalars } = data;
+  loadData("/data/models/geometries/cube-texture.json").then((data) => {
+    const { indices, vertices, diffuse, scalars, textureCoords } = data;
     scene.add(
       new Instance<typeof attributes, typeof uniforms>({
         id: "cube",
@@ -100,6 +108,11 @@ const initData = () => {
           aColor: {
             data: scalars,
             size: 4,
+            type: gl.FLOAT,
+          },
+          aTextureCoords: {
+            data: textureCoords,
+            size: 2,
             type: gl.FLOAT,
           },
         },
@@ -202,7 +215,7 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we show the difference between constant coloring and per-vertex coloring."
+    "On this example we show how to render a simple texture."
   );
 
   gl = getGLContext();

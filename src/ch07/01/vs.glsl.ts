@@ -18,8 +18,10 @@ uniform vec4 uMaterialAmbient;
 in vec3 aPosition;
 in vec3 aNormal;
 in vec4 aColor;
+in vec2 aTextureCoords;
 
 out vec4 vColor;
+out vec2 vTextureCoords;
 
 void main(void) {
   gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
@@ -43,6 +45,7 @@ void main(void) {
   } 
 
   vColor = vec4(vec3(color), uAlpha);
+  vTextureCoords = aTextureCoords;
 }
 `;
 
