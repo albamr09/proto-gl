@@ -19,3 +19,17 @@ export const loadAllDataFromFolder = (folderPath: string, size: number) => {
     return fetch(`${folderPath}/part${i + 1}.json`).then((res) => res.json());
   });
 };
+
+export const loadImage = (src: string) => {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    try {
+      const imageInput = new Image();
+      imageInput.src = src;
+      imageInput.onload = () => {
+        resolve(imageInput);
+      };
+    } catch (e) {
+      reject(e);
+    }
+  });
+};

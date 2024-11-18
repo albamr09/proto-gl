@@ -1,3 +1,4 @@
+import { loadImage } from "../files.js";
 import { setupStyles } from "./styles.js";
 
 const CONTROL_CONTAINER_ID = "control-container";
@@ -248,6 +249,76 @@ export const createColorInputForm = ({
   // Append the label, color input to the form
   form.appendChild(labelElement);
   form.appendChild(colorInput);
+
+  // Append the form to the container
+  formContainer.appendChild(form);
+
+  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
+  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+};
+
+export const createImageInputForm = ({
+  label,
+  value,
+  onInit = () => {},
+  onChange,
+}: {
+  label: string;
+  value?: string;
+  onInit?: (file: HTMLImageElement) => void;
+  onChange: (file: HTMLImageElement) => void;
+}) => {
+  // Create a div container
+  const formContainer = document.createElement("div");
+  formContainer.classList.add("controller-element");
+
+  // Create the form element
+  const form = document.createElement("div");
+  form.classList.add("form-container");
+
+  // Create a label for the input
+  const labelElement = document.createElement("label");
+  labelElement.setAttribute("for", "imageInput");
+  const labelSpan = document.createElement("span");
+  labelSpan.innerHTML = label;
+  labelElement.appendChild(labelSpan);
+
+  // Create an input element of type "file"
+  const imageInput = document.createElement("input");
+  imageInput.setAttribute("type", "file");
+  imageInput.setAttribute("id", "imageInput");
+  imageInput.setAttribute("name", "imageInput");
+  // Accept only image files
+  imageInput.setAttribute("accept", "image/*");
+
+  if (value) {
+    loadImage(value).then((image) => {
+      onInit(image);
+    });
+  }
+
+  // Add an event listener for the "change" event on the file input
+  imageInput.addEventListener("change", function () {
+    // Get the selected file from the input
+    const file = imageInput.files ? imageInput.files[0] : null;
+    if (!file) return;
+
+    // Create a FileReader to read the image file
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const src = event.target?.result as string;
+      loadImage(src).then((image) => {
+        onChange(image);
+      });
+    };
+
+    // Read the file as a data URL
+    reader.readAsDataURL(file);
+  });
+
+  // Append the label and file input to the form
+  form.appendChild(labelElement);
+  form.appendChild(imageInput);
 
   // Append the form to the container
   formContainer.appendChild(form);
