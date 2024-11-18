@@ -123,7 +123,7 @@ class Scene {
       this.objects.get(id)?.setConfigurationValue(key, value);
       return;
     }
-    Object.values(this.objects).forEach((o) => {
+    this.objects.forEach((o) => {
       o.setConfigurationValue(key, value);
     });
   }
@@ -131,7 +131,7 @@ class Scene {
   // Context
   setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
     fn(this.gl);
-    Object.values(this.objects).forEach((o) => {
+    this.objects.forEach((o) => {
       o.setGLParameters(fn);
     });
   }
@@ -151,7 +151,7 @@ class Scene {
       this.objects.get(id)?.updateUniform(uniformName, value, metadata);
       return;
     }
-    Object.values(this.objects).forEach((o) => {
+    this.objects.forEach((o) => {
       o.updateUniform(uniformName, value, metadata);
     });
   }
