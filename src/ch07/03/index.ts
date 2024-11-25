@@ -2,6 +2,8 @@ import { loadData } from "../../lib/files.js";
 import {
   createCheckboxInputForm,
   createDescriptionPanel,
+  createImageInputForm,
+  createSelectorForm,
   createSliderInputForm,
   initController,
   initGUI,
@@ -28,8 +30,14 @@ let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
+let texture: WebGLTexture | null;
 
-const attributes = ["aPosition", "aColor", "aNormal"] as const;
+const attributes = [
+  "aPosition",
+  "aColor",
+  "aNormal",
+  "aTextureCoords",
+] as const;
 const uniforms = [
   "uMaterialDiffuse",
   "uLightPosition",
@@ -38,8 +46,22 @@ const uniforms = [
   "uUsePerVertexColoring",
   "uUseLambert",
   "uAlpha",
-  "uSampler2D",
+  "uSampler",
 ] as const;
+
+enum MagFilter {
+  LINEAR = "LINEAR",
+  NEAREST = "NEAREST",
+}
+
+enum MinFilter {
+  LINEAR = "LINEAR",
+  NEAREST = "NEAREST",
+  NEAREST_MIPMAP_NEAREST = "NEAREST_MIPMAP_NEAREST",
+  LINEAR_MIPMAP_NEAREST = "LINEAR_MIPMAP_NEAREST",
+  NEAREST_MIPMAP_LINEAR = "NEAREST_MIPMAP_LINEAR",
+  LINEAR_MIPMAP_LINEAR = "LINEAR_MIPMAP_LINEAR",
+}
 
 const initProgram = () => {
   scene = new Scene(gl);
@@ -103,6 +125,11 @@ const initData = () => {
           size: 3,
           type: gl.FLOAT,
         },
+        aTextureCoords: {
+          data: textureCoords,
+          size: 2,
+          type: gl.FLOAT,
+        },
       },
       uniforms: {
         uMaterialDiffuse: {
@@ -121,24 +148,37 @@ const initData = () => {
           data: 1,
           type: UniformType.FLOAT,
         },
+        uSampler: {
+          data: 0,
+          type: UniformType.INT,
+        },
         ...lightUniforms,
       },
       indices,
     });
-    // Create texture
-    const texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
     scene.add(cubeInstance);
   });
 };
 
 const draw = () => {
-  scene.render();
+  scene.render(() => {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+  });
 };
 
 const render = () => {
   draw();
   requestAnimationFrame(render);
+};
+
+const loadTexture = (image: HTMLImageElement) => {
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.bindTexture(gl.TEXTURE_2D, null);
 };
 
 const initControls = () => {
@@ -165,6 +205,38 @@ const initControls = () => {
     step: 0.1,
     onChange: (v) => {
       scene.updateUniform("uAlpha", v, "cube");
+    },
+  });
+  createImageInputForm({
+    label: "Texture Image",
+    value: "/data/images/webgl.png",
+    onInit: (v) => {
+      // Create texture
+      texture = gl.createTexture();
+      loadTexture(v);
+    },
+    onChange: (v) => {
+      loadTexture(v);
+    },
+  });
+  createSelectorForm({
+    label: "Magnification Filter",
+    value: MagFilter.NEAREST,
+    options: Object.values(MagFilter),
+    onChange: (v) => {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl[v]);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    },
+  });
+  createSelectorForm({
+    label: "Minification Filter",
+    value: MinFilter.NEAREST,
+    options: Object.values(MinFilter),
+    onChange: (v) => {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl[v]);
+      gl.bindTexture(gl.TEXTURE_2D, null);
     },
   });
 };

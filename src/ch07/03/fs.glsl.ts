@@ -2,12 +2,15 @@ const fragmentShaderSource = `#version 300 es
 
 precision mediump float;
 
-in vec4 vColor;
+uniform sampler2D uSampler;
 
-out vec4 fragtColor;
+in vec4 vColor;
+in vec2 vTextureCoords;
+
+out vec4 fragColor;
 
 void main(void) {
-  fragtColor = vec4(vColor);
+  fragColor = texture(uSampler, vTextureCoords) * vec4(vColor);
 }
 `;
 
