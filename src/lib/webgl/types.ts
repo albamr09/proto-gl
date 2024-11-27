@@ -79,6 +79,14 @@ export enum PROGRAM_TYPE {
   FRAGMENT,
 }
 
+export type Uniforms<U extends readonly string[], T> = {
+  [P in TransformUniformsType[number] | U[number]]: T | null;
+};
+
+export type Attributes<A extends readonly string[]> = {
+  [P in A[number]]: number;
+};
+
 // Camera
 export enum CAMERA_TYPE {
   TRACKING = "Tracking",

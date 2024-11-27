@@ -1,16 +1,10 @@
 import {
+  Attributes,
   PROGRAM_TYPE,
   TransformUniforms,
   TransformUniformsType,
+  Uniforms,
 } from "./types.js";
-
-export type Uniforms<U extends readonly string[], T> = {
-  [P in TransformUniformsType[number] | U[number]]: T | null;
-};
-
-export type Attributes<A extends readonly string[]> = {
-  [P in A[number]]: number;
-};
 
 class Program<
   A extends readonly string[] = [],

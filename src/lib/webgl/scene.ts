@@ -149,7 +149,7 @@ class Scene {
   }
 
   updateUniform<T>(
-    uniformName: any,
+    uniformName: string,
     value: T,
     id?: string,
     metadata?: UniformMetadata

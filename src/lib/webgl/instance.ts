@@ -1,5 +1,5 @@
 import { uuidv4 } from "../utils.js";
-import Program, { Uniforms } from "./program.js";
+import Program from "./program.js";
 import {
   AttributeDefinition,
   InstanceConfiguration,
@@ -7,6 +7,7 @@ import {
   TransformUniformsType,
   UniformDefinition,
   UniformMetadata,
+  Uniforms,
 } from "./types.js";
 import { Uniform } from "./uniforms.js";
 
