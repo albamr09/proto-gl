@@ -20,10 +20,8 @@ import {
   configureCanvas,
   getGLContext,
 } from "../../lib/web-gl.js";
-import Camera, {
-  CAMERA_TYPE,
-  PROJECTION_TYPE,
-} from "../../lib/webgl/camera.js";
+import Camera from "../../lib/webgl/camera.js";
+import { CAMERA_TYPE, PROJECTION_TYPE } from "../../lib/webgl/types.js";
 import Controller from "../../lib/webgl/controller.js";
 import Instance from "../../lib/webgl/instance.js";
 import Axis from "../../lib/webgl/models/axis/index.js";

@@ -239,7 +239,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   }
 
   // TODO: type this?
-  setConfigurationValue(key: keyof Configuration, value: any) {
+  setConfigurationValue(key: keyof InstanceConfiguration, value: any) {
     this.configuration[key] = value;
   }
 

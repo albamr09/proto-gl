@@ -1,5 +1,5 @@
 import Instance from "../../instance.js";
-import { UniformType } from "../../uniforms.js";
+import { UniformType } from "../../types.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
