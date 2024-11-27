@@ -1,4 +1,4 @@
-import { transformUniforms } from "./uniforms";
+import { Matrix4 } from "../math/matrix";
 
 // Attributes
 export type AttributeDefinition = {
@@ -10,7 +10,12 @@ export type AttributeDefinition = {
 };
 
 // Uniforms
-export type TransformUniforms = typeof transformUniforms;
+export const TransformUniforms = [
+  "uModelViewMatrix",
+  "uNormalMatrix",
+  "uProjectionMatrix",
+] as const;
+export type TransformUniformsType = typeof TransformUniforms;
 
 export type UniformMetadata = {
   size?: number;
@@ -25,6 +30,26 @@ export enum UniformType {
   MATRIX,
   TEXTURE,
 }
+
+export const transformUniformsDefinition: {
+  [x in (typeof TransformUniforms)[number]]: {
+    data: Float32Array;
+    type: UniformType;
+  };
+} = {
+  uModelViewMatrix: {
+    data: Matrix4.identity().toFloatArray(),
+    type: UniformType.MATRIX,
+  },
+  uNormalMatrix: {
+    data: Matrix4.identity().toFloatArray(),
+    type: UniformType.MATRIX,
+  },
+  uProjectionMatrix: {
+    data: Matrix4.identity().toFloatArray(),
+    type: UniformType.MATRIX,
+  },
+};
 
 export type UniformDataMap = {
   [UniformType.INT]: number | boolean;

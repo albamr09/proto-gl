@@ -3,11 +3,12 @@ import Program, { Uniforms } from "./program.js";
 import {
   AttributeDefinition,
   InstanceConfiguration,
-  TransformUniforms,
+  transformUniformsDefinition,
+  TransformUniformsType,
   UniformDefinition,
   UniformMetadata,
 } from "./types.js";
-import { Uniform, transformUniformsDefinition } from "./uniforms.js";
+import { Uniform } from "./uniforms.js";
 
 const defaultConfiguration: InstanceConfiguration = {
   pickable: true,
@@ -197,7 +198,10 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       ...transformUniformsDefinition,
     } as Uniforms<U, UniformDefinition>;
     this.uniforms = (
-      Object.keys(mergedUniforms) as (U[number] | TransformUniforms[number])[]
+      Object.keys(mergedUniforms) as (
+        | U[number]
+        | TransformUniformsType[number]
+      )[]
     ).reduce((dict, k) => {
       const uniform = mergedUniforms[k] as UniformDefinition;
       const location = this.program.uniforms[k];
@@ -215,7 +219,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   }
 
   updateUniform<T>(
-    uniformName: U[number] | TransformUniforms[number],
+    uniformName: U[number] | TransformUniformsType[number],
     value: T,
     metadata?: UniformMetadata
   ) {
@@ -229,7 +233,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     }
   }
 
-  getUniform(uniformName: U[number] | TransformUniforms[number]) {
+  getUniform(uniformName: U[number] | TransformUniformsType[number]) {
     return this.uniforms?.[uniformName];
   }
 

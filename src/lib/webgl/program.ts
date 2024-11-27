@@ -1,8 +1,11 @@
-import { PROGRAM_TYPE, TransformUniforms } from "./types.js";
-import { transformUniforms } from "./uniforms.js";
+import {
+  PROGRAM_TYPE,
+  TransformUniforms,
+  TransformUniformsType,
+} from "./types.js";
 
 export type Uniforms<U extends readonly string[], T> = {
-  [P in TransformUniforms[number] | U[number]]: T | null;
+  [P in TransformUniformsType[number] | U[number]]: T | null;
 };
 
 export type Attributes<A extends readonly string[]> = {
@@ -70,7 +73,7 @@ class Program<
   /**
    * Returns the location of the attribute
    */
-  getUniform(uniformName: TransformUniforms[number] & U[number]) {
+  getUniform(uniformName: TransformUniformsType[number] & U[number]) {
     return this.uniforms[uniformName];
   }
 
@@ -100,7 +103,7 @@ class Program<
     if (!this._program) {
       return uniforms;
     }
-    for (const name of [...(uniformNames ?? []), ...transformUniforms]) {
+    for (const name of [...(uniformNames ?? []), ...TransformUniforms]) {
       const location = this.gl.getUniformLocation(this._program, name);
       if (location === -1) {
         throw new Error(`Uniform ${name} not found in the shader program`);

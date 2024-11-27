@@ -1,31 +1,4 @@
-import { Matrix4 } from "../math/matrix.js";
 import { UniformType, UniformDataMap, UniformMetadata } from "./types.js";
-
-export const transformUniforms = [
-  "uModelViewMatrix",
-  "uNormalMatrix",
-  "uProjectionMatrix",
-] as const;
-
-export const transformUniformsDefinition: {
-  [x in (typeof transformUniforms)[number]]: {
-    data: Float32Array;
-    type: UniformType;
-  };
-} = {
-  uModelViewMatrix: {
-    data: Matrix4.identity().toFloatArray(),
-    type: UniformType.MATRIX,
-  },
-  uNormalMatrix: {
-    data: Matrix4.identity().toFloatArray(),
-    type: UniformType.MATRIX,
-  },
-  uProjectionMatrix: {
-    data: Matrix4.identity().toFloatArray(),
-    type: UniformType.MATRIX,
-  },
-};
 
 export class Uniform {
   private name: string;
