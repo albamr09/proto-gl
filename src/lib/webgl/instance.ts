@@ -5,6 +5,8 @@ import {
   UniformType,
   transformUniformsDefinition,
   TransformUniforms,
+  UniformDataMap,
+  UniformMetadata,
 } from "./uniforms.js";
 
 export type AttributeDefinition = {
@@ -15,15 +17,11 @@ export type AttributeDefinition = {
   offset?: number;
 };
 
-export type UniformMetadata = {
-  size?: number;
-  transpose?: boolean;
-};
-
-export type UniformDefinition = UniformMetadata & {
-  data: any;
-  type: UniformType;
-};
+export type UniformDefinition<T extends UniformType = UniformType> =
+  UniformMetadata & {
+    type: T;
+    data: UniformDataMap[T];
+  };
 
 export interface Configuration {
   pickable?: boolean;

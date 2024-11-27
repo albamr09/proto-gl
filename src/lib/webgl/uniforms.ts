@@ -1,5 +1,4 @@
 import { Matrix4 } from "../math/matrix.js";
-import { UniformMetadata } from "./instance.js";
 
 export const transformUniforms = [
   "uModelViewMatrix",
@@ -9,13 +8,29 @@ export const transformUniforms = [
 
 export type TransformUniforms = typeof transformUniforms;
 
+export type UniformMetadata = {
+  size?: number;
+  transpose?: boolean;
+};
+
 export enum UniformType {
   INT,
   FLOAT,
   VECTOR_FLOAT,
   VECTOR_INT,
   MATRIX,
+  TEXTURE,
 }
+
+export type UniformDataMap = {
+  [UniformType.INT]: number | boolean;
+  [UniformType.FLOAT]: number;
+  [UniformType.VECTOR_FLOAT]: number[];
+  [UniformType.VECTOR_INT]: number[];
+  [UniformType.MATRIX]: Float32Array;
+  // TODO ALBA: this should be a texture
+  [UniformType.TEXTURE]: any;
+};
 
 export const transformUniformsDefinition: {
   [x in (typeof transformUniforms)[number]]: {

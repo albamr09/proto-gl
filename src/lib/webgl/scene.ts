@@ -1,7 +1,8 @@
 import { computeNormalMatrix } from "../math/3d.js";
 import { Matrix4 } from "../math/matrix.js";
 import { uuidv4 } from "../utils.js";
-import Instance, { Configuration, UniformMetadata } from "./instance.js";
+import Instance, { Configuration } from "./instance.js";
+import { UniformMetadata } from "./uniforms.js";
 
 class Scene {
   private gl: WebGL2RenderingContext;
