@@ -20,14 +20,15 @@ import {
   configureCanvas,
   getGLContext,
 } from "../../lib/web-gl.js";
-import Camera, { CAMERA_TYPE } from "../../lib/webgl/camera.js";
+import Camera from "../../lib/webgl/camera.js";
+import { CAMERA_TYPE } from "../../lib/webgl/types.js";
 import Controller from "../../lib/webgl/controller.js";
 import Instance from "../../lib/webgl/instance.js";
 import Axis from "../../lib/webgl/models/axis/index.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
 import Program from "../../lib/webgl/program.js";
 import Scene from "../../lib/webgl/scene.js";
-import { UniformType } from "../../lib/webgl/uniforms.js";
+import { UniformType } from "../../lib/webgl/types.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
 

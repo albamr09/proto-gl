@@ -1,8 +1,9 @@
-import Instance, {
+import Instance from "../../instance.js";
+import {
   AttributeDefinition,
-  Configuration,
+  InstanceConfiguration,
   UniformDefinition,
-} from "../../instance.js";
+} from "../../types.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
@@ -45,7 +46,7 @@ class Mesh<
     uniforms?: {
       [P in (typeof DefaultUniforms)[number] | U[number]]?: UniformDefinition;
     };
-    configuration?: Configuration;
+    configuration?: InstanceConfiguration;
   }) {
     super({
       id,

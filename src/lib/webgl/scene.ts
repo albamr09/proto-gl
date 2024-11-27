@@ -1,8 +1,8 @@
 import { computeNormalMatrix } from "../math/3d.js";
 import { Matrix4 } from "../math/matrix.js";
 import { uuidv4 } from "../utils.js";
-import Instance, { Configuration } from "./instance.js";
-import { UniformMetadata } from "./uniforms.js";
+import Instance from "./instance.js";
+import { InstanceConfiguration, UniformMetadata } from "./types.js";
 
 class Scene {
   private gl: WebGL2RenderingContext;
@@ -31,7 +31,9 @@ class Scene {
   }
 
   // Objects
-  add(o: Instance<any, any>) {
+  add<A extends readonly string[], U extends readonly string[]>(
+    o: Instance<A, U>
+  ) {
     const id = o.getId() ?? uuidv4();
     o.setId(id);
     this.objects.set(id, o);
@@ -119,7 +121,11 @@ class Scene {
     console.log("Render Order:", this.renderOrder);
   }
 
-  setConfigurationValue<T>(key: keyof Configuration, value: T, id?: string) {
+  setConfigurationValue<T>(
+    key: keyof InstanceConfiguration,
+    value: T,
+    id?: string
+  ) {
     if (id) {
       this.objects.get(id)?.setConfigurationValue(key, value);
       return;

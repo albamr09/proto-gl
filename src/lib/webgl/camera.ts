@@ -2,16 +2,7 @@ import { Angle } from "../math/angle.js";
 import { Matrix4 } from "../math/matrix.js";
 import { Vector } from "../math/vector.js";
 import Scene from "./scene.js";
-
-export enum CAMERA_TYPE {
-  TRACKING = "Tracking",
-  ORBITING = "Orbiting",
-}
-
-export enum PROJECTION_TYPE {
-  PERSPECTIVE = "Perspective",
-  ORTHOGRAPHIC = "Orthographic",
-}
+import { CAMERA_TYPE, PROJECTION_TYPE } from "./types.js";
 
 class Camera {
   // Camera config

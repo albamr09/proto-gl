@@ -1,36 +1,11 @@
 import { Matrix4 } from "../math/matrix.js";
+import { UniformType, UniformDataMap, UniformMetadata } from "./types.js";
 
 export const transformUniforms = [
   "uModelViewMatrix",
   "uNormalMatrix",
   "uProjectionMatrix",
 ] as const;
-
-export type TransformUniforms = typeof transformUniforms;
-
-export type UniformMetadata = {
-  size?: number;
-  transpose?: boolean;
-};
-
-export enum UniformType {
-  INT,
-  FLOAT,
-  VECTOR_FLOAT,
-  VECTOR_INT,
-  MATRIX,
-  TEXTURE,
-}
-
-export type UniformDataMap = {
-  [UniformType.INT]: number | boolean;
-  [UniformType.FLOAT]: number;
-  [UniformType.VECTOR_FLOAT]: number[];
-  [UniformType.VECTOR_INT]: number[];
-  [UniformType.MATRIX]: Float32Array;
-  // TODO ALBA: this should be a texture
-  [UniformType.TEXTURE]: any;
-};
 
 export const transformUniformsDefinition: {
   [x in (typeof transformUniforms)[number]]: {
@@ -55,8 +30,7 @@ export const transformUniformsDefinition: {
 export class Uniform {
   private name: string;
   private type: UniformType;
-  // TODO: type this
-  private data: any;
+  private data: UniformDataMap[UniformType];
   private location?: WebGLUniformLocation;
   private size?: number;
   private transpose?: boolean;
@@ -64,7 +38,7 @@ export class Uniform {
   constructor(
     name: string,
     type: UniformType,
-    data: any,
+    data: UniformDataMap[UniformType],
     location?: WebGLUniformLocation,
     size?: number,
     transpose?: boolean
@@ -85,7 +59,7 @@ export class Uniform {
     this.location = location;
   }
 
-  setData(data: any) {
+  setData(data: typeof this.data) {
     this.data = data;
   }
 

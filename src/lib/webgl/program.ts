@@ -1,9 +1,5 @@
-import { TransformUniforms, transformUniforms } from "./uniforms.js";
-
-export enum PROGRAM_TYPE {
-  VERTEX,
-  FRAGMENT,
-}
+import { PROGRAM_TYPE, TransformUniforms } from "./types.js";
+import { transformUniforms } from "./uniforms.js";
 
 export type Uniforms<U extends readonly string[], T> = {
   [P in TransformUniforms[number] | U[number]]: T | null;

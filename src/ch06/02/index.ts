@@ -22,7 +22,7 @@ import Instance from "../../lib/webgl/instance.js";
 import Axis from "../../lib/webgl/models/axis/index.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
 import Scene from "../../lib/webgl/scene.js";
-import { UniformType } from "../../lib/webgl/uniforms.js";
+import { UniformType } from "../../lib/webgl/types.js";
 import fragmentShaderSource from "./lights/fs.glsl.js";
 import vertexShaderSource from "./lights/vs.glsl.js";
 import wallVS from "./wall/vs.glsl.js";

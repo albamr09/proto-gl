@@ -29,7 +29,7 @@ import Axis from "../../lib/webgl/models/axis/index.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
 import Program from "../../lib/webgl/program.js";
 import Scene from "../../lib/webgl/scene.js";
-import { UniformType } from "../../lib/webgl/uniforms.js";
+import { UniformType } from "../../lib/webgl/types.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
 

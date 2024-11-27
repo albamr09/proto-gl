@@ -3,7 +3,7 @@ import Instance from "../../lib/webgl/instance.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
-import { UniformType } from "../../lib/webgl/uniforms.js";
+import { UniformType } from "../../lib/webgl/types.js";
 import { Vector } from "../../lib/math/vector.js";
 
 const attributes = ["aPos"] as const;

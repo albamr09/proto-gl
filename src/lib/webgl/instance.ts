@@ -1,35 +1,15 @@
 import { uuidv4 } from "../utils.js";
 import Program, { Uniforms } from "./program.js";
 import {
-  Uniform,
-  UniformType,
-  transformUniformsDefinition,
+  AttributeDefinition,
+  InstanceConfiguration,
   TransformUniforms,
-  UniformDataMap,
+  UniformDefinition,
   UniformMetadata,
-} from "./uniforms.js";
+} from "./types.js";
+import { Uniform, transformUniformsDefinition } from "./uniforms.js";
 
-export type AttributeDefinition = {
-  data: number[];
-  size: number;
-  type: GLenum;
-  stride?: number;
-  offset?: number;
-};
-
-export type UniformDefinition<T extends UniformType = UniformType> =
-  UniformMetadata & {
-    type: T;
-    data: UniformDataMap[T];
-  };
-
-export interface Configuration {
-  pickable?: boolean;
-  visible?: boolean;
-  renderingMode?: GLenum;
-}
-
-const defaultConfiguration: Configuration = {
+const defaultConfiguration: InstanceConfiguration = {
   pickable: true,
   visible: true,
   // TODO: this kinda sucks, we are setting a
@@ -45,7 +25,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private vao!: WebGLVertexArrayObject | null;
   private ibo!: WebGLBuffer | null;
   private size!: number;
-  private configuration!: Configuration;
+  private configuration!: InstanceConfiguration;
 
   /**
    * Creates an object with its own program
@@ -75,7 +55,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       [P in U[number]]?: UniformDefinition;
     };
     size?: number;
-    configuration?: Configuration;
+    configuration?: InstanceConfiguration;
   }) {
     this.id = id ?? uuidv4();
     this.gl = gl;

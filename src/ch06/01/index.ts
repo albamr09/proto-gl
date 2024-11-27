@@ -20,7 +20,7 @@ import Camera, {
 import Controller from "../../lib/webgl/controller.js";
 import Instance from "../../lib/webgl/instance.js";
 import Scene from "../../lib/webgl/scene.js";
-import { UniformType } from "../../lib/webgl/uniforms.js";
+import { UniformType } from "../../lib/webgl/types.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 

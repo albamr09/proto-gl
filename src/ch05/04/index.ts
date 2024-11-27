@@ -27,7 +27,7 @@ import Axis from "../../lib/webgl/models/axis/index.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
 import Mesh from "../../lib/webgl/models/mesh/index.js";
 import Scene from "../../lib/webgl/scene.js";
-import { UniformType } from "../../lib/webgl/uniforms.js";
+import { UniformType } from "../../lib/webgl/types.js";
 
 enum INTERPOLATION {
   LINEAR = "linear",
