@@ -5,9 +5,11 @@ import {
   InstanceConfiguration,
   transformUniformsDefinition,
   TransformUniformsType,
+  UniformDataMap,
   UniformDefinition,
   UniformMetadata,
   Uniforms,
+  UniformType,
 } from "./types.js";
 import { Uniform } from "./uniforms.js";
 
@@ -219,9 +221,9 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     }, {} as Uniforms<U, Uniform>);
   }
 
-  updateUniform<T>(
+  updateUniform(
     uniformName: U[number] | TransformUniformsType[number],
-    value: T,
+    value: UniformDataMap[UniformType],
     metadata?: UniformMetadata
   ) {
     // It if exists update

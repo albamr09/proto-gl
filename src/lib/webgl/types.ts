@@ -1,4 +1,4 @@
-import { Matrix4 } from "../math/matrix";
+import { Matrix4 } from "../math/matrix.js";
 
 // Attributes
 export type AttributeDefinition = {
@@ -28,7 +28,6 @@ export enum UniformType {
   VECTOR_FLOAT,
   VECTOR_INT,
   MATRIX,
-  TEXTURE,
 }
 
 export const transformUniformsDefinition: {
@@ -52,13 +51,11 @@ export const transformUniformsDefinition: {
 };
 
 export type UniformDataMap = {
-  [UniformType.INT]: number | boolean;
-  [UniformType.FLOAT]: number;
+  [UniformType.INT]: number | number[] | boolean;
+  [UniformType.FLOAT]: number | number[];
   [UniformType.VECTOR_FLOAT]: number[];
   [UniformType.VECTOR_INT]: number[];
   [UniformType.MATRIX]: Float32Array;
-  // TODO ALBA: this should be a texture
-  [UniformType.TEXTURE]: any;
 };
 
 export type UniformDefinition<T extends UniformType = UniformType> =
