@@ -1,5 +1,5 @@
-import Instance from "../../instance.js";
-import { UniformType } from "../../types.js";
+import { UniformKind } from "../../core/uniform/types.js";
+import Instance from "../../rendering/instance.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
@@ -32,7 +32,7 @@ class Floor extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
       uniforms: {
         uMaterialDiffuse: {
           data: [1.0, 1.0, 1.0, 1.0],
-          type: UniformType.VECTOR_FLOAT,
+          type: UniformKind.VECTOR_FLOAT,
         },
       },
       indices,

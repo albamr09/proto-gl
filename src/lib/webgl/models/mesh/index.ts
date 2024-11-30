@@ -1,9 +1,10 @@
-import Instance from "../../instance.js";
+import Instance from "../../rendering/instance.js";
 import {
-  AttributeDefinition,
+  AttributeConfig,
   InstanceConfiguration,
   UniformDefinition,
-} from "../../types.js";
+} from "../../rendering/types.js";
+
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
@@ -38,9 +39,7 @@ class Mesh<
     id: string;
     gl: WebGL2RenderingContext;
     attributes: {
-      [P in
-        | (typeof DefaultAttributes)[number]
-        | A[number]]: AttributeDefinition;
+      [P in (typeof DefaultAttributes)[number] | A[number]]: AttributeConfig;
     };
     indices: number[];
     uniforms?: {

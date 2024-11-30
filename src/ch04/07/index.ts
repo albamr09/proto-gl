@@ -20,15 +20,15 @@ import {
   configureCanvas,
   getGLContext,
 } from "../../lib/web-gl.js";
-import Camera from "../../lib/webgl/camera.js";
-import { CAMERA_TYPE, PROJECTION_TYPE } from "../../lib/webgl/types.js";
-import Controller from "../../lib/webgl/controller.js";
-import Instance from "../../lib/webgl/instance.js";
+import Camera from "../../lib/webgl/camera/camera.js";
+import { CameraType, ProjectionType } from "../../lib/webgl/camera/types.js";
+import Controller from "../../lib/webgl/camera/controller.js";
+import Instance from "../../lib/webgl/rendering/instance.js";
 import Axis from "../../lib/webgl/models/axis/index.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
-import Program from "../../lib/webgl/program.js";
-import Scene from "../../lib/webgl/scene.js";
-import { UniformType } from "../../lib/webgl/types.js";
+import Program from "../../lib/webgl/core/program.js";
+import Scene from "../../lib/webgl/rendering/scene.js";
+import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
 
@@ -48,8 +48,8 @@ let program: Program<typeof attributes, typeof uniforms>;
 let scene: Scene;
 let camera: Camera;
 let controller: Controller;
-let cameraType = CAMERA_TYPE.TRACKING;
-let porjectionType = PROJECTION_TYPE.PERSPECTIVE;
+let cameraType = CameraType.TRACKING;
+let porjectionType = ProjectionType.PERSPECTIVE;
 let modelTranslation = [0, 25, 120];
 let modelRotation = [0, 0, 0];
 let dollyValue = 0;
@@ -122,15 +122,15 @@ const initData = () => {
         uniforms: {
           uMaterialAmbient: {
             data: [...data.Ka, 1.0],
-            type: UniformType.VECTOR_FLOAT,
+            type: UniformKind.VECTOR_FLOAT,
           },
           uMaterialDiffuse: {
             data: [...data.Kd, 1.0],
-            type: UniformType.VECTOR_FLOAT,
+            type: UniformKind.VECTOR_FLOAT,
           },
           uStaticLight: {
             data: useStaticLight,
-            type: UniformType.INT,
+            type: UniformKind.SCALAR_INT,
           },
         },
         indices: data.indices,
@@ -182,7 +182,7 @@ const initControls = () => {
   const cameraTypeSelector = createSelectorForm({
     label: "Camera Type",
     value: cameraType,
-    options: Object.values(CAMERA_TYPE),
+    options: Object.values(CameraType),
     onChange: (v) => {
       cameraType = v;
       camera.setType(v);
@@ -191,7 +191,7 @@ const initControls = () => {
   const projectionTypeSelector = createSelectorForm({
     label: "Projection Type",
     value: porjectionType,
-    options: Object.values(PROJECTION_TYPE),
+    options: Object.values(ProjectionType),
     onChange: (v) => {
       porjectionType = v;
       camera.setProjection(v);
@@ -307,8 +307,8 @@ const initControls = () => {
       usetStaticLightCheck.checked = false;
       followMouseCheck.checked = false;
       useStaticLight = false;
-      cameraTypeSelector.value = CAMERA_TYPE.TRACKING;
-      projectionTypeSelector.value = PROJECTION_TYPE.PERSPECTIVE;
+      cameraTypeSelector.value = CameraType.TRACKING;
+      projectionTypeSelector.value = ProjectionType.PERSPECTIVE;
     },
   });
 };

@@ -18,12 +18,12 @@ import {
   configureCanvas,
   getGLContext,
 } from "../../lib/web-gl.js";
-import Instance from "../../lib/webgl/instance.js";
+import Instance from "../../lib/webgl/rendering/instance.js";
 import Axis from "../../lib/webgl/models/axis/index.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
-import Program from "../../lib/webgl/program.js";
-import Scene from "../../lib/webgl/scene.js";
-import { UniformType } from "../../lib/webgl/types.js";
+import Program from "../../lib/webgl/core/program.js";
+import Scene from "../../lib/webgl/rendering/scene.js";
+import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
 
@@ -91,11 +91,11 @@ const initData = async () => {
       uniforms: {
         uMaterialDiffuse: {
           data: diffuse,
-          type: UniformType.VECTOR_FLOAT,
+          type: UniformKind.VECTOR_FLOAT,
         },
         uMaterialAmbient: {
           data: [0.2, 0.2, 0.2, 1],
-          type: UniformType.VECTOR_FLOAT,
+          type: UniformKind.VECTOR_FLOAT,
         },
       },
       indices,

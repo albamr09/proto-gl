@@ -22,7 +22,7 @@ import {
   autoResizeCanvas,
   clearScene,
 } from "../../lib/web-gl.js";
-import Program from "../../lib/webgl/program.js";
+import Program from "../../lib/webgl/core/program.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 

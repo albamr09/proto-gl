@@ -1,4 +1,4 @@
-import { Vector } from "../math/vector.js";
+import { Vector } from "../../math/vector.js";
 import Camera from "./camera.js";
 
 class Controller {

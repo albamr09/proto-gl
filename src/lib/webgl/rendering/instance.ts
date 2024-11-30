@@ -1,18 +1,20 @@
-import { uuidv4 } from "../utils.js";
-import Program from "./program.js";
+import { uuidv4 } from "../../utils.js";
+import Program from "../core/program.js";
+import { Uniforms } from "../core/types.js";
+import { UniformFactory } from "../core/uniform/factory.js";
 import {
-  AttributeDefinition,
+  ConcreteUniforms,
+  TRANSFORM_UNIFORM_CONFIG_MAP,
+  TransformUniformKeys,
+  UniformConfig,
+  UniformDataMapping,
+  UniformKind,
+} from "../core/uniform/types.js";
+import {
+  AttributeConfig,
   InstanceConfiguration,
-  transformUniformsDefinition,
-  TransformUniformsType,
-  UniformDataMap,
   UniformDefinition,
-  UniformMetadata,
-  Uniforms,
-  UniformType,
-  UniformTypes,
 } from "./types.js";
-import { UniformFactory } from "./uniform/factory.js";
 
 const defaultConfiguration: InstanceConfiguration = {
   pickable: true,
@@ -26,7 +28,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private id?: string;
   private gl: WebGL2RenderingContext;
   private program: Program<A, U>;
-  private uniforms?: Uniforms<U, UniformTypes>;
+  private uniforms?: Uniforms<U, ConcreteUniforms>;
   private vao!: WebGLVertexArrayObject | null;
   private ibo!: WebGLBuffer | null;
   private size!: number;
@@ -53,7 +55,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     vertexShaderSource?: string;
     fragmentShaderSource?: string;
     attributes: {
-      [P in A[number]]?: AttributeDefinition;
+      [P in A[number]]?: AttributeConfig;
     };
     indices?: number[];
     uniforms?: {
@@ -104,7 +106,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
    */
   setAttributeData(
     attributeName: A[number],
-    attribute: AttributeDefinition,
+    attribute: AttributeConfig,
     bind = false
   ) {
     const { data, size, type, offset, stride } = attribute;
@@ -152,7 +154,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     size,
   }: {
     attributes: {
-      [P in A[number]]?: AttributeDefinition;
+      [P in A[number]]?: AttributeConfig;
     };
     indices?: number[];
     size?: number;
@@ -199,12 +201,12 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     // Uniforms
     const mergedUniforms = {
       ...uniforms,
-      ...transformUniformsDefinition,
+      ...TRANSFORM_UNIFORM_CONFIG_MAP,
     } as Uniforms<U, UniformDefinition>;
     this.uniforms = (
       Object.keys(mergedUniforms) as (
         | U[number]
-        | TransformUniformsType[number]
+        | TransformUniformKeys[number]
       )[]
     ).reduce((dict, k) => {
       const uniform = mergedUniforms[k] as UniformDefinition;
@@ -220,13 +222,13 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       );
 
       return dict;
-    }, {} as Uniforms<U, UniformTypes>);
+    }, {} as Uniforms<U, ConcreteUniforms>);
   }
 
   updateUniform(
-    uniformName: U[number] | TransformUniformsType[number],
-    value: UniformDataMap[UniformType],
-    metadata?: UniformMetadata
+    uniformName: U[number] | TransformUniformKeys[number],
+    value: UniformDataMapping[UniformKind],
+    metadata?: UniformConfig
   ) {
     // It if exists update
     const uniform = this.uniforms?.[uniformName];
@@ -238,7 +240,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     }
   }
 
-  getUniform(uniformName: U[number] | TransformUniformsType[number]) {
+  getUniform(uniformName: U[number] | TransformUniformKeys[number]) {
     return this.uniforms?.[uniformName];
   }
 
@@ -272,7 +274,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     // Populate uniforms
     for (const uniform of Object.values(
       this?.uniforms ?? {}
-    ) as UniformTypes[]) {
+    ) as ConcreteUniforms[]) {
       if (uniform == null || uniform == undefined) continue;
       uniform.bind(this.gl);
     }

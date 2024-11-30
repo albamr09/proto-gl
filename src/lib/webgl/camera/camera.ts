@@ -1,13 +1,13 @@
-import { Angle } from "../math/angle.js";
-import { Matrix4 } from "../math/matrix.js";
-import { Vector } from "../math/vector.js";
-import Scene from "./scene.js";
-import { CAMERA_TYPE, PROJECTION_TYPE } from "./types.js";
+import { Angle } from "../../math/angle.js";
+import { Matrix4 } from "../../math/matrix.js";
+import { Vector } from "../../math/vector.js";
+import Scene from "../rendering/scene.js";
+import { CameraType, ProjectionType } from "./types.js";
 
 class Camera {
   // Camera config
-  public type: CAMERA_TYPE;
-  public projection: PROJECTION_TYPE;
+  public type: CameraType;
+  public projection: ProjectionType;
   // Camera state
   private modelViewMatrix: Matrix4;
   private projectionMatrix: Matrix4;
@@ -33,8 +33,8 @@ class Camera {
   private scene?: Scene;
 
   constructor(
-    type: CAMERA_TYPE,
-    projection = PROJECTION_TYPE.PERSPECTIVE,
+    type: CameraType,
+    projection = ProjectionType.PERSPECTIVE,
     gl?: WebGL2RenderingContext,
     scene?: Scene
   ) {
@@ -80,19 +80,19 @@ class Camera {
   }
 
   isOrbiting() {
-    return this.type === CAMERA_TYPE.ORBITING;
+    return this.type === CameraType.ORBITING;
   }
 
   isTracking() {
-    return this.type === CAMERA_TYPE.TRACKING;
+    return this.type === CameraType.TRACKING;
   }
 
-  setType(type: CAMERA_TYPE) {
+  setType(type: CameraType) {
     this.type = type;
     this.updateModelView();
   }
 
-  setProjection(projection: PROJECTION_TYPE) {
+  setProjection(projection: ProjectionType) {
     this.projection = projection;
     this.updateProjection();
   }
@@ -226,7 +226,7 @@ class Camera {
     this.azimuth = 0;
     this.fov = 45;
     this.setPosition(this.initialPosition);
-    this.type = CAMERA_TYPE.TRACKING;
+    this.type = CameraType.TRACKING;
   }
 
   // Updates camera transformation matrix
@@ -273,7 +273,7 @@ class Camera {
    * of projection: perspective or orthographic.
    */
   updateProjection() {
-    if (this.projection == PROJECTION_TYPE.PERSPECTIVE) {
+    if (this.projection == ProjectionType.PERSPECTIVE) {
       this.projectionMatrix = Matrix4.perspective(
         this.fov,
         this.aspectRatio,
@@ -281,7 +281,7 @@ class Camera {
         this.far,
         this.transposeProjection
       );
-    } else if (this.projection == PROJECTION_TYPE.ORTHOGRAPHIC) {
+    } else if (this.projection == ProjectionType.ORTHOGRAPHIC) {
       this.projectionMatrix = Matrix4.ortho(
         -this.width / this.fov,
         this.width / this.fov,

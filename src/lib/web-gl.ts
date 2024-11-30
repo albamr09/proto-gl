@@ -1,4 +1,4 @@
-import { PROGRAM_TYPE } from "./webgl/types.js";
+import { ProgramType } from "./webgl/core/types";
 
 /**
  * Sets the canvas to be as large as the window that contains it
@@ -28,11 +28,11 @@ export const getGLContext = () => {
  */
 export const compileShader = (
   gl: WebGL2RenderingContext,
-  type: PROGRAM_TYPE,
+  type: ProgramType,
   source: string
 ) => {
   let shader: WebGLShader | null;
-  if (type === PROGRAM_TYPE.VERTEX) {
+  if (type === ProgramType.VERTEX_SHADER) {
     shader = gl.createShader(gl.VERTEX_SHADER);
   } else {
     shader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -63,12 +63,12 @@ export const createProgram = (
   // Obtain the shaders
   const vertexShader = compileShader(
     gl,
-    PROGRAM_TYPE.VERTEX,
+    ProgramType.VERTEX_SHADER,
     vertexShaderSource
   );
   const fragmentShader = compileShader(
     gl,
-    PROGRAM_TYPE.FRAGMENT,
+    ProgramType.FRAGMENT_SHADER,
     fragmentShaderSource
   );
 

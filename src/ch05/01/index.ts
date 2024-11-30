@@ -13,22 +13,22 @@ import {
   getGLContext,
   autoResizeCanvas,
 } from "../../lib/web-gl.js";
-import Camera from "../../lib/webgl/camera.js";
-import { CAMERA_TYPE, PROJECTION_TYPE } from "../../lib/webgl/types.js";
-import Controller from "../../lib/webgl/controller.js";
+import Camera from "../../lib/webgl/camera/camera.js";
+import { CameraType, ProjectionType } from "../../lib/webgl/camera/types.js";
+import Controller from "../../lib/webgl/camera/controller.js";
 import Axis from "../../lib/webgl/models/axis/index.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
 import Mesh from "../../lib/webgl/models/mesh/index.js";
-import Scene from "../../lib/webgl/scene.js";
-import { UniformType } from "../../lib/webgl/types.js";
+import Scene from "../../lib/webgl/rendering/scene.js";
+import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
 let controller: Controller;
-let cameraType = CAMERA_TYPE.ORBITING;
-let projectionType = PROJECTION_TYPE.PERSPECTIVE;
+let cameraType = CameraType.ORBITING;
+let projectionType = ProjectionType.PERSPECTIVE;
 let initialPosition = new Vector([0, 2, 50]);
 let dxSphere = 0.5;
 let dxCone = 0.5;
@@ -47,23 +47,23 @@ const initData = () => {
   const lightUniforms = {
     uLightPosition: {
       data: [0, 120, 120],
-      type: UniformType.VECTOR_FLOAT,
+      type: UniformKind.VECTOR_FLOAT,
     },
     uLightAmbient: {
       data: [0.2, 0.2, 0.2, 1],
-      type: UniformType.VECTOR_FLOAT,
+      type: UniformKind.VECTOR_FLOAT,
     },
     uLightDiffuse: {
       data: [1, 1, 1, 1],
-      type: UniformType.VECTOR_FLOAT,
+      type: UniformKind.VECTOR_FLOAT,
     },
     uLightSpecular: {
       data: [1, 1, 1, 1],
-      type: UniformType.VECTOR_FLOAT,
+      type: UniformKind.VECTOR_FLOAT,
     },
     uShininess: {
       data: 230,
-      type: UniformType.FLOAT,
+      type: UniformKind.SCALAR_FLOAT,
     },
   };
   loadData("/data/models/geometries/sphere2.json").then((data) => {
@@ -87,11 +87,11 @@ const initData = () => {
         uniforms: {
           uMaterialDiffuse: {
             data: diffuse,
-            type: UniformType.VECTOR_FLOAT,
+            type: UniformKind.VECTOR_FLOAT,
           },
           uTranslation: {
             data: [0, 0, 0],
-            type: UniformType.VECTOR_FLOAT,
+            type: UniformKind.VECTOR_FLOAT,
           },
           ...lightUniforms,
         },
@@ -120,11 +120,11 @@ const initData = () => {
         uniforms: {
           uMaterialDiffuse: {
             data: diffuse,
-            type: UniformType.VECTOR_FLOAT,
+            type: UniformKind.VECTOR_FLOAT,
           },
           uTranslation: {
             data: [0, 0, 0],
-            type: UniformType.VECTOR_FLOAT,
+            type: UniformKind.VECTOR_FLOAT,
           },
           ...lightUniforms,
         },
@@ -170,7 +170,7 @@ const initControls = () => {
   createSelectorForm({
     label: "Camera Type",
     value: cameraType,
-    options: Object.values(CAMERA_TYPE),
+    options: Object.values(CameraType),
     onChange: (v) => {
       camera.setType(v);
     },

@@ -1,14 +1,14 @@
-import { UniformType, UniformDataMap, UniformMetadata } from "../types.js";
+import { UniformConfig, UniformDataMapping, UniformKind } from "./types.js";
 
-abstract class Uniform<T extends UniformType> {
+abstract class Uniform<T extends UniformKind> {
   protected name: string;
-  protected data: UniformDataMap[T];
+  protected data: UniformDataMapping[T];
   protected location?: WebGLUniformLocation;
   protected size?: number;
 
   constructor(
     name: string,
-    data: UniformDataMap[T],
+    data: UniformDataMapping[T],
     location?: WebGLUniformLocation,
     size?: number
   ) {
@@ -39,7 +39,7 @@ abstract class Uniform<T extends UniformType> {
     this.data = data;
   }
 
-  setMetadata(metadata: UniformMetadata) {
+  setMetadata(metadata: UniformConfig) {
     if (metadata?.size) {
       this.size = metadata.size;
     }
@@ -48,7 +48,7 @@ abstract class Uniform<T extends UniformType> {
   abstract bind(gl: WebGL2RenderingContext): void;
 }
 
-export class IntUniform extends Uniform<UniformType.INT> {
+export class IntUniform extends Uniform<UniformKind.SCALAR_INT> {
   bind(gl: WebGL2RenderingContext) {
     if (!this.location) {
       throw new Error(`Uniform ${this.name} does not have a location assigned`);
@@ -74,7 +74,7 @@ export class IntUniform extends Uniform<UniformType.INT> {
   }
 }
 
-export class FloatUniform extends Uniform<UniformType.FLOAT> {
+export class FloatUniform extends Uniform<UniformKind.SCALAR_FLOAT> {
   bind(gl: WebGL2RenderingContext) {
     if (!this.location) {
       throw new Error(`Uniform ${this.name} does not have a location assigned`);
@@ -100,7 +100,7 @@ export class FloatUniform extends Uniform<UniformType.FLOAT> {
   }
 }
 
-export class VectorIntUniform extends Uniform<UniformType.VECTOR_INT> {
+export class VectorIntUniform extends Uniform<UniformKind.VECTOR_INT> {
   bind(gl: WebGL2RenderingContext) {
     if (!this.location) {
       throw new Error(`Uniform ${this.name} does not have a location assigned`);
@@ -117,7 +117,7 @@ export class VectorIntUniform extends Uniform<UniformType.VECTOR_INT> {
   }
 }
 
-export class VectorFloatUniform extends Uniform<UniformType.VECTOR_FLOAT> {
+export class VectorFloatUniform extends Uniform<UniformKind.VECTOR_FLOAT> {
   bind(gl: WebGL2RenderingContext) {
     if (!this.location) {
       throw new Error(`Uniform ${this.name} does not have a location assigned`);
@@ -134,7 +134,7 @@ export class VectorFloatUniform extends Uniform<UniformType.VECTOR_FLOAT> {
   }
 }
 
-export class MatrixUniform extends Uniform<UniformType.MATRIX> {
+export class MatrixUniform extends Uniform<UniformKind.MATRIX> {
   private transpose: boolean;
 
   constructor(
@@ -148,7 +148,7 @@ export class MatrixUniform extends Uniform<UniformType.MATRIX> {
     this.transpose = transpose;
   }
 
-  setMetadata(metadata: UniformMetadata) {
+  setMetadata(metadata: UniformConfig) {
     if (metadata?.size) {
       this.size = metadata.size;
     }

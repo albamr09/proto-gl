@@ -1,4 +1,4 @@
-import { UniformDataMap, UniformType, UniformTypes } from "../types.js";
+import { ConcreteUniforms, UniformDataMapping, UniformKind } from "./types.js";
 import {
   FloatUniform,
   IntUniform,
@@ -10,51 +10,51 @@ import {
 export class UniformFactory {
   static createUniform(
     name: string,
-    type: UniformType,
-    data: UniformDataMap[UniformType],
+    type: UniformKind,
+    data: UniformDataMapping[UniformKind],
     location?: WebGLUniformLocation,
     size?: number,
     transpose?: boolean
-  ): UniformTypes {
+  ): ConcreteUniforms {
     switch (type) {
-      case UniformType.INT:
+      case UniformKind.SCALAR_INT:
         return new IntUniform(
           name,
-          data as UniformDataMap[UniformType.INT],
+          data as UniformDataMapping[UniformKind.SCALAR_INT],
           location,
           size
         );
-      case UniformType.FLOAT:
+      case UniformKind.SCALAR_FLOAT:
         return new FloatUniform(
           name,
-          data as UniformDataMap[UniformType.FLOAT],
+          data as UniformDataMapping[UniformKind.SCALAR_FLOAT],
           location,
           size
         );
-      case UniformType.VECTOR_INT:
+      case UniformKind.VECTOR_INT:
         return new VectorIntUniform(
           name,
-          data as UniformDataMap[UniformType.VECTOR_INT],
+          data as UniformDataMapping[UniformKind.VECTOR_INT],
           location,
           size
         );
-      case UniformType.VECTOR_FLOAT:
+      case UniformKind.VECTOR_FLOAT:
         return new VectorFloatUniform(
           name,
-          data as UniformDataMap[UniformType.VECTOR_FLOAT],
+          data as UniformDataMapping[UniformKind.VECTOR_FLOAT],
           location,
           size
         );
-      case UniformType.MATRIX:
+      case UniformKind.MATRIX:
         return new MatrixUniform(
           name,
-          data as UniformDataMap[UniformType.MATRIX],
+          data as UniformDataMapping[UniformKind.MATRIX],
           location,
           size,
           transpose ?? false
         );
       default:
-        throw new Error(`Unsupported UniformType: ${type}`);
+        throw new Error(`Unsupported UniformKind: ${type}`);
     }
   }
 }

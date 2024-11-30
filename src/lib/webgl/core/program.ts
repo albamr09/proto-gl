@@ -1,10 +1,8 @@
+import { Attributes, ProgramType, Uniforms } from "./types.js";
 import {
-  Attributes,
-  PROGRAM_TYPE,
-  TransformUniforms,
-  TransformUniformsType,
-  Uniforms,
-} from "./types.js";
+  TRANSFORM_UNIFORM_NAMES,
+  TransformUniformKeys,
+} from "./uniform/types.js";
 
 class Program<
   A extends readonly string[] = [],
@@ -67,7 +65,7 @@ class Program<
   /**
    * Returns the location of the attribute
    */
-  getUniform(uniformName: TransformUniformsType[number] & U[number]) {
+  getUniform(uniformName: TransformUniformKeys[number] & U[number]) {
     return this.uniforms[uniformName];
   }
 
@@ -97,7 +95,7 @@ class Program<
     if (!this._program) {
       return uniforms;
     }
-    for (const name of [...(uniformNames ?? []), ...TransformUniforms]) {
+    for (const name of [...(uniformNames ?? []), ...TRANSFORM_UNIFORM_NAMES]) {
       const location = this.gl.getUniformLocation(this._program, name);
       if (location === -1) {
         throw new Error(`Uniform ${name} not found in the shader program`);
@@ -118,12 +116,12 @@ class Program<
     // Obtain the shaders
     const vertexShader = this._compileShader(
       gl,
-      PROGRAM_TYPE.VERTEX,
+      ProgramType.VERTEX_SHADER,
       vertexShaderSource
     );
     const fragmentShader = this._compileShader(
       gl,
-      PROGRAM_TYPE.FRAGMENT,
+      ProgramType.FRAGMENT_SHADER,
       fragmentShaderSource
     );
 
@@ -150,11 +148,11 @@ class Program<
    */
   private _compileShader(
     gl: WebGL2RenderingContext,
-    type: PROGRAM_TYPE,
+    type: ProgramType,
     source: string
   ) {
     let shader: WebGLShader | null;
-    if (type === PROGRAM_TYPE.VERTEX) {
+    if (type === ProgramType.VERTEX_SHADER) {
       shader = gl.createShader(gl.VERTEX_SHADER);
     } else {
       shader = gl.createShader(gl.FRAGMENT_SHADER);

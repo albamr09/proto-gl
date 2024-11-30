@@ -19,16 +19,16 @@ import {
   configureCanvas,
   getGLContext,
 } from "../../lib/web-gl.js";
-import Camera from "../../lib/webgl/camera.js";
-import { CAMERA_TYPE } from "../../lib/webgl/types.js";
-import Instance from "../../lib/webgl/instance.js";
+import Instance from "../../lib/webgl/rendering/instance.js";
 import Axis from "../../lib/webgl/models/axis/index.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
-import Program from "../../lib/webgl/program.js";
-import Scene from "../../lib/webgl/scene.js";
-import { UniformType } from "../../lib/webgl/types.js";
+import Program from "../../lib/webgl/core/program.js";
+import Scene from "../../lib/webgl/rendering/scene.js";
+import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
+import { CameraType } from "../../lib/webgl/camera/types.js";
+import Camera from "../../lib/webgl/camera/camera.js";
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
@@ -45,7 +45,7 @@ let scene: Scene;
 let modelViewMatrix = Matrix4.identity();
 let modelTranslation = [0, 2, 50];
 let modelRotation = [0, 0, 0];
-let cameraType = CAMERA_TYPE.TRACKING;
+let cameraType = CameraType.TRACKING;
 let camera: Camera;
 
 const initProgram = () => {
@@ -88,11 +88,11 @@ const initData = () => {
         uniforms: {
           uMaterialDiffuse: {
             data: data.diffuse,
-            type: UniformType.VECTOR_FLOAT,
+            type: UniformKind.VECTOR_FLOAT,
           },
           uMaterialAmbient: {
             data: [0.2, 0.2, 0.2, 1],
-            type: UniformType.VECTOR_FLOAT,
+            type: UniformKind.VECTOR_FLOAT,
           },
         },
         indices: data.indices,
@@ -144,7 +144,7 @@ const initControls = () => {
   const cameraTypeSelector = createSelectorForm({
     label: "Camera Type",
     value: cameraType,
-    options: Object.values(CAMERA_TYPE),
+    options: Object.values(CameraType),
     onChange: (v) => {
       camera.setType(v);
     },

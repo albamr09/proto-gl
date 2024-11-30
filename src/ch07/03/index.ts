@@ -15,12 +15,12 @@ import {
   configureCanvas,
   getGLContext,
 } from "../../lib/web-gl.js";
-import Camera from "../../lib/webgl/camera.js";
-import { CAMERA_TYPE, PROJECTION_TYPE } from "../../lib/webgl/types.js";
-import Controller from "../../lib/webgl/controller.js";
-import Instance from "../../lib/webgl/instance.js";
-import Scene from "../../lib/webgl/scene.js";
-import { UniformType } from "../../lib/webgl/types.js";
+import Camera from "../../lib/webgl/camera/camera.js";
+import { CameraType, ProjectionType } from "../../lib/webgl/camera/types.js";
+import Controller from "../../lib/webgl/camera/controller.js";
+import Instance from "../../lib/webgl/rendering/instance.js";
+import Scene from "../../lib/webgl/rendering/scene.js";
+import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
@@ -64,8 +64,8 @@ enum MinFilter {
 const initProgram = () => {
   scene = new Scene(gl);
   camera = new Camera(
-    CAMERA_TYPE.ORBITING,
-    PROJECTION_TYPE.PERSPECTIVE,
+    CameraType.ORBITING,
+    ProjectionType.PERSPECTIVE,
     gl,
     scene
   );
@@ -89,15 +89,15 @@ const initData = () => {
   const lightUniforms = {
     uLightPosition: {
       data: [0, 5, 20],
-      type: UniformType.VECTOR_FLOAT,
+      type: UniformKind.VECTOR_FLOAT,
     },
     uLightAmbient: {
       data: [1, 1, 1, 1],
-      type: UniformType.VECTOR_FLOAT,
+      type: UniformKind.VECTOR_FLOAT,
     },
     uLightDiffuse: {
       data: [1, 1, 1, 1],
-      type: UniformType.VECTOR_FLOAT,
+      type: UniformKind.VECTOR_FLOAT,
     },
   };
   loadData("/data/models/geometries/cube-texture.json").then((data) => {
@@ -132,23 +132,23 @@ const initData = () => {
       uniforms: {
         uMaterialDiffuse: {
           data: diffuse,
-          type: UniformType.VECTOR_FLOAT,
+          type: UniformKind.VECTOR_FLOAT,
         },
         uUsePerVertexColoring: {
           data: false,
-          type: UniformType.INT,
+          type: UniformKind.SCALAR_INT,
         },
         uUseLambert: {
           data: false,
-          type: UniformType.INT,
+          type: UniformKind.SCALAR_INT,
         },
         uAlpha: {
           data: 1,
-          type: UniformType.FLOAT,
+          type: UniformKind.SCALAR_FLOAT,
         },
         uSampler: {
           data: 0,
-          type: UniformType.INT,
+          type: UniformKind.SCALAR_INT,
         },
         ...lightUniforms,
       },
