@@ -144,13 +144,15 @@ class Scene {
   }
 
   // Uniforms
+  // TODO: Get data should know the type
   getUniform(id: string, uniformName: any) {
     return this.objects.get(id)?.getUniform(uniformName);
   }
 
-  updateUniform<T>(
+  updateUniform(
     uniformName: string,
-    value: T,
+    // TODO: type
+    value: any,
     id?: string,
     metadata?: UniformMetadata
   ) {

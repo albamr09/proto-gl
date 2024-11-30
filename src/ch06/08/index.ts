@@ -190,8 +190,10 @@ const initControls = () => {
     max: 1,
     step: 0.1,
     onChange: (v) => {
+      // TODO: i should know the typeo f the data and the type of the uniform just from its name
       const diffuse = scene.getUniform("wall", "uMaterialDiffuse")?.getData();
-      if (diffuse) {
+      // TODO: i should not be checking if this is array
+      if (diffuse && Array.isArray(diffuse)) {
         scene.updateUniform(
           "uMaterialDiffuse",
           [...diffuse.slice(0, 3), v],
@@ -208,7 +210,8 @@ const initControls = () => {
     step: 0.1,
     onChange: (v) => {
       const diffuse = scene.getUniform("cone", "uMaterialDiffuse")?.getData();
-      if (diffuse) {
+      // TODO: i should not be checking if this is array
+      if (diffuse && Array.isArray(diffuse)) {
         scene.updateUniform(
           "uMaterialDiffuse",
           [...diffuse.slice(0, 3), v],

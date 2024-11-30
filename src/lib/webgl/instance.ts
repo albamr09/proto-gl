@@ -10,8 +10,9 @@ import {
   UniformMetadata,
   Uniforms,
   UniformType,
+  UniformTypes,
 } from "./types.js";
-import { Uniform } from "./uniforms.js";
+import { UniformFactory } from "./uniform/factory.js";
 
 const defaultConfiguration: InstanceConfiguration = {
   pickable: true,
@@ -25,7 +26,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private id?: string;
   private gl: WebGL2RenderingContext;
   private program: Program<A, U>;
-  private uniforms?: Uniforms<U, Uniform>;
+  private uniforms?: Uniforms<U, UniformTypes>;
   private vao!: WebGLVertexArrayObject | null;
   private ibo!: WebGLBuffer | null;
   private size!: number;
@@ -209,7 +210,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       const uniform = mergedUniforms[k] as UniformDefinition;
       const location = this.program.uniforms[k];
       if (uniform == null || uniform == undefined || !location) return dict;
-      dict[k] = new Uniform(
+      dict[k] = UniformFactory.createUniform(
         k,
         uniform.type,
         uniform.data,
@@ -217,8 +218,9 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
         uniform?.size,
         uniform?.transpose
       );
+
       return dict;
-    }, {} as Uniforms<U, Uniform>);
+    }, {} as Uniforms<U, UniformTypes>);
   }
 
   updateUniform(
@@ -268,9 +270,11 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     cb(this, this.gl);
 
     // Populate uniforms
-    for (const uniform of Object.values(this?.uniforms ?? {}) as Uniform[]) {
+    for (const uniform of Object.values(
+      this?.uniforms ?? {}
+    ) as UniformTypes[]) {
       if (uniform == null || uniform == undefined) continue;
-      uniform.bindUniformForType(this.gl);
+      uniform.bind(this.gl);
     }
 
     // If we have IBO defined draw using index information

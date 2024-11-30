@@ -1,4 +1,11 @@
 import { Matrix4 } from "../math/matrix.js";
+import {
+  FloatUniform,
+  IntUniform,
+  MatrixUniform,
+  VectorFloatUniform,
+  VectorIntUniform,
+} from "./uniform/uniforms.js";
 
 // Attributes
 export type AttributeDefinition = {
@@ -29,6 +36,13 @@ export enum UniformType {
   VECTOR_INT,
   MATRIX,
 }
+
+export type UniformTypes =
+  | IntUniform
+  | FloatUniform
+  | VectorIntUniform
+  | VectorFloatUniform
+  | MatrixUniform;
 
 export const transformUniformsDefinition: {
   [x in (typeof TransformUniforms)[number]]: {
