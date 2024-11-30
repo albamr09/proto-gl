@@ -1,4 +1,4 @@
-import { TransformUniformKeys } from "./uniform/types";
+import { TransformUniformKeys } from "./uniform/types.js";
 
 export enum ProgramType {
   VERTEX_SHADER,
