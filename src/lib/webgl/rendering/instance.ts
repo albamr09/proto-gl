@@ -1,5 +1,6 @@
 import { uuidv4 } from "../../utils.js";
 import Program from "../core/program.js";
+import Texture from "../core/texture.js";
 import { Uniforms } from "../core/types.js";
 import { UniformFactory } from "../core/uniform/factory.js";
 import {
@@ -33,6 +34,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private ibo!: WebGLBuffer | null;
   private size!: number;
   private configuration!: InstanceConfiguration;
+  private texture?: Texture;
 
   /**
    * Creates an object with its own program
@@ -48,6 +50,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     uniforms,
     size,
     configuration,
+    texture,
   }: {
     gl: WebGL2RenderingContext;
     program?: Program<A, U>;
@@ -63,6 +66,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     };
     size?: number;
     configuration?: InstanceConfiguration;
+    texture?: Texture;
   }) {
     this.id = id ?? uuidv4();
     this.gl = gl;
@@ -88,6 +92,10 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       ...configuration,
     };
 
+    if (texture) {
+      this.texture = texture;
+      this.texture.createTexture(gl);
+    }
     this.setupAttributes({ attributes, indices, size });
     this.setupUniforms({ uniforms });
   }

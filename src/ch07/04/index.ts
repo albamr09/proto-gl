@@ -25,6 +25,16 @@ import { CameraType, ProjectionType } from "../../lib/webgl/camera/types.js";
 import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 
 const attributes = ["aPosition", "aNormal", "aTextureCoords", "aColor"];
+const uniforms = [
+  "uMaterialDiffuse",
+  "uLightPosition",
+  "uLightAmbient",
+  "uLightDiffuse",
+  "uUsePerVertexColoring",
+  "uUseLambert",
+  "uAlpha",
+  "uSampler",
+] as const;
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
@@ -52,10 +62,12 @@ const initProgram = () => {
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 };
 
-const initData = () => {
+const initData = async () => {
   loadData("/data/models/geometries/cube-texture.json").then((data) => {
     const { indices, vertices, diffuse, scalars, image, textureCoords } = data;
+    // TODO: maybe this should be inside instance
     const texture = new Texture(image.replace("/common", "/data"));
+    await texture.loadImageData();
     const lightUniforms = {
       uLightPosition: {
         data: [0, 5, 20],
@@ -70,7 +82,7 @@ const initData = () => {
         type: UniformKind.VECTOR_FLOAT,
       },
     };
-    const cubeObject = new Instance<typeof attributes>({
+    const cubeObject = new Instance<typeof attributes, typeof uniforms>({
       id: "cube",
       gl,
       vertexShaderSource,
@@ -121,6 +133,7 @@ const initData = () => {
         },
         ...lightUniforms,
       },
+      texture,
     });
     scene.add(cubeObject);
   });
