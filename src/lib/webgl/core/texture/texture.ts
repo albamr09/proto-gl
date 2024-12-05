@@ -51,14 +51,15 @@ class Texture {
     return this.loadHTMLImage(this.source);
   }
 
-  private loadHTMLImage(source: string): Promise<HTMLImageElement> {
+  private loadHTMLImage(source: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.src = source;
 
       img.onload = () => {
         this.imageData = img;
-        resolve(img);
+        this.populateGLTexture();
+        resolve();
       };
 
       img.onerror = () => {
@@ -121,6 +122,16 @@ class Texture {
       this.gl.TEXTURE_2D,
       this.gl.TEXTURE_MIN_FILTER,
       this.configuration?.minFilter ?? this.gl.NEAREST
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_S,
+      this.configuration?.wrapS ?? this.gl.CLAMP_TO_EDGE
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_R,
+      this.configuration?.wrapT ?? this.gl.CLAMP_TO_EDGE
     );
     if (this.configuration?.generateMipmap) {
       this.gl.generateMipmap(this.gl.TEXTURE_2D);

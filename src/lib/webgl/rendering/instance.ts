@@ -121,9 +121,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     });
     this.texture.createTexture();
     if (!this.texture.hasData()) {
-      this.texture.loadData().then(() => {
-        this.texture?.populateGLTexture();
-      });
+      this.texture.loadData();
     }
   }
 
@@ -288,9 +286,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     }
     if (source) {
       this.texture.setSource(source);
-      this.texture.loadData().then(() => {
-        this.texture!.populateGLTexture();
-      });
+      this.texture.loadData();
     } else if (data) {
       this.texture.setImage(data);
       this.texture.populateGLTexture();

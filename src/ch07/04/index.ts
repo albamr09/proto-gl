@@ -56,6 +56,12 @@ enum MinFilter {
   LINEAR_MIPMAP_LINEAR = "LINEAR_MIPMAP_LINEAR",
 }
 
+enum WrapOptions {
+  CLAMP_TO_EDGE = "CLAMP_TO_EDGE",
+  MIRRORED_REPEAT = "MIRRORED_REPEAT",
+  REPEAT = "REPEAT",
+}
+
 const initProgram = () => {
   scene = new Scene(gl);
   camera = new Camera(
@@ -79,7 +85,7 @@ const initProgram = () => {
 
 const initData = async () => {
   loadData("/data/models/geometries/cube-texture.json").then(async (data) => {
-    const { indices, vertices, diffuse, scalars, image, textureCoords } = data;
+    const { indices, vertices, diffuse, scalars, textureCoords } = data;
     const lightUniforms = {
       uLightPosition: {
         data: [0, 5, 20],
@@ -146,7 +152,7 @@ const initData = async () => {
         ...lightUniforms,
       },
       texture: {
-        source: image.replace("/common", "/data"),
+        source: "/data/images/webgl-marble.png",
         configuration: {
           generateMipmap: true,
         },
@@ -217,6 +223,28 @@ const initControls = () => {
       scene.updateTexture({
         id: "cube",
         texture: { configuration: { minFilter: gl[v] } },
+      });
+    },
+  });
+  createSelectorForm({
+    label: "Wrap on S",
+    value: WrapOptions.CLAMP_TO_EDGE,
+    options: Object.values(WrapOptions),
+    onChange: (v) => {
+      scene.updateTexture({
+        id: "cube",
+        texture: { configuration: { wrapS: gl[v] } },
+      });
+    },
+  });
+  createSelectorForm({
+    label: "Wrap on T",
+    value: WrapOptions.CLAMP_TO_EDGE,
+    options: Object.values(WrapOptions),
+    onChange: (v) => {
+      scene.updateTexture({
+        id: "cube",
+        texture: { configuration: { wrapT: gl[v] } },
       });
     },
   });

@@ -8,4 +8,6 @@ export interface TextureConfiguration {
   generateMipmap?: boolean;
   magFilter?: GLint;
   minFilter?: GLint;
+  wrapS?: GLint;
+  wrapT?: GLint;
 }
