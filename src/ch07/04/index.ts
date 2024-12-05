@@ -2,6 +2,8 @@ import { loadData } from "../../lib/files.js";
 import {
   createCheckboxInputForm,
   createDescriptionPanel,
+  createImageInputForm,
+  createSelectorForm,
   createSliderInputForm,
   initController,
   initGUI,
@@ -39,6 +41,20 @@ let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
+
+enum MagFilter {
+  LINEAR = "LINEAR",
+  NEAREST = "NEAREST",
+}
+
+enum MinFilter {
+  LINEAR = "LINEAR",
+  NEAREST = "NEAREST",
+  NEAREST_MIPMAP_NEAREST = "NEAREST_MIPMAP_NEAREST",
+  LINEAR_MIPMAP_NEAREST = "LINEAR_MIPMAP_NEAREST",
+  NEAREST_MIPMAP_LINEAR = "NEAREST_MIPMAP_LINEAR",
+  LINEAR_MIPMAP_LINEAR = "LINEAR_MIPMAP_LINEAR",
+}
 
 const initProgram = () => {
   scene = new Scene(gl);
@@ -131,6 +147,9 @@ const initData = async () => {
       },
       texture: {
         source: image.replace("/common", "/data"),
+        configuration: {
+          generateMipmap: true,
+        },
       },
     });
     scene.add(cubeObject);
@@ -172,18 +191,35 @@ const initControls = () => {
       scene.updateUniform("uAlpha", v, "cube");
     },
   });
-  // createImageInputForm({
-  //   label: "Texture Image",
-  //   value: "/data/images/webgl.png",
-  //   onInit: (v) => {
-  //     // Create texture
-  //     texture = gl.createTexture();
-  //     loadTexture(v);
-  //   },
-  //   onChange: (v) => {
-  //     loadTexture(v);
-  //   },
-  // });
+  createImageInputForm({
+    label: "Texture Image",
+    value: "/data/images/webgl.png",
+    onChange: (v) => {
+      scene.updateTexture({ id: "cube", texture: { data: v } });
+    },
+  });
+  createSelectorForm({
+    label: "Magnification Filter",
+    value: MagFilter.NEAREST,
+    options: Object.values(MagFilter),
+    onChange: (v) => {
+      scene.updateTexture({
+        id: "cube",
+        texture: { configuration: { magFilter: gl[v] } },
+      });
+    },
+  });
+  createSelectorForm({
+    label: "Minification Filter",
+    value: MinFilter.NEAREST,
+    options: Object.values(MinFilter),
+    onChange: (v) => {
+      scene.updateTexture({
+        id: "cube",
+        texture: { configuration: { minFilter: gl[v] } },
+      });
+    },
+  });
 };
 
 const init = () => {

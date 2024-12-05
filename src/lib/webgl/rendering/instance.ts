@@ -1,6 +1,10 @@
 import { uuidv4 } from "../../utils.js";
 import Program from "../core/program.js";
-import Texture from "../core/texture.js";
+import Texture from "../core/texture/texture.js";
+import {
+  TextureConfiguration,
+  TextureDefinition,
+} from "../core/texture/types.js";
 import { Uniforms } from "../core/types.js";
 import { UniformFactory } from "../core/uniform/factory.js";
 import {
@@ -23,11 +27,6 @@ const defaultConfiguration: InstanceConfiguration = {
   // TODO: this kinda sucks, we are setting a
   // random number instead of the actual default
   renderingMode: 0,
-};
-
-type TextureParam = {
-  source?: string;
-  data?: Uint8Array;
 };
 
 class Instance<A extends readonly string[], U extends readonly string[] = []> {
@@ -71,7 +70,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     };
     size?: number;
     configuration?: InstanceConfiguration;
-    texture?: TextureParam;
+    texture?: TextureDefinition;
   }) {
     this.id = id ?? uuidv4();
     this.gl = gl;
@@ -105,23 +104,27 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     }
   }
 
-  setId(id: string) {
+  public setId(id: string) {
     this.id = id;
   }
 
-  getId() {
+  public getId() {
     return this.id;
   }
 
-  private loadTexture(texture: TextureParam) {
+  private loadTexture(texture: TextureDefinition) {
     this.texture = new Texture({
       gl: this.gl,
       source: texture?.source,
+      configuration: texture?.configuration,
+      data: texture.data,
     });
     this.texture.createTexture();
-    this.texture.loadData().then(() => {
-      this.texture?.populateGLTexture();
-    });
+    if (!this.texture.hasData()) {
+      this.texture.loadData().then(() => {
+        this.texture?.populateGLTexture();
+      });
+    }
   }
 
   /**
@@ -249,7 +252,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     }, {} as Uniforms<U, ConcreteUniforms>);
   }
 
-  updateUniform(
+  public updateUniform(
     uniformName: U[number] | TransformUniformKeys[number],
     value: UniformDataMapping[UniformKind],
     metadata?: UniformConfig
@@ -264,21 +267,41 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     }
   }
 
-  getUniform(uniformName: U[number] | TransformUniformKeys[number]) {
+  public getUniform(uniformName: U[number] | TransformUniformKeys[number]) {
     return this.uniforms?.[uniformName];
   }
 
-  setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
+  public setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
     fn(this.gl);
     this.program.setGLParameters(fn);
   }
 
   // TODO: type this?
-  setConfigurationValue(key: keyof InstanceConfiguration, value: any) {
+  public setConfigurationValue(key: keyof InstanceConfiguration, value: any) {
     this.configuration[key] = value;
   }
 
-  render({
+  public updateTexture({ source, data, configuration }: TextureDefinition) {
+    if (!this.texture) {
+      console.warn("No texture is attached to the instance");
+      return;
+    }
+    if (source) {
+      this.texture.setSource(source);
+      this.texture.loadData().then(() => {
+        this.texture!.populateGLTexture();
+      });
+    } else if (data) {
+      this.texture.setImage(data);
+      this.texture.populateGLTexture();
+    }
+
+    if (configuration) {
+      this.texture.updateConfiguration(configuration);
+    }
+  }
+
+  public render({
     cb = () => {},
   }: {
     cb?: (o: Instance<A, U>, gl: WebGL2RenderingContext) => void;

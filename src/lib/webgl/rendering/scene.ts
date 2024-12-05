@@ -1,6 +1,7 @@
 import { computeNormalMatrix } from "../../math/3d.js";
 import { Matrix4 } from "../../math/matrix.js";
 import { uuidv4 } from "../../utils.js";
+import { TextureDefinition } from "../core/texture/types.js";
 import { UniformConfig } from "../core/uniform/types.js";
 import Instance from "./instance";
 import { InstanceConfiguration } from "./types.js";
@@ -163,6 +164,16 @@ class Scene {
     }
     this.objects.forEach((o) => {
       o.updateUniform(uniformName, value, metadata);
+    });
+  }
+
+  updateTexture({ id, texture }: { id?: string; texture: TextureDefinition }) {
+    if (id) {
+      this.objects.get(id)?.updateTexture({ ...texture });
+      return;
+    }
+    this.objects.forEach((o) => {
+      o.updateTexture({ ...texture });
     });
   }
 

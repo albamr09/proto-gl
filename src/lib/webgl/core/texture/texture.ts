@@ -1,8 +1,4 @@
-export interface TextureConfiguration {
-  generateMipmap?: boolean;
-  magFilter?: GLint;
-  minFilter?: GLint;
-}
+import { TextureConfiguration } from "./types";
 
 class Texture {
   private gl: WebGL2RenderingContext;
@@ -51,9 +47,6 @@ class Texture {
   public loadData() {
     if (!this.source) {
       throw new Error("There is no source on this texture");
-    }
-    if (this.imageData) {
-      console.warn("Data was already loaded");
     }
     return this.loadHTMLImage(this.source);
   }
@@ -107,12 +100,12 @@ class Texture {
     );
   }
 
-  public upateConfiguration(configuration: TextureConfiguration) {
+  public updateConfiguration(configuration: TextureConfiguration) {
     if (!this.glTexture) {
       console.error("Cannot load texture as it has not been created");
       return;
     }
-    this.configuration = configuration;
+    this.configuration = { ...this.configuration, ...configuration };
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
     this.setGLParameters();
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
