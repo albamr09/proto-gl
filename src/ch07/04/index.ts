@@ -17,7 +17,6 @@ import Camera from "../../lib/webgl/camera/camera.js";
 import Controller from "../../lib/webgl/camera/controller.js";
 import Instance from "../../lib/webgl/rendering/instance.js";
 import Scene from "../../lib/webgl/rendering/scene.js";
-import Texture from "../../lib/webgl/core/texture.js";
 
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
@@ -63,11 +62,8 @@ const initProgram = () => {
 };
 
 const initData = async () => {
-  loadData("/data/models/geometries/cube-texture.json").then((data) => {
+  loadData("/data/models/geometries/cube-texture.json").then(async (data) => {
     const { indices, vertices, diffuse, scalars, image, textureCoords } = data;
-    // TODO: maybe this should be inside instance
-    const texture = new Texture(image.replace("/common", "/data"));
-    await texture.loadImageData();
     const lightUniforms = {
       uLightPosition: {
         data: [0, 5, 20],
@@ -133,7 +129,9 @@ const initData = async () => {
         },
         ...lightUniforms,
       },
-      texture,
+      texture: {
+        source: image.replace("/common", "/data"),
+      },
     });
     scene.add(cubeObject);
   });

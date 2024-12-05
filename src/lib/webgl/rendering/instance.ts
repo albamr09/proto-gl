@@ -25,6 +25,11 @@ const defaultConfiguration: InstanceConfiguration = {
   renderingMode: 0,
 };
 
+type TextureParam = {
+  source?: string;
+  data?: Uint8Array;
+};
+
 class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private id?: string;
   private gl: WebGL2RenderingContext;
@@ -66,7 +71,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     };
     size?: number;
     configuration?: InstanceConfiguration;
-    texture?: Texture;
+    texture?: TextureParam;
   }) {
     this.id = id ?? uuidv4();
     this.gl = gl;
@@ -92,12 +97,12 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       ...configuration,
     };
 
-    if (texture) {
-      this.texture = texture;
-      this.texture.createTexture(gl);
-    }
     this.setupAttributes({ attributes, indices, size });
     this.setupUniforms({ uniforms });
+
+    if (texture) {
+      this.loadTexture(texture);
+    }
   }
 
   setId(id: string) {
@@ -108,11 +113,22 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     return this.id;
   }
 
+  private loadTexture(texture: TextureParam) {
+    this.texture = new Texture({
+      gl: this.gl,
+      source: texture?.source,
+    });
+    this.texture.createTexture();
+    this.texture.loadData().then(() => {
+      this.texture?.populateGLTexture();
+    });
+  }
+
   /**
    * Set the data for a given attribute and associates the attribute
    * with the instances VAO
    */
-  setAttributeData(
+  public setAttributeData(
     attributeName: A[number],
     attribute: AttributeConfig,
     bind = false
@@ -156,7 +172,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   /**
    * Initializes all attributes and indices. It also enables the attributes.
    */
-  setupAttributes({
+  private setupAttributes({
     attributes,
     indices,
     size,
@@ -199,7 +215,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
   }
 
-  setupUniforms({
+  private setupUniforms({
     uniforms,
   }: {
     uniforms?: {
@@ -274,6 +290,11 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     this.gl.bindVertexArray(this.vao);
     if (this.ibo) {
       this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo);
+    }
+
+    // Textures
+    if (this.texture?.hasData()) {
+      this.texture.activate();
     }
 
     // Callback

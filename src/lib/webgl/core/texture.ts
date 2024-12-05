@@ -1,19 +1,29 @@
+export interface TextureConfiguration {
+  generateMipmap?: boolean;
+  magFilter?: GLint;
+  minFilter?: GLint;
+}
+
 class Texture {
+  private gl: WebGL2RenderingContext;
   private source: string | null = null;
-  private type: "image" | "bytes";
-  private imageData!: HTMLImageElement | Uint8Array;
+  private imageData?: HTMLImageElement;
   private glTexture?: WebGLTexture | null;
+  private configuration?: TextureConfiguration;
 
   constructor({
+    gl,
     source,
     data,
-    type,
+    configuration,
   }: {
+    gl: WebGL2RenderingContext;
     source?: string;
-    data?: Uint8Array | HTMLImageElement;
-    type?: "image" | "bytes";
+    data?: HTMLImageElement;
+    configuration?: TextureConfiguration;
   }) {
-    this.type = type ?? "bytes";
+    this.gl = gl;
+    this.configuration = configuration;
     if (source) {
       this.source = source;
     }
@@ -26,24 +36,29 @@ class Texture {
     return this.source;
   }
 
+  public setSource(source: string) {
+    this.source = source;
+  }
+
   public getImage() {
     return this.imageData;
   }
 
-  public loadImageData() {
+  public setImage(data: HTMLImageElement) {
+    this.imageData = data;
+  }
+
+  public loadData() {
     if (!this.source) {
       throw new Error("There is no source on this texture");
     }
-    if (this.type === "image") {
-      return this.loadImage(this.source);
-    } else if (this.type === "bytes") {
-      return this.loadPixelArray(this.source);
-    } else {
-      throw new Error(`Unsupported texture type: ${this.type}`);
+    if (this.imageData) {
+      console.warn("Data was already loaded");
     }
+    return this.loadHTMLImage(this.source);
   }
 
-  private loadImage(source: string): Promise<HTMLImageElement> {
+  private loadHTMLImage(source: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.src = source;
@@ -59,63 +74,73 @@ class Texture {
     });
   }
 
-  private async loadPixelArray(source: string): Promise<Uint8Array> {
-    const response = await fetch(source);
-
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch pixel data from source: ${source} (status: ${response.status})`
-      );
-    }
-
-    const buffer = await response.arrayBuffer();
-    const pixelArray = new Uint8Array(buffer);
-
-    this.imageData = pixelArray;
-    return pixelArray;
+  public createTexture() {
+    this.glTexture = this.gl.createTexture();
   }
 
-  private loadTexture(gl: WebGL2RenderingContext) {
+  public hasData() {
+    return !!this.imageData;
+  }
+
+  public populateGLTexture() {
     if (!this.glTexture) {
       console.error("Cannot load texture as it has not been created");
       return;
     }
-    gl.bindTexture(gl.TEXTURE_2D, this.glTexture);
-    // Populates texture on index 0 with given data
-    if (this.imageData instanceof Uint8Array) {
-      // Use Uint8Array for raw pixel data
-      const width = 256; // Specify the width
-      const height = 256; // Specify the height
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        width,
-        height,
-        0,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        this.imageData
-      );
-    } else {
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        this.imageData
-      );
-    }
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.bindTexture(gl.TEXTURE_2D, null);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
+    this.populateWithImageData();
+    this.setGLParameters();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
   }
 
-  public createTexture(gl: WebGL2RenderingContext) {
-    this.glTexture = gl.createTexture();
-    this.loadTexture(gl);
+  private populateWithImageData() {
+    if (!this.imageData) {
+      throw Error("Cannot bind texture without data");
+    }
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D,
+      0,
+      this.gl.RGBA,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      this.imageData
+    );
+  }
+
+  public upateConfiguration(configuration: TextureConfiguration) {
+    if (!this.glTexture) {
+      console.error("Cannot load texture as it has not been created");
+      return;
+    }
+    this.configuration = configuration;
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
+    this.setGLParameters();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+  }
+
+  private setGLParameters() {
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MAG_FILTER,
+      this.configuration?.magFilter ?? this.gl.NEAREST
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MIN_FILTER,
+      this.configuration?.minFilter ?? this.gl.NEAREST
+    );
+    if (this.configuration?.generateMipmap) {
+      this.gl.generateMipmap(this.gl.TEXTURE_2D);
+    }
+  }
+
+  public activate() {
+    if (!this.glTexture) {
+      console.error("Cannot activate texture as it has not been created");
+      return;
+    }
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
   }
 
   public deleteTexture(gl: WebGL2RenderingContext) {
