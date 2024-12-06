@@ -1,10 +1,7 @@
 import { uuidv4 } from "../../utils.js";
 import Program from "../core/program.js";
 import Texture from "../core/texture/texture.js";
-import {
-  TextureConfiguration,
-  TextureDefinition,
-} from "../core/texture/types.js";
+import { TextureDefinition } from "../core/texture/types.js";
 import { Uniforms } from "../core/types.js";
 import { UniformFactory } from "../core/uniform/factory.js";
 import {

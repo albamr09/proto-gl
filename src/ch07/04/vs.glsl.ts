@@ -43,7 +43,8 @@ void main(void) {
   }
 
   vColor = vec4(vec3(Ia + Id), uAlpha);
-  vTextureCoords = aTextureCoords;
+  // Transform texture coords to see the effect of different wrap modes
+  vTextureCoords = (aTextureCoords * 3.0) - vec2(1.0, 1.0);
 }
 `;
 

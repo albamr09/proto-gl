@@ -138,7 +138,7 @@ const initData = async () => {
           type: UniformKind.SCALAR_INT,
         },
         uUseLambert: {
-          data: false,
+          data: true,
           type: UniformKind.SCALAR_INT,
         },
         uAlpha: {
