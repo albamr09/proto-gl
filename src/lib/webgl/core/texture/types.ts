@@ -1,4 +1,5 @@
 export interface TextureDefinition {
+  index: number;
   source?: string;
   data?: HTMLImageElement;
   configuration?: TextureConfiguration;

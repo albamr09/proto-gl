@@ -35,7 +35,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private ibo!: WebGLBuffer | null;
   private size!: number;
   private configuration!: InstanceConfiguration;
-  private texture?: Texture;
+  private textures?: Map<Number, Texture>;
 
   /**
    * Creates an object with its own program
@@ -51,7 +51,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     uniforms,
     size,
     configuration,
-    texture,
+    textures,
   }: {
     gl: WebGL2RenderingContext;
     program?: Program<A, U>;
@@ -67,7 +67,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     };
     size?: number;
     configuration?: InstanceConfiguration;
-    texture?: TextureDefinition;
+    textures?: TextureDefinition[];
   }) {
     this.id = id ?? uuidv4();
     this.gl = gl;
@@ -96,8 +96,9 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     this.setupAttributes({ attributes, indices, size });
     this.setupUniforms({ uniforms });
 
-    if (texture) {
-      this.loadTexture(texture);
+    if (textures) {
+      this.textures = new Map();
+      textures.forEach((texture) => this.loadTexture(texture));
     }
   }
 
@@ -110,16 +111,18 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   }
 
   private loadTexture(texture: TextureDefinition) {
-    this.texture = new Texture({
+    const newTexture = new Texture({
       gl: this.gl,
+      index: texture.index,
       source: texture?.source,
       configuration: texture?.configuration,
       data: texture.data,
     });
-    this.texture.createTexture();
-    if (!this.texture.hasData()) {
-      this.texture.loadData();
+    newTexture.createTexture();
+    if (!newTexture.hasData()) {
+      newTexture.loadData();
     }
+    this.textures?.set(texture.index, newTexture);
   }
 
   /**
@@ -276,22 +279,30 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     this.configuration[key] = value;
   }
 
-  public updateTexture({ source, data, configuration }: TextureDefinition) {
-    if (!this.texture) {
+  public updateTexture({
+    index,
+    source,
+    data,
+    configuration,
+  }: TextureDefinition) {
+    const textureToUpdate = this.textures?.get(index);
+    if (!textureToUpdate) {
       console.warn("No texture is attached to the instance");
       return;
     }
     if (source) {
-      this.texture.setSource(source);
-      this.texture.loadData();
+      textureToUpdate.setSource(source);
+      textureToUpdate.loadData();
     } else if (data) {
-      this.texture.setImage(data);
-      this.texture.populateGLTexture();
+      textureToUpdate.setImage(data);
+      textureToUpdate.populateGLTexture();
     }
 
     if (configuration) {
-      this.texture.updateConfiguration(configuration);
+      textureToUpdate.updateConfiguration(configuration);
     }
+
+    this.textures?.set(index, textureToUpdate);
   }
 
   public render({
@@ -309,9 +320,11 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     }
 
     // Textures
-    if (this.texture?.hasData()) {
-      this.texture.activate();
-    }
+    this.textures?.forEach((texture) => {
+      if (texture.hasData()) {
+        texture.activate();
+      }
+    });
 
     // Callback
     cb(this, this.gl);

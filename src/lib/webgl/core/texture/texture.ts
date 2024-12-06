@@ -2,6 +2,7 @@ import { TextureConfiguration } from "./types";
 
 class Texture {
   private gl: WebGL2RenderingContext;
+  private index: number;
   private source: string | null = null;
   private imageData?: HTMLImageElement;
   private glTexture?: WebGLTexture | null;
@@ -9,16 +10,19 @@ class Texture {
 
   constructor({
     gl,
+    index,
     source,
     data,
     configuration,
   }: {
     gl: WebGL2RenderingContext;
+    index: number;
     source?: string;
     data?: HTMLImageElement;
     configuration?: TextureConfiguration;
   }) {
     this.gl = gl;
+    this.index = index;
     this.configuration = configuration;
     if (source) {
       this.source = source;
@@ -130,7 +134,7 @@ class Texture {
     );
     this.gl.texParameteri(
       this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_WRAP_R,
+      this.gl.TEXTURE_WRAP_T,
       this.configuration?.wrapT ?? this.gl.CLAMP_TO_EDGE
     );
     if (this.configuration?.generateMipmap) {
@@ -143,7 +147,7 @@ class Texture {
       console.error("Cannot activate texture as it has not been created");
       return;
     }
-    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.activeTexture(this.gl.TEXTURE0 + this.index);
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
   }
 

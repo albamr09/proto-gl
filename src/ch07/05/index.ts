@@ -3,7 +3,6 @@ import {
   createCheckboxInputForm,
   createDescriptionPanel,
   createImageInputForm,
-  createSelectorForm,
   createSliderInputForm,
   initController,
   initGUI,
@@ -34,33 +33,14 @@ const uniforms = [
   "uUsePerVertexColoring",
   "uUseLambert",
   "uAlpha",
-  "uSampler",
+  "uTextureSampler",
+  "uLightTextureSampler",
 ] as const;
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
-
-enum MagFilter {
-  LINEAR = "LINEAR",
-  NEAREST = "NEAREST",
-}
-
-enum MinFilter {
-  LINEAR = "LINEAR",
-  NEAREST = "NEAREST",
-  NEAREST_MIPMAP_NEAREST = "NEAREST_MIPMAP_NEAREST",
-  LINEAR_MIPMAP_NEAREST = "LINEAR_MIPMAP_NEAREST",
-  NEAREST_MIPMAP_LINEAR = "NEAREST_MIPMAP_LINEAR",
-  LINEAR_MIPMAP_LINEAR = "LINEAR_MIPMAP_LINEAR",
-}
-
-enum WrapOptions {
-  CLAMP_TO_EDGE = "CLAMP_TO_EDGE",
-  MIRRORED_REPEAT = "MIRRORED_REPEAT",
-  REPEAT = "REPEAT",
-}
 
 const initProgram = () => {
   scene = new Scene(gl);
@@ -145,8 +125,12 @@ const initData = async () => {
           data: 1,
           type: UniformKind.SCALAR_FLOAT,
         },
-        uSampler: {
+        uTextureSampler: {
           data: 0,
+          type: UniformKind.SCALAR_INT,
+        },
+        uLightTextureSampler: {
+          data: 1,
           type: UniformKind.SCALAR_INT,
         },
         ...lightUniforms,
@@ -155,9 +139,10 @@ const initData = async () => {
         {
           index: 0,
           source: "/data/images/webgl-marble.png",
-          configuration: {
-            generateMipmap: true,
-          },
+        },
+        {
+          index: 1,
+          source: "/data/images/light.png",
         },
       ],
     });
@@ -207,48 +192,11 @@ const initControls = () => {
       scene.updateTexture({ id: "cube", texture: { index: 0, data: v } });
     },
   });
-  createSelectorForm({
-    label: "Magnification Filter",
-    value: MagFilter.NEAREST,
-    options: Object.values(MagFilter),
+  createImageInputForm({
+    label: "Texture Image",
+    value: "/data/images/light.png",
     onChange: (v) => {
-      scene.updateTexture({
-        id: "cube",
-        texture: { index: 0, configuration: { magFilter: gl[v] } },
-      });
-    },
-  });
-  createSelectorForm({
-    label: "Minification Filter",
-    value: MinFilter.NEAREST,
-    options: Object.values(MinFilter),
-    onChange: (v) => {
-      scene.updateTexture({
-        id: "cube",
-        texture: { index: 0, configuration: { minFilter: gl[v] } },
-      });
-    },
-  });
-  createSelectorForm({
-    label: "Wrap on S",
-    value: WrapOptions.CLAMP_TO_EDGE,
-    options: Object.values(WrapOptions),
-    onChange: (v) => {
-      scene.updateTexture({
-        id: "cube",
-        texture: { index: 0, configuration: { wrapS: gl[v] } },
-      });
-    },
-  });
-  createSelectorForm({
-    label: "Wrap on T",
-    value: WrapOptions.CLAMP_TO_EDGE,
-    options: Object.values(WrapOptions),
-    onChange: (v) => {
-      scene.updateTexture({
-        id: "cube",
-        texture: { index: 0, configuration: { wrapT: gl[v] } },
-      });
+      scene.updateTexture({ id: "cube", texture: { index: 1, data: v } });
     },
   });
 };
@@ -256,7 +204,7 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will show how to use the differente texture wrapping modes."
+    "In this example we will show how to use multiple textures."
   );
 
   gl = getGLContext();
