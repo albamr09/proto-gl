@@ -35,6 +35,7 @@ const uniforms = [
   "uAlpha",
   "uTextureSampler",
   "uLightTextureSampler",
+  "uUseMultiply",
 ] as const;
 
 let gl: WebGL2RenderingContext;
@@ -133,6 +134,10 @@ const initData = async () => {
           data: 1,
           type: UniformKind.SCALAR_INT,
         },
+        uUseMultiply: {
+          data: 1,
+          type: UniformKind.SCALAR_INT,
+        },
         ...lightUniforms,
       },
       textures: [
@@ -183,6 +188,13 @@ const initControls = () => {
     step: 0.1,
     onChange: (v) => {
       scene.updateUniform("uAlpha", v, "cube");
+    },
+  });
+  createCheckboxInputForm({
+    label: "Use Multiply Texture",
+    value: true,
+    onChange: (v) => {
+      scene.updateUniform("uUseMultiply", v, "cube");
     },
   });
   createImageInputForm({
