@@ -211,7 +211,7 @@ class Scene {
   /**
    * Setups scene to render
    */
-  clear = (heightFactor = 1, widthFactor = 1) => {
+  clear(heightFactor = 1, widthFactor = 1) {
     // Define the viewport geometry, this is used internally to map NDC coordinates
     // to the final drawing space
     this.gl.viewport(
@@ -222,7 +222,7 @@ class Scene {
     );
     // Clear the scene
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-  };
+  }
 }
 
 export default Scene;

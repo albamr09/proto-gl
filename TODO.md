@@ -1,0 +1,5 @@
+- Simplify scene class: add renderer class, etc.
+- Simplify instance class:
+  - add attribute class?
+  - uniform class should handle creation?
+- All private methods with underscore
