@@ -1,10 +1,11 @@
-import { TextureConfiguration } from "./types";
+import TextureImage from "./image.js";
+import { TextureConfiguration, TextureTargets } from "./types";
 
 class Texture {
   private gl: WebGL2RenderingContext;
   private index: number;
-  private source: string | null = null;
-  private imageData?: HTMLImageElement;
+  private target: TextureTargets;
+  private image?: TextureImage;
   private glTexture?: WebGLTexture | null;
   private configuration?: TextureConfiguration;
 
@@ -13,10 +14,12 @@ class Texture {
     index,
     source,
     data,
+    target,
     configuration,
   }: {
     gl: WebGL2RenderingContext;
     index: number;
+    target?: TextureTargets;
     source?: string;
     data?: HTMLImageElement;
     configuration?: TextureConfiguration;
@@ -24,84 +27,82 @@ class Texture {
     this.gl = gl;
     this.index = index;
     this.configuration = configuration;
+    this.target = target ?? this.gl.TEXTURE_2D;
     if (source) {
-      this.source = source;
+      this.image = new TextureImage({ source });
+    } else if (data) {
+      this.image = new TextureImage({ data });
     }
-    if (data) {
-      this.imageData = data;
+    this.createTexture();
+    this.addImageDataToTexture();
+  }
+
+  private addImageDataToTexture() {
+    if (!this.image) {
+      console.warn("Texture image was not created");
+      return;
     }
-  }
-
-  public getSource() {
-    return this.source;
-  }
-
-  public setSource(source: string) {
-    this.source = source;
-  }
-
-  public getImage() {
-    return this.imageData;
-  }
-
-  public setImage(data: HTMLImageElement) {
-    this.imageData = data;
-  }
-
-  public loadData() {
-    if (!this.source) {
-      throw new Error("There is no source on this texture");
+    if (this.image.hasData()) {
+      this.populateGLTexture();
+      return;
     }
-    return this.loadHTMLImage(this.source);
-  }
-
-  private loadHTMLImage(source: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.src = source;
-
-      img.onload = () => {
-        this.imageData = img;
+    this.image
+      .loadImage()
+      .then(() => {
         this.populateGLTexture();
-        resolve();
-      };
-
-      img.onerror = () => {
-        reject(new Error(`Failed to load imageData from source: ${source}`));
-      };
-    });
+      })
+      .catch((e) => {
+        console.error(
+          `Could not add image to texture ${this.image!.getSource()}: ${e}`
+        );
+      });
   }
 
-  public createTexture() {
+  public updateImage({
+    source,
+    data,
+  }: {
+    source?: string;
+    data?: HTMLImageElement;
+  }) {
+    if (!this.image) {
+      console.warn("Cannot update a non existent image");
+      return;
+    }
+    if (source) {
+      this.image.setSource(source);
+    } else if (data) {
+      this.image.setImage(data);
+    }
+    this.addImageDataToTexture();
+  }
+
+  private createTexture() {
     this.glTexture = this.gl.createTexture();
   }
 
-  public hasData() {
-    return !!this.imageData;
-  }
-
-  public populateGLTexture() {
+  private populateGLTexture() {
     if (!this.glTexture) {
       console.error("Cannot load texture as it has not been created");
       return;
     }
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
+    this.gl.bindTexture(this.target, this.glTexture);
     this.populateWithImageData();
     this.setGLParameters();
-    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    this.gl.bindTexture(this.target, null);
   }
 
   private populateWithImageData() {
-    if (!this.imageData) {
+    if (!this.image?.hasData()) {
       throw Error("Cannot bind texture without data");
     }
     this.gl.texImage2D(
-      this.gl.TEXTURE_2D,
+      this.target,
       0,
       this.gl.RGBA,
       this.gl.RGBA,
       this.gl.UNSIGNED_BYTE,
-      this.imageData
+      this.image?.getImage()!
     );
   }
 
@@ -111,34 +112,34 @@ class Texture {
       return;
     }
     this.configuration = { ...this.configuration, ...configuration };
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
+    this.gl.bindTexture(this.target, this.glTexture);
     this.setGLParameters();
-    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    this.gl.bindTexture(this.target, null);
   }
 
   private setGLParameters() {
     this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
+      this.target,
       this.gl.TEXTURE_MAG_FILTER,
       this.configuration?.magFilter ?? this.gl.NEAREST
     );
     this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
+      this.target,
       this.gl.TEXTURE_MIN_FILTER,
       this.configuration?.minFilter ?? this.gl.NEAREST
     );
     this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
+      this.target,
       this.gl.TEXTURE_WRAP_S,
       this.configuration?.wrapS ?? this.gl.CLAMP_TO_EDGE
     );
     this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
+      this.target,
       this.gl.TEXTURE_WRAP_T,
       this.configuration?.wrapT ?? this.gl.CLAMP_TO_EDGE
     );
     if (this.configuration?.generateMipmap) {
-      this.gl.generateMipmap(this.gl.TEXTURE_2D);
+      this.gl.generateMipmap(this.target);
     }
   }
 
@@ -147,8 +148,11 @@ class Texture {
       console.error("Cannot activate texture as it has not been created");
       return;
     }
+    if (!this.image?.hasData()) {
+      return;
+    }
     this.gl.activeTexture(this.gl.TEXTURE0 + this.index);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
+    this.gl.bindTexture(this.target, this.glTexture);
   }
 
   public deleteTexture(gl: WebGL2RenderingContext) {

@@ -58,7 +58,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     id?: string;
     vertexShaderSource?: string;
     fragmentShaderSource?: string;
-    attributes: {
+    attributes?: {
       [P in A[number]]?: AttributeConfig;
     };
     indices?: number[];
@@ -93,7 +93,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       ...configuration,
     };
 
-    this.setupAttributes({ attributes, indices, size });
+    this.setupAttributes({ attributes: attributes ?? {}, indices, size });
     this.setupUniforms({ uniforms });
 
     if (textures) {
@@ -116,12 +116,8 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       index: texture.index,
       source: texture?.source,
       configuration: texture?.configuration,
-      data: texture.data,
+      data: texture?.data,
     });
-    newTexture.createTexture();
-    if (!newTexture.hasData()) {
-      newTexture.loadData();
-    }
     this.textures?.set(texture.index, newTexture);
   }
 
@@ -290,13 +286,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       console.warn("No texture is attached to the instance");
       return;
     }
-    if (source) {
-      textureToUpdate.setSource(source);
-      textureToUpdate.loadData();
-    } else if (data) {
-      textureToUpdate.setImage(data);
-      textureToUpdate.populateGLTexture();
-    }
+    textureToUpdate.updateImage({ source, data });
 
     if (configuration) {
       textureToUpdate.updateConfiguration(configuration);
@@ -321,9 +311,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
 
     // Textures
     this.textures?.forEach((texture) => {
-      if (texture.hasData()) {
-        texture.activate();
-      }
+      texture.activate();
     });
 
     // Callback
