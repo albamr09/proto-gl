@@ -87,6 +87,24 @@ const initData = () => {
           source: "/data/images/webgl.png",
           configuration: { generateMipmap: true },
         },
+        {
+          index: 1,
+          target: gl.TEXTURE_CUBE_MAP,
+          faces: {
+            [gl.TEXTURE_CUBE_MAP_POSITIVE_X]:
+              "/data/images/cubemap/positive-x.png",
+            [gl.TEXTURE_CUBE_MAP_POSITIVE_Y]:
+              "/data/images/cubemap/positive-y.png",
+            [gl.TEXTURE_CUBE_MAP_POSITIVE_Z]:
+              "/data/images/cubemap/positive-z.png",
+            [gl.TEXTURE_CUBE_MAP_NEGATIVE_X]:
+              "/data/images/cubemap/negative-x.png",
+            [gl.TEXTURE_CUBE_MAP_NEGATIVE_Y]:
+              "/data/images/cubemap/negative-y.png",
+            [gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]:
+              "/data/images/cubemap/negative-z.png",
+          },
+        },
       ],
     });
     scene.add(cubeInstance);

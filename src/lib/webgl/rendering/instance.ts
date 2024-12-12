@@ -113,10 +113,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private loadTexture(texture: TextureDefinition) {
     const newTexture = new Texture({
       gl: this.gl,
-      index: texture.index,
-      source: texture?.source,
-      configuration: texture?.configuration,
-      data: texture?.data,
+      ...texture,
     });
     this.textures?.set(texture.index, newTexture);
   }

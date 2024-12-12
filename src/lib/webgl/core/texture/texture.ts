@@ -1,5 +1,6 @@
+import { objectEntries } from "../../../utils/types.js";
 import TextureImage from "./image.js";
-import { TextureConfiguration, TextureTargets } from "./types";
+import { CubeMapTargets, TextureConfiguration, TextureTargets } from "./types";
 
 class Texture {
   private gl: WebGL2RenderingContext;
@@ -8,6 +9,7 @@ class Texture {
   private image?: TextureImage;
   private glTexture?: WebGLTexture | null;
   private configuration?: TextureConfiguration;
+  private faces?: Map<CubeMapTargets, TextureImage>;
 
   constructor({
     gl,
@@ -15,12 +17,14 @@ class Texture {
     source,
     data,
     target,
+    faces,
     configuration,
   }: {
     gl: WebGL2RenderingContext;
     index: number;
     target?: TextureTargets;
     source?: string;
+    faces?: Record<CubeMapTargets, string>;
     data?: HTMLImageElement;
     configuration?: TextureConfiguration;
   }) {
@@ -28,32 +32,49 @@ class Texture {
     this.index = index;
     this.configuration = configuration;
     this.target = target ?? this.gl.TEXTURE_2D;
+    this.createTexture();
+
     if (source) {
       this.image = new TextureImage({ source });
     } else if (data) {
       this.image = new TextureImage({ data });
+    } else if (faces) {
+      this.faces = new Map();
+      if (this.target !== WebGL2RenderingContext.TEXTURE_CUBE_MAP) {
+        console.error("Cannot create faces for texture that are not cube maps");
+        return;
+      }
+      objectEntries(faces).forEach(([target, source]) => {
+        const faceImage = new TextureImage({ source });
+        this.faces?.set(target, faceImage);
+        this.addImageDataToTexture(faceImage, target);
+      });
     }
-    this.createTexture();
-    this.addImageDataToTexture();
+    if (this.image) {
+      this.addImageDataToTexture(this.image, this.target);
+    }
   }
 
-  private addImageDataToTexture() {
-    if (!this.image) {
+  private addImageDataToTexture(
+    image: TextureImage,
+    dataTarget: TextureTargets | CubeMapTargets
+  ) {
+    if (!image) {
       console.warn("Texture image was not created");
       return;
     }
-    if (this.image.hasData()) {
-      this.populateGLTexture();
+    if (image.hasData()) {
+      this.populateGLTexture(image, dataTarget);
       return;
     }
-    this.image
+    image
       .loadImage()
       .then(() => {
-        this.populateGLTexture();
+        this.populateGLTexture(image, dataTarget);
       })
       .catch((e) => {
         console.error(
-          `Could not add image to texture ${this.image!.getSource()}: ${e}`
+          `Could not add image to texture ${image!.getSource()}: ${e}`
         );
       });
   }
@@ -61,9 +82,11 @@ class Texture {
   public updateImage({
     source,
     data,
+    target,
   }: {
     source?: string;
     data?: HTMLImageElement;
+    target?: TextureTargets | CubeMapTargets;
   }) {
     if (!this.image) {
       console.warn("Cannot update a non existent image");
@@ -74,35 +97,41 @@ class Texture {
     } else if (data) {
       this.image.setImage(data);
     }
-    this.addImageDataToTexture();
+    this.addImageDataToTexture(this.image, target ?? this.target);
   }
 
   private createTexture() {
     this.glTexture = this.gl.createTexture();
   }
 
-  private populateGLTexture() {
+  private populateGLTexture(
+    image: TextureImage,
+    dataTarget: TextureTargets | CubeMapTargets
+  ) {
     if (!this.glTexture) {
       console.error("Cannot load texture as it has not been created");
       return;
     }
     this.gl.bindTexture(this.target, this.glTexture);
-    this.populateWithImageData();
+    this.populateWithImageData(image, dataTarget);
     this.setGLParameters();
     this.gl.bindTexture(this.target, null);
   }
 
-  private populateWithImageData() {
-    if (!this.image?.hasData()) {
+  private populateWithImageData(
+    image: TextureImage,
+    dataTarget: TextureTargets | CubeMapTargets
+  ) {
+    if (!image?.hasData()) {
       throw Error("Cannot bind texture without data");
     }
     this.gl.texImage2D(
-      this.target,
+      dataTarget,
       0,
       this.gl.RGBA,
       this.gl.RGBA,
       this.gl.UNSIGNED_BYTE,
-      this.image?.getImage()!
+      image.getImage()!
     );
   }
 
