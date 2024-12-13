@@ -1,4 +1,6 @@
-import Texture, { CubeMapTexture, Texture2D } from "./texture.js";
+import CubeMapTexture from "./cubemap-texture.js";
+import Texture2D from "./texture-2d.js";
+import Texture from "./texture.js";
 import {
   CubeMapTargets,
   TextureConfiguration,
