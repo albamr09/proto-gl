@@ -155,6 +155,7 @@ const initData = async () => {
         {
           index: 0,
           source: "/data/images/webgl-marble.png",
+          target: gl.TEXTURE_2D,
           configuration: {
             generateMipmap: true,
           },

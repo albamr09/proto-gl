@@ -2,75 +2,41 @@ import { objectEntries } from "../../../utils/types.js";
 import TextureImage from "./image.js";
 import { CubeMapTargets, TextureConfiguration, TextureTargets } from "./types";
 
-class Texture {
-  private gl: WebGL2RenderingContext;
-  private index: number;
-  private target: TextureTargets;
-  private image?: TextureImage;
-  private glTexture?: WebGLTexture | null;
-  private configuration?: TextureConfiguration;
-  private faces?: Map<CubeMapTargets, TextureImage>;
+abstract class Texture {
+  protected glTexture?: WebGLTexture | null;
 
-  constructor({
-    gl,
-    index,
-    source,
-    data,
-    target,
-    faces,
-    configuration,
-  }: {
-    gl: WebGL2RenderingContext;
-    index: number;
-    target?: TextureTargets;
-    source?: string;
-    faces?: Record<CubeMapTargets, string>;
-    data?: HTMLImageElement;
-    configuration?: TextureConfiguration;
-  }) {
-    this.gl = gl;
-    this.index = index;
-    this.configuration = configuration;
-    this.target = target ?? this.gl.TEXTURE_2D;
+  constructor(
+    protected gl: WebGL2RenderingContext,
+    protected index: number,
+    protected target: TextureTargets,
+    protected configuration?: TextureConfiguration
+  ) {
     this.createTexture();
-
-    if (source) {
-      this.image = new TextureImage({ source });
-    } else if (data) {
-      this.image = new TextureImage({ data });
-    } else if (faces) {
-      this.faces = new Map();
-      if (this.target !== WebGL2RenderingContext.TEXTURE_CUBE_MAP) {
-        console.error("Cannot create faces for texture that are not cube maps");
-        return;
-      }
-      objectEntries(faces).forEach(([target, source]) => {
-        const faceImage = new TextureImage({ source });
-        this.faces?.set(target, faceImage);
-        this.addImageDataToTexture(faceImage, target);
-      });
-    }
-    if (this.image) {
-      this.addImageDataToTexture(this.image, this.target);
-    }
   }
 
-  private addImageDataToTexture(
+  public activate() {}
+  public updateImage({}: {
+    source?: string;
+    data?: HTMLImageElement;
+    faces?: { [Key in CubeMapTargets]: string };
+  }) {}
+
+  protected addImageDataToTexture(
     image: TextureImage,
-    dataTarget: TextureTargets | CubeMapTargets
+    target: TextureTargets | CubeMapTargets
   ) {
     if (!image) {
       console.warn("Texture image was not created");
       return;
     }
     if (image.hasData()) {
-      this.populateGLTexture(image, dataTarget);
+      this.populateGLTexture(image, target);
       return;
     }
     image
       .loadImage()
       .then(() => {
-        this.populateGLTexture(image, dataTarget);
+        this.populateGLTexture(image, target);
       })
       .catch((e) => {
         console.error(
@@ -79,60 +45,8 @@ class Texture {
       });
   }
 
-  public updateImage({
-    source,
-    data,
-    target,
-  }: {
-    source?: string;
-    data?: HTMLImageElement;
-    target?: TextureTargets | CubeMapTargets;
-  }) {
-    if (!this.image) {
-      console.warn("Cannot update a non existent image");
-      return;
-    }
-    if (source) {
-      this.image.setSource(source);
-    } else if (data) {
-      this.image.setImage(data);
-    }
-    this.addImageDataToTexture(this.image, target ?? this.target);
-  }
-
-  private createTexture() {
+  protected createTexture(): void {
     this.glTexture = this.gl.createTexture();
-  }
-
-  private populateGLTexture(
-    image: TextureImage,
-    dataTarget: TextureTargets | CubeMapTargets
-  ) {
-    if (!this.glTexture) {
-      console.error("Cannot load texture as it has not been created");
-      return;
-    }
-    this.gl.bindTexture(this.target, this.glTexture);
-    this.populateWithImageData(image, dataTarget);
-    this.setGLParameters();
-    this.gl.bindTexture(this.target, null);
-  }
-
-  private populateWithImageData(
-    image: TextureImage,
-    dataTarget: TextureTargets | CubeMapTargets
-  ) {
-    if (!image?.hasData()) {
-      throw Error("Cannot bind texture without data");
-    }
-    this.gl.texImage2D(
-      dataTarget,
-      0,
-      this.gl.RGBA,
-      this.gl.RGBA,
-      this.gl.UNSIGNED_BYTE,
-      image.getImage()!
-    );
   }
 
   public updateConfiguration(configuration: TextureConfiguration) {
@@ -144,6 +58,37 @@ class Texture {
     this.gl.bindTexture(this.target, this.glTexture);
     this.setGLParameters();
     this.gl.bindTexture(this.target, null);
+  }
+
+  protected populateGLTexture(
+    image: TextureImage,
+    target: TextureTargets | CubeMapTargets
+  ) {
+    if (!this.glTexture) {
+      console.error("Cannot load texture as it has not been created");
+      return;
+    }
+    this.gl.bindTexture(this.target, this.glTexture);
+    this.populateWithImageData(image, target);
+    this.setGLParameters();
+    this.gl.bindTexture(this.target, null);
+  }
+
+  private populateWithImageData(
+    image: TextureImage,
+    target: TextureTargets | CubeMapTargets
+  ) {
+    if (!image?.hasData()) {
+      throw Error("Cannot bind texture without data");
+    }
+    this.gl.texImage2D(
+      Number(target),
+      0,
+      this.gl.RGBA,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      image.getImage()!
+    );
   }
 
   private setGLParameters() {
@@ -172,7 +117,64 @@ class Texture {
     }
   }
 
-  public activate() {
+  public deleteTexture(gl: WebGL2RenderingContext) {
+    if (!this.glTexture) {
+      console.error("Cannot delete texture as it has not been created");
+      return;
+    }
+    gl.deleteTexture(this.glTexture);
+  }
+}
+
+export class Texture2D extends Texture {
+  private image?: TextureImage;
+
+  constructor({
+    gl,
+    index,
+    source,
+    data,
+    configuration,
+  }: {
+    gl: WebGL2RenderingContext;
+    index: number;
+    source?: string;
+    data?: HTMLImageElement;
+    configuration?: TextureConfiguration;
+  }) {
+    super(gl, index, gl.TEXTURE_2D, configuration);
+    this.createTexture();
+
+    if (source) {
+      this.image = new TextureImage({ source });
+    } else if (data) {
+      this.image = new TextureImage({ data });
+    }
+    if (this.image) {
+      this.addImageDataToTexture(this.image, this.target);
+    }
+  }
+
+  public override updateImage({
+    source,
+    data,
+  }: {
+    source?: string;
+    data?: HTMLImageElement;
+  }) {
+    if (!this.image) {
+      console.warn("Cannot update a non existent image");
+      return;
+    }
+    if (source) {
+      this.image.setSource(source);
+    } else if (data) {
+      this.image.setImage(data);
+    }
+    this.addImageDataToTexture(this.image, this.target);
+  }
+
+  public override activate() {
     if (!this.glTexture) {
       console.error("Cannot activate texture as it has not been created");
       return;
@@ -183,13 +185,72 @@ class Texture {
     this.gl.activeTexture(this.gl.TEXTURE0 + this.index);
     this.gl.bindTexture(this.target, this.glTexture);
   }
+}
 
-  public deleteTexture(gl: WebGL2RenderingContext) {
+export class CubeMapTexture extends Texture {
+  private faces?: Map<CubeMapTargets, TextureImage>;
+
+  constructor({
+    gl,
+    index,
+    faces,
+    configuration,
+  }: {
+    gl: WebGL2RenderingContext;
+    index: number;
+    faces?: Record<CubeMapTargets, string>;
+    configuration?: TextureConfiguration;
+  }) {
+    super(gl, index, gl.TEXTURE_CUBE_MAP, configuration);
+    if (faces) {
+      this.faces = new Map();
+      objectEntries(faces).forEach(([target, source]) => {
+        const faceImage = new TextureImage({ source });
+        this.faces?.set(target, faceImage);
+        this.addImageDataToTexture(faceImage, target);
+      });
+    }
+  }
+
+  private allFacesHaveData(): boolean {
+    if (!this.faces) {
+      console.warn("No faces defined for this cube map texture");
+      return false;
+    }
+
+    for (const image of this.faces.values()) {
+      if (!image.hasData()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  public override updateImage({
+    faces,
+  }: {
+    faces?: { [Key in CubeMapTargets]: string };
+  }) {
+    objectEntries(faces as object).forEach(([target, source]) => {
+      const faceImage = this.faces?.get(target);
+      if (faceImage) {
+        faceImage.setImage(source);
+        this.addImageDataToTexture(faceImage, target);
+      }
+    });
+  }
+
+  public override activate() {
     if (!this.glTexture) {
-      console.error("Cannot delete texture as it has not been created");
+      console.error("Cannot activate texture as it has not been created");
       return;
     }
-    gl.deleteTexture(this.glTexture);
+    if (!this.allFacesHaveData()) {
+      return;
+    }
+    this.gl.activeTexture(this.gl.TEXTURE0 + this.index);
+    this.gl.bindTexture(this.target, this.glTexture);
   }
 }
 

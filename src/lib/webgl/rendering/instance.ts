@@ -1,7 +1,8 @@
 import { uuidv4 } from "../../utils.js";
 import Program from "../core/program.js";
+import TextureFactory from "../core/texture/factory.js";
 import Texture from "../core/texture/texture.js";
-import { TextureDefinition } from "../core/texture/types.js";
+import { TextureDefinition, TextureParameters } from "../core/texture/types.js";
 import { Uniforms } from "../core/types.js";
 import { UniformFactory } from "../core/uniform/factory.js";
 import {
@@ -111,7 +112,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   }
 
   private loadTexture(texture: TextureDefinition) {
-    const newTexture = new Texture({
+    const newTexture = TextureFactory.create({
       gl: this.gl,
       ...texture,
     });
@@ -276,14 +277,15 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     index,
     source,
     data,
+    faces,
     configuration,
-  }: TextureDefinition) {
+  }: TextureParameters) {
     const textureToUpdate = this.textures?.get(index);
     if (!textureToUpdate) {
       console.warn("No texture is attached to the instance");
       return;
     }
-    textureToUpdate.updateImage({ source, data });
+    textureToUpdate.updateImage({ source, data, faces });
 
     if (configuration) {
       textureToUpdate.updateConfiguration(configuration);

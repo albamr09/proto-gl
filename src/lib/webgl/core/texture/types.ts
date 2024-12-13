@@ -1,10 +1,13 @@
-export interface TextureDefinition {
+export interface TextureParameters {
   index: number;
-  target?: TextureTargets;
   source?: string;
   data?: HTMLImageElement;
-  faces?: Record<CubeMapTargets, string>;
+  faces?: { [Key in CubeMapTargets]: string };
   configuration?: TextureConfiguration;
+}
+
+export interface TextureDefinition extends TextureParameters {
+  target: TextureTargets;
 }
 
 export interface TextureConfiguration {

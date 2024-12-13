@@ -144,10 +144,12 @@ const initData = async () => {
         {
           index: 0,
           source: "/data/images/webgl-marble.png",
+          target: gl.TEXTURE_2D,
         },
         {
           index: 1,
           source: "/data/images/light.png",
+          target: gl.TEXTURE_2D,
         },
       ],
     });
