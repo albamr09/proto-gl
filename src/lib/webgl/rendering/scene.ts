@@ -1,7 +1,7 @@
 import { computeNormalMatrix } from "../../math/3d.js";
 import { Matrix4 } from "../../math/matrix.js";
 import { uuidv4 } from "../../utils.js";
-import { TextureDefinition, TextureParameters } from "../core/texture/types.js";
+import { TextureParameters } from "../core/texture/types.js";
 import { UniformConfig } from "../core/uniform/types.js";
 import Instance from "./instance";
 import { InstanceConfiguration } from "./types.js";
