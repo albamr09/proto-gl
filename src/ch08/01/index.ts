@@ -33,10 +33,10 @@ const uniforms = [
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
+let pickingController: PickingController;
 let program: Program<typeof attributes, typeof uniforms>;
 
 const initProgram = () => {
-  const pickingController = new PickingController(gl, canvas);
   scene = new Scene(gl);
   const camera = new Camera(
     CameraType.ORBITING,
@@ -44,7 +44,13 @@ const initProgram = () => {
     gl,
     scene
   );
-  new Controller({ camera, canvas });
+  const getHitValue = (o: Instance<typeof attributes, typeof uniforms>) => {
+    // @ts-ignore
+    const data = o.getUniform("uMaterialDiffuse")?.getData();
+    return data;
+  };
+  pickingController = new PickingController(scene, canvas, getHitValue);
+  new Controller({ camera, canvas, pickingController });
   camera.setPosition(new Vector([0, 0, 40]));
   camera.setElevation(-40);
   camera.setAzimuth(30);

@@ -1,17 +1,34 @@
+import { denormalizeColor } from "../../../colors.js";
+import Instance from "../instance";
+import Scene from "../scene";
+
+// TODO: create events for object clicked, object dragged
 class PickingController {
   private gl: WebGL2RenderingContext;
+  private scene: Scene;
   private renderBuffer?: WebGLRenderbuffer | null;
   private texture?: WebGLTexture | null;
   private frameBuffer?: WebGLFramebuffer | null;
+  private getHitValue: (o: Instance<any, any>) => number[];
 
-  constructor(gl: WebGL2RenderingContext, canvas: HTMLCanvasElement) {
-    this.gl = gl;
+  constructor(
+    scene: Scene,
+    canvas: HTMLCanvasElement,
+    getHitValue: (o: Instance<any, any>) => number[]
+  ) {
+    this.gl = scene.getContext();
+    this.scene = scene;
+    this.getHitValue = getHitValue;
     this.createRenderBuffer(canvas);
     this.createTexture(canvas);
     this.createFrameBuffer();
+
+    this.scene.addEventListener("render", () => {
+      this.render();
+    });
   }
 
-  createRenderBuffer(canvas: HTMLCanvasElement) {
+  private createRenderBuffer(canvas: HTMLCanvasElement) {
     const { height, width } = canvas;
 
     this.renderBuffer = this.gl.createRenderbuffer();
@@ -24,7 +41,7 @@ class PickingController {
     );
   }
 
-  createTexture(canvas: HTMLCanvasElement) {
+  private createTexture(canvas: HTMLCanvasElement) {
     const { height, width } = canvas;
 
     this.texture = this.gl.createTexture();
@@ -42,7 +59,7 @@ class PickingController {
     );
   }
 
-  createFrameBuffer() {
+  private createFrameBuffer() {
     if (!this.texture || !this.renderBuffer) {
       console.warn("Could not create frame buffer");
       return;
@@ -74,15 +91,44 @@ class PickingController {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
   }
 
-  render(drawCallback: () => void) {
+  private render() {
     if (!this.frameBuffer) {
       console.warn("Could not draw offscreen framebuffer");
       return;
     }
 
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
-    drawCallback();
+    this.scene.render(() => {}, true, true);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+  }
+
+  onClick(x: number, y: number) {
+    if (!this.frameBuffer) {
+      console.warn("Could not pick object, framebuffer not initialized");
+      return;
+    }
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
+    const pixelColor = this.scene.getPixelColor(x, y);
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+    const clickedObject = this.getClickedObject(
+      Array.prototype.map.call(pixelColor, (x) => x) as number[]
+    );
+  }
+
+  private getClickedObject(pixelColor: number[]) {
+    return this.scene.find((object) => {
+      const objectColor = this.getHitValue(object);
+      const denormalizedColor = denormalizeColor(objectColor);
+      if (this.compare(denormalizedColor, pixelColor)) {
+        return object;
+      }
+    });
+  }
+
+  private compare(objectColor: number[], pixelColor: number[]) {
+    return objectColor.every((_, i) => {
+      return objectColor[i] - pixelColor[i] <= 1;
+    });
   }
 }
 

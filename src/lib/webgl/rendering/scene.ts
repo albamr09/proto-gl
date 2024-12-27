@@ -6,7 +6,7 @@ import { UniformConfig } from "../core/uniform/types.js";
 import Instance from "./instance";
 import { InstanceConfiguration } from "./types.js";
 
-class Scene {
+class Scene extends EventTarget {
   private gl: WebGL2RenderingContext;
   private objects: Map<string, Instance<any, any>>;
   private renderOrder: string[];
@@ -15,6 +15,7 @@ class Scene {
   private projectionMatrix: Matrix4;
 
   constructor(gl: WebGL2RenderingContext) {
+    super();
     this.gl = gl;
     this.modelViewMatrix = Matrix4.identity();
     this.normalMatrix = Matrix4.identity();
@@ -145,6 +146,10 @@ class Scene {
     });
   }
 
+  getContext() {
+    return this.gl;
+  }
+
   // Uniforms
   // TODO: Get data should know the type
   getUniform(id: string, uniformName: any) {
@@ -186,26 +191,30 @@ class Scene {
     this.projectionMatrix = projectionMatrix.copy() as Matrix4;
   }
 
-  render(cb: (o: Instance<any, any>) => void = () => {}, clear = true) {
+  // TODO: this should be dict
+  render(
+    cb: (o: Instance<any, any>) => void = () => {},
+    clear = true,
+    offscreen = false
+  ) {
     clear && this.clear();
-    this.renderOrder.forEach((id) => {
-      const o = this.objects.get(id);
-      if (!o) {
-        console.warn(`Object ${id} was not found while rendering`);
-        return;
-      }
+    this.traverse((o) => {
       o.updateUniform("uModelViewMatrix", this.modelViewMatrix.toFloatArray());
       o.updateUniform("uNormalMatrix", this.normalMatrix.toFloatArray());
       o.updateUniform(
         "uProjectionMatrix",
         this.projectionMatrix.toFloatArray()
       );
+      o.updateUniform("uOffScreen", offscreen);
       o.render({
         cb: (o) => {
           cb(o);
         },
       });
     });
+    if (!offscreen) {
+      this.dispatchEvent(new CustomEvent("render"));
+    }
   }
 
   /**
@@ -222,6 +231,50 @@ class Scene {
     );
     // Clear the scene
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+  }
+
+  getPixelColor(x: number, y: number) {
+    const readout = new Uint8Array(4);
+    this.gl.readPixels(
+      x,
+      y,
+      1,
+      1,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      readout
+    );
+    return readout;
+  }
+
+  traverse(cb: (o: Instance<any, any>) => void) {
+    this.renderOrder.forEach((id) => {
+      const o = this.objects.get(id);
+      if (!o) {
+        console.warn(`Object ${id} was not found on traverse`);
+        return;
+      }
+      cb(o);
+    });
+  }
+
+  find(cb: (o: Instance<any, any>) => Instance<any, any> | undefined) {
+    return this.renderOrder.reduce<Instance<any, any> | undefined>(
+      (objectFound, id) => {
+        if (objectFound) {
+          return objectFound;
+        }
+
+        const o = this.objects.get(id);
+        if (!o) {
+          console.warn(`Object ${id} was not found on traverse`);
+          return undefined;
+        }
+
+        return cb(o) ? o : undefined;
+      },
+      undefined
+    );
   }
 }
 

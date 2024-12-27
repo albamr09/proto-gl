@@ -4,6 +4,7 @@ import Camera from "./camera.js";
 
 class Controller {
   private camera: Camera;
+  private canvas: HTMLCanvasElement;
   private pickingController?: PickingController;
   // Config
   private motionFactor: number;
@@ -35,6 +36,7 @@ class Controller {
     onAngleChange?: (angle: Vector) => void;
   }) {
     this.camera = camera;
+    this.canvas = canvas;
     this.pickingController = pickingController;
     this.dolly = 0;
     this.isDragging = false;
@@ -165,6 +167,34 @@ class Controller {
     this.isDragging = true;
     this.x = e.clientX;
     this.y = e.clientY;
+
+    // TODO: method
+    // Handle picking
+    const { x, y } = this.get2DCoords(e);
+    this.pickingController?.onClick(x, y);
+  }
+
+  // TODO: review this
+  private get2DCoords(e: MouseEvent) {
+    let top = 0,
+      left = 0,
+      canvas: HTMLCanvasElement | null = this.canvas;
+
+    while (canvas && canvas.tagName !== "BODY") {
+      top += canvas.offsetTop;
+      left += canvas.offsetLeft;
+      // TODO: type well
+      // @ts-ignore
+      canvas = canvas.offsetParent;
+    }
+
+    left += window.pageXOffset;
+    top -= window.pageYOffset;
+
+    return {
+      x: e.clientX - left,
+      y: this.canvas.height - (e.clientY - top),
+    };
   }
 
   onMouseUp(_e: MouseEvent) {
