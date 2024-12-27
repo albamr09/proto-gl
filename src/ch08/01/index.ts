@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
+import { calculateNormals } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
@@ -14,12 +15,20 @@ import Program from "../../lib/webgl/core/program.js";
 import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
 import Instance from "../../lib/webgl/rendering/instance.js";
+import PickingController from "../../lib/webgl/rendering/picking/picking.js";
 import Scene from "../../lib/webgl/rendering/scene.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
-const attributes = ["aPosition"] as const;
-const uniforms = ["uMaterialDiffuse", "uTransform"] as const;
+const attributes = ["aPosition", "aNormal"] as const;
+const uniforms = [
+  "uMaterialDiffuse",
+  "uTransform",
+  "uLightPosition",
+  "uLightAmbient",
+  "uLightDiffuse",
+  "uOffScreen",
+] as const;
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
@@ -27,6 +36,7 @@ let scene: Scene;
 let program: Program<typeof attributes, typeof uniforms>;
 
 const initProgram = () => {
+  const pickingController = new PickingController(gl, canvas);
   scene = new Scene(gl);
   const camera = new Camera(
     CameraType.ORBITING,
@@ -53,6 +63,20 @@ const loadObject = (
   id: string,
   properties: { translate: Vector; scale: Vector; color?: number[] }
 ) => {
+  const ligthUniforms = {
+    uLightAmbient: {
+      data: [0, 0, 0, 1],
+      type: UniformKind.VECTOR_FLOAT,
+    },
+    uLightDiffuse: {
+      data: [1, 1, 1, 1],
+      type: UniformKind.VECTOR_FLOAT,
+    },
+    uLightPosition: {
+      data: [0, 5, 20],
+      type: UniformKind.VECTOR_FLOAT,
+    },
+  };
   loadData(path).then((data) => {
     const { vertices, indices, diffuse } = data;
     const instance = new Instance<typeof attributes, typeof uniforms>({
@@ -66,8 +90,17 @@ const loadObject = (
           size: 3,
           type: gl.FLOAT,
         },
+        aNormal: {
+          data: calculateNormals(vertices, indices, 3),
+          size: 3,
+          type: gl.FLOAT,
+        },
       },
       uniforms: {
+        uOffScreen: {
+          data: false,
+          type: UniformKind.SCALAR_INT,
+        },
         uMaterialDiffuse: {
           data: properties.color ?? diffuse ?? [1, 1, 1, 1],
           type: UniformKind.VECTOR_FLOAT,
@@ -79,6 +112,7 @@ const loadObject = (
             .toFloatArray(),
           type: UniformKind.MATRIX,
         },
+        ...ligthUniforms,
       },
     });
     scene.add(instance);

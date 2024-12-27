@@ -1,8 +1,10 @@
 import { Vector } from "../../math/vector.js";
+import PickingController from "../rendering/picking/picking.js";
 import Camera from "./camera.js";
 
 class Controller {
   private camera: Camera;
+  private pickingController?: PickingController;
   // Config
   private motionFactor: number;
   private followMouse: boolean;
@@ -22,15 +24,18 @@ class Controller {
   constructor({
     camera,
     canvas,
+    pickingController,
     onDollyChange = () => {},
     onAngleChange = () => {},
   }: {
     camera: Camera;
     canvas: HTMLCanvasElement;
+    pickingController?: PickingController;
     onDollyChange?: (dolly: number) => void;
     onAngleChange?: (angle: Vector) => void;
   }) {
     this.camera = camera;
+    this.pickingController = pickingController;
     this.dolly = 0;
     this.isDragging = false;
     this.x = 0;
