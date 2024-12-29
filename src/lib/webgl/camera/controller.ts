@@ -1,5 +1,5 @@
 import { Vector } from "../../math/vector.js";
-import PickingController from "../rendering/picking/picking.js";
+import PickingController from "../core/picking/picking.js";
 import Camera from "./camera.js";
 
 class Controller {
@@ -52,13 +52,7 @@ class Controller {
     this.onDollyChange = onDollyChange;
 
     // Mouse events
-    canvas.addEventListener(
-      "wheel",
-      (e) => {
-        this.onWheel(e);
-      },
-      { passive: true }
-    );
+    canvas.addEventListener("wheel", (e) => this.onWheel(e), { passive: true });
     canvas.onmousedown = this.onMouseDown.bind(this);
     canvas.onmousemove = this.onMouseMove.bind(this);
     canvas.onmouseup = this.onMouseUp.bind(this);
@@ -69,48 +63,14 @@ class Controller {
     canvas.ontouchend = this.onTouchEnd.bind(this);
 
     // Key events
-    window.onkeydown = this.onKeyDown.bind(this);
+    window.addEventListener("keydown", this.onKeyDown.bind(this));
   }
 
-  /**
-   * Handles drag event
-   */
-  drag(e: MouseEvent | TouchEvent) {
-    this.lastX = this.x;
-    this.lastY = this.y;
-
-    if (e instanceof MouseEvent) {
-      this.x = e.clientX;
-      this.y = e.clientY;
-    } else if (e instanceof TouchEvent) {
-      this.x = e.touches[0].clientX;
-      this.y = e.touches[0].clientY;
-    }
-
-    const dx = this.x - this.lastX;
-    const dy = this.y - this.lastY;
-
-    const azimuth = this.camera.azimuth + dx * this.motionFactor;
-    const elevation = this.camera.elevation + -dy * this.motionFactor;
-    this.setRotation(elevation, azimuth);
+  private onWheel(e: WheelEvent) {
+    this.zoom(e);
   }
 
-  /**
-   * Handles look event (kinda like drag but used with tracking camera)
-   */
-  look(e: MouseEvent) {
-    const { width, height } = e.target as HTMLCanvasElement;
-    this.x = e.clientX;
-    this.y = e.clientY;
-    const azimuth = (this.x - width / 2.0) * this.motionFactor;
-    const elevation = -(this.y - height / 2.0) * this.motionFactor;
-    this.setRotation(elevation, azimuth);
-  }
-
-  /**
-   * Handles zoom event
-   */
-  zoom(e: TouchEvent | WheelEvent) {
+  private zoom(e: TouchEvent | WheelEvent) {
     let dolly = this.dolly;
     if (e instanceof WheelEvent) {
       dolly += -e.deltaY * this.motionFactor;
@@ -131,11 +91,7 @@ class Controller {
     this.setDolly(dolly);
   }
 
-  onWheel(e: WheelEvent) {
-    this.zoom(e);
-  }
-
-  onTouchStart(e: TouchEvent) {
+  private onTouchStart(e: TouchEvent) {
     if (e.touches.length === 2) {
       this.isTouchZoom = true;
     } else if (e.touches.length == 1) {
@@ -145,7 +101,7 @@ class Controller {
     }
   }
 
-  onTouchMove(e: TouchEvent) {
+  private onTouchMove(e: TouchEvent) {
     // Zoom
     if (this.isTouchZoom) {
       this.zoom(e);
@@ -154,7 +110,31 @@ class Controller {
     }
   }
 
-  onTouchEnd(e: TouchEvent) {
+  private drag(e: MouseEvent | TouchEvent) {
+    if (this.pickingController?.isDragging()) {
+      return;
+    }
+
+    this.lastX = this.x;
+    this.lastY = this.y;
+
+    if (e instanceof MouseEvent) {
+      this.x = e.clientX;
+      this.y = e.clientY;
+    } else if (e instanceof TouchEvent) {
+      this.x = e.touches[0].clientX;
+      this.y = e.touches[0].clientY;
+    }
+
+    const dx = this.x - this.lastX;
+    const dy = this.y - this.lastY;
+
+    const azimuth = this.camera.azimuth + dx * this.motionFactor;
+    const elevation = this.camera.elevation + -dy * this.motionFactor;
+    this.setRotation(elevation, azimuth);
+  }
+
+  private onTouchEnd(e: TouchEvent) {
     if (e.touches.length !== 2) {
       this.isTouchZoom = false;
     }
@@ -163,53 +143,37 @@ class Controller {
     }
   }
 
-  onMouseDown(e: MouseEvent) {
+  private onMouseDown(e: MouseEvent) {
     this.isDragging = true;
     this.x = e.clientX;
     this.y = e.clientY;
 
-    // TODO: method
-    // Handle picking
-    const { x, y } = this.get2DCoords(e);
-    this.pickingController?.onClick(x, y);
+    this.pickingController?.onClick(e);
   }
 
-  // TODO: review this
-  private get2DCoords(e: MouseEvent) {
-    let top = 0,
-      left = 0,
-      canvas: HTMLCanvasElement | null = this.canvas;
-
-    while (canvas && canvas.tagName !== "BODY") {
-      top += canvas.offsetTop;
-      left += canvas.offsetLeft;
-      // TODO: type well
-      // @ts-ignore
-      canvas = canvas.offsetParent;
-    }
-
-    left += window.pageXOffset;
-    top -= window.pageYOffset;
-
-    return {
-      x: e.clientX - left,
-      y: this.canvas.height - (e.clientY - top),
-    };
-  }
-
-  onMouseUp(_e: MouseEvent) {
+  private onMouseUp(_e: MouseEvent) {
     this.isDragging = false;
   }
 
-  onMouseMove(e: MouseEvent) {
+  private onMouseMove(e: MouseEvent) {
     if (this.isDragging) {
       this.drag(e);
+      this.pickingController?.onDrag(e);
     } else if (this.camera.isTracking() && this.followMouse) {
       this.look(e);
     }
   }
 
-  onKeyDown(e: KeyboardEvent) {
+  private look(e: MouseEvent) {
+    const { width, height } = e.target as HTMLCanvasElement;
+    this.x = e.clientX;
+    this.y = e.clientY;
+    const azimuth = (this.x - width / 2.0) * this.motionFactor;
+    const elevation = -(this.y - height / 2.0) * this.motionFactor;
+    this.setRotation(elevation, azimuth);
+  }
+
+  private onKeyDown(e: KeyboardEvent) {
     let dolly = this.dolly;
     let azimuth = this.camera.azimuth;
     // Emulate first person movement
@@ -237,7 +201,7 @@ class Controller {
     }
   }
 
-  setDolly(dolly: number) {
+  private setDolly(dolly: number) {
     if (dolly != this.dolly) {
       this.dolly = dolly;
       this.camera.dolly(this.dolly);
@@ -245,7 +209,7 @@ class Controller {
     }
   }
 
-  setRotation(x: number, y: number) {
+  private setRotation(x: number, y: number) {
     if (x != this.camera.elevation || y != this.camera.azimuth) {
       this.camera.setElevation(x);
       this.camera.setAzimuth(y);
@@ -253,11 +217,11 @@ class Controller {
     }
   }
 
-  setFollowMouse(x: boolean) {
+  public setFollowMouse(x: boolean) {
     this.followMouse = x;
   }
 
-  setMotionFactor(factor: number) {
+  public setMotionFactor(factor: number) {
     this.motionFactor = factor;
   }
 }

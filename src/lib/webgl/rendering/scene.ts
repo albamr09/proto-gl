@@ -4,7 +4,7 @@ import { uuidv4 } from "../../utils.js";
 import { TextureParameters } from "../core/texture/types.js";
 import { UniformConfig } from "../core/uniform/types.js";
 import Instance from "./instance";
-import { InstanceConfiguration } from "./types.js";
+import { EventTypes, InstanceConfiguration } from "./types.js";
 
 class Scene extends EventTarget {
   private gl: WebGL2RenderingContext;
@@ -233,7 +233,7 @@ class Scene extends EventTarget {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
 
-  getPixelColor(x: number, y: number) {
+  public getPixelColor(x: number, y: number) {
     const readout = new Uint8Array(4);
     this.gl.readPixels(
       x,
@@ -247,7 +247,7 @@ class Scene extends EventTarget {
     return readout;
   }
 
-  traverse(cb: (o: Instance<any, any>) => void) {
+  public traverse(cb: (o: Instance<any, any>) => void) {
     this.renderOrder.forEach((id) => {
       const o = this.objects.get(id);
       if (!o) {
@@ -258,7 +258,7 @@ class Scene extends EventTarget {
     });
   }
 
-  find(cb: (o: Instance<any, any>) => Instance<any, any> | undefined) {
+  public find(cb: (o: Instance<any, any>) => Instance<any, any> | undefined) {
     return this.renderOrder.reduce<Instance<any, any> | undefined>(
       (objectFound, id) => {
         if (objectFound) {
@@ -275,6 +275,13 @@ class Scene extends EventTarget {
       },
       undefined
     );
+  }
+
+  public override addEventListener(
+    type: EventTypes,
+    callback: EventListenerOrEventListenerObject | null
+  ): void {
+    super.addEventListener(type, callback);
   }
 }
 

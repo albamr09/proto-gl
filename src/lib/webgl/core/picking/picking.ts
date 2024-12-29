@@ -1,31 +1,46 @@
 import { denormalizeColor } from "../../../colors.js";
-import Instance from "../instance";
-import Scene from "../scene";
+import Instance from "../../rendering/instance.js";
+import Scene from "../../rendering/scene.js";
 
 // TODO: create events for object clicked, object dragged
-class PickingController {
+class PickingController extends EventTarget {
+  private canvas: HTMLCanvasElement;
   private gl: WebGL2RenderingContext;
   private scene: Scene;
   private renderBuffer?: WebGLRenderbuffer | null;
   private texture?: WebGLTexture | null;
   private frameBuffer?: WebGLFramebuffer | null;
   private getHitValue: (o: Instance<any, any>) => number[];
+  // State
+  private x: number;
+  private y: number;
+  private lastX: number;
+  private lastY: number;
+  private selectedObject?: Instance<any, any>;
+  private canDrag: boolean;
 
   constructor(
     scene: Scene,
     canvas: HTMLCanvasElement,
     getHitValue: (o: Instance<any, any>) => number[]
   ) {
+    super();
+    this.canvas = canvas;
     this.gl = scene.getContext();
     this.scene = scene;
+    this.x = 0;
+    this.y = 0;
+    this.lastX = 0;
+    this.lastY = 0;
+    this.canDrag = false;
     this.getHitValue = getHitValue;
     this.createRenderBuffer(canvas);
     this.createTexture(canvas);
     this.createFrameBuffer();
 
-    this.scene.addEventListener("render", () => {
-      this.render();
-    });
+    this.scene.addEventListener("render", () => this.render());
+    window.addEventListener("keydown", this.onKeyPressed.bind(this));
+    window.addEventListener("keyup", this.onKeyPressed.bind(this));
   }
 
   private createRenderBuffer(canvas: HTMLCanvasElement) {
@@ -102,17 +117,50 @@ class PickingController {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
   }
 
-  onClick(x: number, y: number) {
+  private onKeyPressed(e: KeyboardEvent) {
+    this.canDrag = e.ctrlKey;
+  }
+
+  public onClick(e: MouseEvent) {
     if (!this.frameBuffer) {
       console.warn("Could not pick object, framebuffer not initialized");
       return;
     }
+    const { x, y } = this.get2DCoords(e);
+    this.lastX = x;
+    this.lastY = y;
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
     const pixelColor = this.scene.getPixelColor(x, y);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-    const clickedObject = this.getClickedObject(
+    this.selectedObject = this.getClickedObject(
       Array.prototype.map.call(pixelColor, (x) => x) as number[]
     );
+    if (this.selectedObject && !this.canDrag) {
+      this.selectedObject.triggerOnClick();
+    }
+  }
+
+  // TODO: review this
+  private get2DCoords(e: MouseEvent) {
+    let top = 0,
+      left = 0,
+      canvas: HTMLCanvasElement | null = this.canvas;
+
+    while (canvas && canvas.tagName !== "BODY") {
+      top += canvas.offsetTop;
+      left += canvas.offsetLeft;
+      // TODO: type well
+      // @ts-ignore
+      canvas = canvas.offsetParent;
+    }
+
+    left += window.pageXOffset;
+    top -= window.pageYOffset;
+
+    return {
+      x: e.clientX - left,
+      y: this.canvas.height - (e.clientY - top),
+    };
   }
 
   private getClickedObject(pixelColor: number[]) {
@@ -129,6 +177,25 @@ class PickingController {
     return objectColor.every((_, i) => {
       return objectColor[i] - pixelColor[i] <= 1;
     });
+  }
+
+  public onDrag(e: MouseEvent) {
+    if (!this.canDrag) {
+      return;
+    }
+
+    const { x, y } = this.get2DCoords(e);
+    this.x = x;
+    this.y = y;
+
+    const dx = this.x - this.lastX;
+    const dy = this.y - this.lastY;
+
+    this.selectedObject?.triggerOnDrag(dx, dy);
+  }
+
+  public isDragging() {
+    return this.canDrag;
   }
 }
 

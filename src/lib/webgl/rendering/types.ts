@@ -23,3 +23,5 @@ export interface InstanceConfiguration {
   visible?: boolean;
   renderingMode?: GLenum;
 }
+
+export type EventTypes = "render";

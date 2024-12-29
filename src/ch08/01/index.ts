@@ -15,7 +15,7 @@ import Program from "../../lib/webgl/core/program.js";
 import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
 import Instance from "../../lib/webgl/rendering/instance.js";
-import PickingController from "../../lib/webgl/rendering/picking/picking.js";
+import PickingController from "../../lib/webgl/core/picking/picking.js";
 import Scene from "../../lib/webgl/rendering/scene.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
@@ -119,6 +119,19 @@ const loadObject = (
           type: UniformKind.MATRIX,
         },
         ...ligthUniforms,
+      },
+      onClick: (o) => {
+        console.log("i have been clicked", o);
+      },
+      onDrag: ({ instance, dx, dy }) => {
+        const newTranslation = properties.translate.sum(
+          new Vector([dx, dy, 0])
+        );
+        const newTransform = Matrix4.identity()
+          .translate(newTranslation)
+          .scale(properties.scale)
+          .toFloatArray();
+        instance.updateUniform("uTransform", newTransform);
       },
     });
     scene.add(instance);
