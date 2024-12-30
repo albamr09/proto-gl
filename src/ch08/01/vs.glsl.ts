@@ -10,6 +10,7 @@ uniform vec4 uMaterialDiffuse;
 uniform vec4 uLightDiffuse;
 uniform vec4 uLightAmbient;
 uniform vec3 uLightPosition;
+uniform float uAlpha;
 
 uniform bool uOffScreen;
 
@@ -31,7 +32,7 @@ void main(void) {
     float lambertTerm = dot(N, -L);
     vec4 Id = uLightDiffuse * uMaterialDiffuse * clamp(lambertTerm, 0.0, 1.0);
 
-    vColor = vec4(vec3(Ia + Id), 1.0);
+    vColor = vec4(vec3(Ia + Id), uAlpha);
   }
 }
 `;

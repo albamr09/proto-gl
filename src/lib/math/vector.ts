@@ -1,3 +1,6 @@
+import { Angle } from "./angle.js";
+import { Matrix3 } from "./matrix.js";
+
 export class Vector {
   public elements: number[];
 
@@ -147,5 +150,92 @@ export class Vector {
     }
     // Obtain angles by the inverse of the tangent
     return Math.atan(tan);
+  }
+
+  /**
+   * Rotates a vector by the given vector angle, where the vector angle
+   * stores information about the angle of rotation for each axis (x, y, z)
+   * The angle is measured in degrees
+   **/
+  rotateVecDeg(angle: Vector) {
+    let result = this as Vector;
+    result = this.rotateDeg(angle.at(0), new Vector([1, 0, 0]));
+    result = result.rotateDeg(angle.at(1), new Vector([0, 1, 0]));
+    result = result.rotateDeg(angle.at(2), new Vector([0, 0, 1]));
+    return result;
+  }
+
+  /**
+   * Rotates a vector by the given vector angle, where the vector angle
+   * stores information about the angle of rotation for each axis (x, y, z)
+   * The angle is measured in radians
+   **/
+  rotateVec(angle: Vector) {
+    let result = this as Vector;
+    result = this.rotate(angle.at(0), new Vector([1, 0, 0]));
+    result = result.rotate(angle.at(1), new Vector([0, 1, 0]));
+    result = result.rotate(angle.at(2), new Vector([0, 0, 1]));
+    return result;
+  }
+
+  /**
+   * Rotates a vector on the given axis by the given angle (in degreee)
+   * For more information see rotate funcion.
+   **/
+  rotateDeg(angle: number, axis: Vector) {
+    const radAngle = Angle.toRadians(angle);
+    return this.rotate(radAngle, axis);
+  }
+
+  /** Rotates a vector on 3d space on the given axes by the given angle (in radians).
+   *
+   * Note: by inversing the sign of the sine on the rotation matrices you change
+   * the direction of the translation (clockwise or counter-clockwise)
+   */
+  rotate(angle: number, axis: Vector) {
+    if (this.dimension() !== 3) {
+      throw new Error("Rotation for non 3 dimensional vectors no implemented");
+    }
+
+    let [x, y, z] = [axis.at(0), axis.at(1), axis.at(2)];
+
+    const s = Math.sin(angle);
+    const c = Math.cos(angle);
+
+    // Rotation on axis X
+    const rotationMatrixX = new Matrix3([
+      [1, 0, 0],
+      [0, c, -s],
+      [0, s, c],
+    ]);
+
+    // Rotation on axis Y
+    const rotationMatrixY = new Matrix3([
+      [c, 0, -s],
+      [0, 1, 0],
+      [s, 0, c],
+    ]);
+
+    // Rotation on axis Z
+    const rotationMatrixZ = new Matrix3([
+      [c, s, 0],
+      [-s, c, 0],
+      [0, 0, 1],
+    ]);
+
+    let result = Matrix3.identity();
+
+    // Combine rotations based on axis
+    if (x == 1) {
+      result = rotationMatrixX.multiply(result);
+    }
+    if (y == 1) {
+      result = rotationMatrixY.multiply(result);
+    }
+    if (z == 1) {
+      result = rotationMatrixZ.multiply(result);
+    }
+
+    return result.multiply(this);
   }
 }

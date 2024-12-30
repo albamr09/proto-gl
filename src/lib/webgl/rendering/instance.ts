@@ -37,7 +37,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private size!: number;
   private configuration!: InstanceConfiguration;
   private textures?: Map<Number, Texture>;
-  public onClick?: (o: typeof this) => void;
+  public onClick?: (o: Instance<A, U>) => void;
   public onDrag?: ({
     instance,
     dx,
@@ -47,6 +47,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     dx: number;
     dy: number;
   }) => void;
+  public onDragFinish?: (o: Instance<A, U>) => void;
 
   /**
    * Creates an object with its own program
@@ -65,6 +66,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     textures,
     onClick,
     onDrag,
+    onDragFinish,
   }: {
     gl: WebGL2RenderingContext;
     program?: Program<A, U>;
@@ -91,6 +93,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
       dx: number;
       dy: number;
     }) => void;
+    onDragFinish?: (o: Instance<A, U>) => void;
   }) {
     this.id = id ?? uuidv4();
     this.gl = gl;
@@ -126,6 +129,7 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
 
     this.onClick = onClick;
     this.onDrag = onDrag;
+    this.onDragFinish = onDragFinish;
   }
 
   public setId(id: string) {
@@ -367,12 +371,15 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
   }
 
-  // TODO: only send some of the objects data not everything
   public triggerOnClick() {
     this.onClick && this.onClick(this);
   }
   public triggerOnDrag(dx: number, dy: number) {
     this.onDrag && this.onDrag({ instance: this, dx, dy });
+  }
+
+  public triggerOnDragFinish() {
+    this.onDragFinish && this.onDragFinish(this);
   }
 }
 

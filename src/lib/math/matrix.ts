@@ -43,7 +43,7 @@ export class Matrix {
     } else if (this instanceof Matrix3) {
       return new Matrix3(this.matrix.map((r) => [...r.elements]));
     } else if (this instanceof Matrix2) {
-      return new Matrix3(this.matrix.map((r) => [...r.elements]));
+      return new Matrix2(this.matrix.map((r) => [...r.elements]));
     }
     return new Matrix(this.matrix.map((r) => [...r.elements]));
   }
@@ -461,7 +461,7 @@ export class Matrix3 extends Matrix {
   }
 
   static identity() {
-    return Matrix.identity(2) as Matrix2;
+    return Matrix.identity(3) as Matrix3;
   }
 
   dimension() {

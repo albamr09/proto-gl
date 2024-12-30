@@ -2,7 +2,6 @@ import { denormalizeColor } from "../../../colors.js";
 import Instance from "../../rendering/instance.js";
 import Scene from "../../rendering/scene.js";
 
-// TODO: create events for object clicked, object dragged
 class PickingController extends EventTarget {
   private canvas: HTMLCanvasElement;
   private gl: WebGL2RenderingContext;
@@ -164,7 +163,7 @@ class PickingController extends EventTarget {
   }
 
   private getClickedObject(pixelColor: number[]) {
-    return this.scene.find((object) => {
+    return this.scene.findLast((object) => {
       const objectColor = this.getHitValue(object);
       const denormalizedColor = denormalizeColor(objectColor);
       if (this.compare(denormalizedColor, pixelColor)) {
@@ -175,7 +174,7 @@ class PickingController extends EventTarget {
 
   private compare(objectColor: number[], pixelColor: number[]) {
     return objectColor.every((_, i) => {
-      return objectColor[i] - pixelColor[i] <= 1;
+      return Math.abs(objectColor[i] - pixelColor[i]) <= 1;
     });
   }
 
@@ -192,6 +191,10 @@ class PickingController extends EventTarget {
     const dy = this.y - this.lastY;
 
     this.selectedObject?.triggerOnDrag(dx, dy);
+  }
+
+  public onDragFinish() {
+    this.selectedObject?.triggerOnDragFinish();
   }
 
   public isDragging() {

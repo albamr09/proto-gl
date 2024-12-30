@@ -4,7 +4,6 @@ import Camera from "./camera.js";
 
 class Controller {
   private camera: Camera;
-  private canvas: HTMLCanvasElement;
   private pickingController?: PickingController;
   // Config
   private motionFactor: number;
@@ -36,7 +35,6 @@ class Controller {
     onAngleChange?: (angle: Vector) => void;
   }) {
     this.camera = camera;
-    this.canvas = canvas;
     this.pickingController = pickingController;
     this.dolly = 0;
     this.isDragging = false;
@@ -153,6 +151,7 @@ class Controller {
 
   private onMouseUp(_e: MouseEvent) {
     this.isDragging = false;
+    this.pickingController?.onDragFinish();
   }
 
   private onMouseMove(e: MouseEvent) {

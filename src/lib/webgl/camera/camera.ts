@@ -260,7 +260,7 @@ class Camera {
       // i know sorry this does not make much sense)
       this.modelViewMatrix = this.modelViewMatrix.translate(negatedPosition);
       this.modelViewMatrix = this.modelViewMatrix.rotateVecDeg(
-        new Vector([this.elevation, this.azimuth, 0])
+        this.getRotation()
       );
     }
 
@@ -293,6 +293,10 @@ class Camera {
       );
     }
     this.scene?.updateProjectionMatrix(this.projectionMatrix);
+  }
+
+  getRotation() {
+    return new Vector([this.elevation, this.azimuth, 0]);
   }
 }
 

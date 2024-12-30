@@ -258,20 +258,18 @@ class Scene extends EventTarget {
     });
   }
 
-  public find(cb: (o: Instance<any, any>) => Instance<any, any> | undefined) {
+  public findLast(
+    cb: (o: Instance<any, any>) => Instance<any, any> | undefined
+  ) {
     return this.renderOrder.reduce<Instance<any, any> | undefined>(
       (objectFound, id) => {
-        if (objectFound) {
-          return objectFound;
-        }
-
         const o = this.objects.get(id);
         if (!o) {
           console.warn(`Object ${id} was not found on traverse`);
           return undefined;
         }
-
-        return cb(o) ? o : undefined;
+        objectFound = cb(o) ? o : objectFound;
+        return objectFound;
       },
       undefined
     );

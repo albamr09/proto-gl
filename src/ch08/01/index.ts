@@ -20,6 +20,8 @@ import Scene from "../../lib/webgl/rendering/scene.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
+const MOTION_FACTOR = 0.03;
+
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
   "uMaterialDiffuse",
@@ -28,17 +30,19 @@ const uniforms = [
   "uLightAmbient",
   "uLightDiffuse",
   "uOffScreen",
+  "uAlpha",
 ] as const;
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
+let camera: Camera;
 let pickingController: PickingController;
 let program: Program<typeof attributes, typeof uniforms>;
 
 const initProgram = () => {
   scene = new Scene(gl);
-  const camera = new Camera(
+  camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
     gl,
@@ -62,6 +66,13 @@ const initProgram = () => {
     attributes,
     uniforms
   );
+
+  // Alpha blending configuration
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  // Config culling
+  gl.enable(gl.CULL_FACE);
 };
 
 const loadObject = (
@@ -85,6 +96,7 @@ const loadObject = (
   };
   loadData(path).then((data) => {
     const { vertices, indices, diffuse } = data;
+    let lastTranslation: Vector;
     const instance = new Instance<typeof attributes, typeof uniforms>({
       id,
       gl,
@@ -118,24 +130,60 @@ const loadObject = (
             .toFloatArray(),
           type: UniformKind.MATRIX,
         },
+        uAlpha: {
+          data: 1,
+          type: UniformKind.SCALAR_FLOAT,
+        },
         ...ligthUniforms,
       },
       onClick: (o) => {
         console.log("i have been clicked", o);
       },
       onDrag: ({ instance, dx, dy }) => {
-        const newTranslation = properties.translate.sum(
-          new Vector([dx, dy, 0])
+        lastTranslation = properties.translate.sum(
+          computeObjectDragTranslation(dx, dy)
         );
         const newTransform = Matrix4.identity()
-          .translate(newTranslation)
+          .translate(lastTranslation)
           .scale(properties.scale)
           .toFloatArray();
         instance.updateUniform("uTransform", newTransform);
+        instance.updateUniform("uAlpha", 0.5);
+      },
+      onDragFinish: () => {
+        instance.updateUniform("uAlpha", 1);
+        properties.translate = lastTranslation;
+        lastTranslation = new Vector([0, 0, 0]);
       },
     });
     scene.add(instance);
   });
+};
+
+const computeObjectDragTranslation = (dx: number, dy: number) => {
+  const cameraRotation = camera.getRotation();
+  const upVector = new Vector([0, dy, 0]);
+  const rightVector = new Vector([dx, 0, 0]);
+  const { rotatedUpVector, rotatedRightVector } = rotateUpRightVectors(
+    upVector,
+    rightVector,
+    cameraRotation
+  );
+  const newTranslationValues = rotatedUpVector.elements.map((_, i) => {
+    return (rotatedUpVector.at(i) + rotatedRightVector.at(i)) * MOTION_FACTOR;
+  });
+  return new Vector(newTranslationValues);
+};
+
+const rotateUpRightVectors = (
+  upVector: Vector,
+  rightVector: Vector,
+  rotationVector: Vector
+) => {
+  const rotatedUpVector = upVector.rotateVecDeg(rotationVector);
+  const rotatedRightVector = rightVector.rotateVecDeg(rotationVector);
+
+  return { rotatedUpVector, rotatedRightVector };
 };
 
 const initData = () => {
