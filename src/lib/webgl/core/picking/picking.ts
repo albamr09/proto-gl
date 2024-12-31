@@ -111,9 +111,14 @@ class PickingController extends EventTarget {
       return;
     }
 
+    const blendingEnabled = this.gl.getParameter(this.gl.BLEND);
+    this.gl.disable(this.gl.BLEND);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
     this.scene.render(() => {}, true, true);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+    if (blendingEnabled) {
+      this.gl.enable(this.gl.BLEND);
+    }
   }
 
   private onKeyPressed(e: KeyboardEvent) {

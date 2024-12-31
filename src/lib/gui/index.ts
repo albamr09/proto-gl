@@ -412,7 +412,7 @@ export const createSliderInputForm = ({
 
   // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
   document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
-  return { sliderInput, textInput };
+  return { labelElement, sliderInput, textInput };
 };
 
 /**

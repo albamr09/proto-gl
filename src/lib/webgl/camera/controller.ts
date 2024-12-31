@@ -151,7 +151,9 @@ class Controller {
 
   private onMouseUp(_e: MouseEvent) {
     this.isDragging = false;
-    this.pickingController?.onDragFinish();
+    if (this.pickingController?.isDragging()) {
+      this.pickingController?.onDragFinish();
+    }
   }
 
   private onMouseMove(e: MouseEvent) {

@@ -1,5 +1,10 @@
 import { loadData } from "../../lib/files.js";
-import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
+import {
+  createDescriptionPanel,
+  createVector3dSliders,
+  initController,
+  initGUI,
+} from "../../lib/gui/index.js";
 import { calculateNormals } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
 import { Vector } from "../../lib/math/vector.js";
@@ -33,12 +38,22 @@ const uniforms = [
   "uAlpha",
 ] as const;
 
+type ObjectProperties = { translate: Vector; scale: Vector; color?: number[] };
+
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
 let pickingController: PickingController;
 let program: Program<typeof attributes, typeof uniforms>;
+let titleElement: HTMLDivElement;
+let sliders: {
+  labelElement: HTMLLabelElement;
+  textInput: HTMLInputElement;
+  sliderInput: HTMLInputElement;
+}[];
+let selectedInstance: Instance<typeof attributes, typeof uniforms>;
+let objectProperties: { [x: string]: ObjectProperties } = {};
 
 const initProgram = () => {
   scene = new Scene(gl);
@@ -75,11 +90,7 @@ const initProgram = () => {
   gl.enable(gl.CULL_FACE);
 };
 
-const loadObject = (
-  path: string,
-  id: string,
-  properties: { translate: Vector; scale: Vector; color?: number[] }
-) => {
+const loadObject = (path: string, id: string, properties: ObjectProperties) => {
   const ligthUniforms = {
     uLightAmbient: {
       data: [0, 0, 0, 1],
@@ -94,6 +105,7 @@ const loadObject = (
       type: UniformKind.VECTOR_FLOAT,
     },
   };
+  objectProperties[id] = { ...properties };
   loadData(path).then((data) => {
     const { vertices, indices, diffuse } = data;
     let lastTranslation: Vector;
@@ -137,27 +149,53 @@ const loadObject = (
         ...ligthUniforms,
       },
       onClick: (o) => {
-        console.log("i have been clicked", o);
+        selectedInstance = o;
+        titleElement.textContent = `Selected element ${o.getId() ?? "None"}`;
+        const instanceProperties = getInstanceProperties(instance);
+        updateControls(instanceProperties);
       },
       onDrag: ({ instance, dx, dy }) => {
-        lastTranslation = properties.translate.sum(
+        const instanceProperties = getInstanceProperties(instance);
+        lastTranslation = instanceProperties.translate.sum(
           computeObjectDragTranslation(dx, dy)
         );
         const newTransform = Matrix4.identity()
           .translate(lastTranslation)
-          .scale(properties.scale)
+          .scale(instanceProperties.scale)
           .toFloatArray();
         instance.updateUniform("uTransform", newTransform);
-        instance.updateUniform("uAlpha", 0.5);
+        instance.updateUniform("uAlpha", 0.8);
       },
-      onDragFinish: () => {
+      onDragFinish: (instance) => {
         instance.updateUniform("uAlpha", 1);
-        properties.translate = lastTranslation;
+        updateInstanceProperties(instance, "translate", lastTranslation);
         lastTranslation = new Vector([0, 0, 0]);
       },
     });
     scene.add(instance);
   });
+};
+
+const getInstanceProperties = (
+  o: Instance<typeof attributes, typeof uniforms>
+) => {
+  const id = o.getId();
+  if (!id) {
+    throw new Error("Cannot access properties of an object without id");
+  }
+  return { ...objectProperties[id] };
+};
+
+const updateInstanceProperties = (
+  o: Instance<typeof attributes, typeof uniforms>,
+  property: keyof ObjectProperties,
+  value: any
+) => {
+  const id = o.getId();
+  if (!id) {
+    return;
+  }
+  objectProperties[id][property] = value;
 };
 
 const computeObjectDragTranslation = (dx: number, dy: number) => {
@@ -223,10 +261,59 @@ const render = () => {
   requestAnimationFrame(render);
 };
 
+const updateControls = (properties: ObjectProperties) => {
+  sliders.forEach((_, i) => {
+    sliders[i].labelElement.style.visibility = "visible";
+    sliders[i].sliderInput.style.visibility = "visible";
+    sliders[i].textInput.style.visibility = "visible";
+    sliders[i].sliderInput.value = `${properties.scale.at(i)}`;
+    sliders[i].textInput.value = `${properties.scale.at(i)}`;
+  });
+};
+
+const createControls = () => {
+  initController();
+  const controlContainer = document.getElementById("control-container");
+
+  titleElement = document.createElement("div");
+  titleElement.textContent = "No object is selected";
+  titleElement.style.fontSize = "16px";
+  titleElement.style.fontWeight = "bold";
+  titleElement.style.marginBottom = "10px";
+  controlContainer?.appendChild(titleElement);
+
+  sliders = createVector3dSliders({
+    labels: ["Scale on X", "Scale on Y", "Scale on Z"],
+    value: [1, 1, 1],
+    min: 0,
+    max: 5,
+    step: 0.1,
+    onChange: (scaleVector) => {
+      const selectedInstanceProperties =
+        getInstanceProperties(selectedInstance);
+      updateInstanceProperties(
+        selectedInstance,
+        "scale",
+        new Vector(scaleVector)
+      );
+      const newTransform = Matrix4.identity()
+        .translate(selectedInstanceProperties.translate)
+        .scale(new Vector(scaleVector))
+        .toFloatArray();
+      selectedInstance.updateUniform("uTransform", newTransform);
+    },
+  });
+  sliders.forEach((slider) => {
+    slider.labelElement.style.visibility = "hidden";
+    slider.sliderInput.style.visibility = "hidden";
+    slider.textInput.style.visibility = "hidden";
+  });
+};
+
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "This is an example on how to implement picking based on the color of each object using an offscreen framebuffer."
+    "This is an example on how to implement picking based on the color of each object using an offscreen framebuffer. On this example you can click objects as well as drag them around the scene when the Ctrl key is pressed."
   );
 
   gl = getGLContext();
@@ -236,7 +323,7 @@ const init = () => {
   initProgram();
   initData();
   render();
-  // Controls
+  createControls();
 };
 
 window.onload = init;
