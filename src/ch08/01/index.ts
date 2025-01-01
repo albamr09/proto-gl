@@ -151,6 +151,10 @@ const loadObject = (path: string, id: string, properties: ObjectProperties) => {
         const instanceProperties = getInstanceProperties(instance);
         updateControls(instanceProperties);
       },
+      transformationProperties: {
+        scaleVector: properties.scale,
+        translationVector: properties.translate,
+      },
     });
     scene.add(instance);
   });

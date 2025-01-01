@@ -49,3 +49,9 @@ export type InstanceDragEndPayload<
 export type SceneEventTypes = "render";
 
 export type InstanceEventTypes = "click" | "drag" | "dragend";
+
+export type InstanceTransformationProperties = {
+  scaleVector?: Vector;
+  translationVector?: Vector;
+  rotationVector?: Vector;
+};

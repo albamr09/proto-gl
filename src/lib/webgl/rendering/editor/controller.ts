@@ -1,7 +1,11 @@
 import { Matrix4 } from "../../../math/matrix.js";
 import { Vector } from "../../../math/vector.js";
 import Instance from "../instance.js";
-import { InstanceDragEndPayload, InstanceDragPayload } from "../types.js";
+import {
+  InstanceDragEndPayload,
+  InstanceDragPayload,
+  InstanceTransformationProperties,
+} from "../types.js";
 
 const MOTION_FACTOR = 0.03;
 
@@ -20,11 +24,16 @@ class EditorController {
     this.lastInstanceProperties = new Map();
   }
 
-  public initializeInstanceProperties(id: string) {
+  public initializeInstanceProperties(
+    id: string,
+    transformationProperties?: InstanceTransformationProperties
+  ) {
+    const { scaleVector, translationVector, rotationVector } =
+      transformationProperties ?? {};
     const initialProperties = {
-      scaleVector: new Vector([1, 1, 1]),
-      translationVector: new Vector([0, 0, 0]),
-      rotationVector: new Vector([0, 0, 0]),
+      scaleVector: scaleVector ?? new Vector([1, 1, 1]),
+      translationVector: translationVector ?? new Vector([0, 0, 0]),
+      rotationVector: rotationVector ?? new Vector([0, 0, 0]),
     };
     this.instancesProperties.set(id, initialProperties);
     this.lastInstanceProperties.set(id, initialProperties);

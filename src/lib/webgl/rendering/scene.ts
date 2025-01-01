@@ -53,7 +53,10 @@ class Scene extends EventTarget {
     this.objects.set(id, instance);
     this.renderOrder.push(id);
     this.addInstanceListeners(instance);
-    this.editorController?.initializeInstanceProperties(id);
+    this.editorController?.initializeInstanceProperties(
+      id,
+      instance.getTransformationProperties()
+    );
   }
 
   private addInstanceListeners = <

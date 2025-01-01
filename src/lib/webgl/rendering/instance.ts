@@ -21,6 +21,7 @@ import {
   InstanceDragEndPayload,
   InstanceDragPayload,
   InstanceEventTypes,
+  InstanceTransformationProperties,
   UniformDefinition,
 } from "./types.js";
 
@@ -45,6 +46,7 @@ class Instance<
   private size!: number;
   private configuration!: InstanceConfiguration;
   private textures?: Map<Number, Texture>;
+  private transformationProperties?: InstanceTransformationProperties;
   public onClick?: (o: InstanceClickPayload<A, U>) => void;
   public onDrag?: ({ instance, dx, dy }: InstanceDragPayload<A, U>) => void;
   public onDragFinish?: (o: InstanceDragEndPayload<A, U>) => void;
@@ -64,6 +66,7 @@ class Instance<
     size,
     configuration,
     textures,
+    transformationProperties,
     onClick,
     onDrag,
     onDragFinish,
@@ -83,6 +86,7 @@ class Instance<
     size?: number;
     configuration?: InstanceConfiguration;
     textures?: TextureDefinition[];
+    transformationProperties?: InstanceTransformationProperties;
     onClick?: (o: InstanceClickPayload<A, U>) => void;
     onDrag?: ({ instance, dx, dy }: InstanceDragPayload<A, U>) => void;
     onDragFinish?: (o: InstanceDragEndPayload<A, U>) => void;
@@ -120,6 +124,7 @@ class Instance<
       textures.forEach((texture) => this.loadTexture(texture));
     }
 
+    this.transformationProperties = transformationProperties;
     this.onClick = onClick;
     this.onDrag = onDrag;
     this.onDragFinish = onDragFinish;
@@ -393,6 +398,10 @@ class Instance<
     callback: EventListenerOrEventListenerObject | null
   ): void {
     super.removeEventListener(type, callback);
+  }
+
+  public getTransformationProperties() {
+    return this.transformationProperties;
   }
 }
 
