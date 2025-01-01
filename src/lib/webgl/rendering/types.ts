@@ -1,8 +1,10 @@
+import { Vector } from "../../math/vector.js";
 import {
   UniformConfig,
   UniformDataMapping,
   UniformKind,
 } from "../core/uniform/types.js";
+import Instance from "./instance.js";
 
 export type UniformDefinition<K extends UniformKind = UniformKind> =
   UniformConfig & {
@@ -24,4 +26,26 @@ export interface InstanceConfiguration {
   renderingMode?: GLenum;
 }
 
-export type EventTypes = "render";
+export type InstanceDragPayload<
+  A extends readonly string[],
+  U extends readonly string[]
+> = {
+  instance: Instance<A, U>;
+  dx: number;
+  dy: number;
+  cameraRotationVector: Vector;
+};
+
+export type InstanceClickPayload<
+  A extends readonly string[],
+  U extends readonly string[]
+> = Instance<A, U>;
+
+export type InstanceDragEndPayload<
+  A extends readonly string[],
+  U extends readonly string[]
+> = Instance<A, U>;
+
+export type SceneEventTypes = "render";
+
+export type InstanceEventTypes = "click" | "drag" | "dragend";

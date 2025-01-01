@@ -1,3 +1,4 @@
+import { Vector } from "../../math/vector.js";
 import { uuidv4 } from "../../utils.js";
 import Program from "../core/program.js";
 import TextureFactory from "../core/texture/factory.js";
@@ -15,7 +16,11 @@ import {
 } from "../core/uniform/types.js";
 import {
   AttributeConfig,
+  InstanceClickPayload,
   InstanceConfiguration,
+  InstanceDragEndPayload,
+  InstanceDragPayload,
+  InstanceEventTypes,
   UniformDefinition,
 } from "./types.js";
 
@@ -27,7 +32,10 @@ const defaultConfiguration: InstanceConfiguration = {
   renderingMode: 0,
 };
 
-class Instance<A extends readonly string[], U extends readonly string[] = []> {
+class Instance<
+  A extends readonly string[],
+  U extends readonly string[] = []
+> extends EventTarget {
   private id?: string;
   private gl: WebGL2RenderingContext;
   private program: Program<A, U>;
@@ -37,17 +45,9 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   private size!: number;
   private configuration!: InstanceConfiguration;
   private textures?: Map<Number, Texture>;
-  public onClick?: (o: Instance<A, U>) => void;
-  public onDrag?: ({
-    instance,
-    dx,
-    dy,
-  }: {
-    instance: Instance<A, U>;
-    dx: number;
-    dy: number;
-  }) => void;
-  public onDragFinish?: (o: Instance<A, U>) => void;
+  public onClick?: (o: InstanceClickPayload<A, U>) => void;
+  public onDrag?: ({ instance, dx, dy }: InstanceDragPayload<A, U>) => void;
+  public onDragFinish?: (o: InstanceDragEndPayload<A, U>) => void;
 
   /**
    * Creates an object with its own program
@@ -83,18 +83,11 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
     size?: number;
     configuration?: InstanceConfiguration;
     textures?: TextureDefinition[];
-    onClick?: (o: Instance<A, U>) => void;
-    onDrag?: ({
-      instance,
-      dx,
-      dy,
-    }: {
-      instance: Instance<A, U>;
-      dx: number;
-      dy: number;
-    }) => void;
-    onDragFinish?: (o: Instance<A, U>) => void;
+    onClick?: (o: InstanceClickPayload<A, U>) => void;
+    onDrag?: ({ instance, dx, dy }: InstanceDragPayload<A, U>) => void;
+    onDragFinish?: (o: InstanceDragEndPayload<A, U>) => void;
   }) {
+    super();
     this.id = id ?? uuidv4();
     this.gl = gl;
 
@@ -372,14 +365,34 @@ class Instance<A extends readonly string[], U extends readonly string[] = []> {
   }
 
   public triggerOnClick() {
-    this.onClick && this.onClick(this);
+    const payload = this;
+    this.onClick && this.onClick(payload);
+    this.dispatchEvent(new CustomEvent("click", { detail: payload }));
   }
-  public triggerOnDrag(dx: number, dy: number) {
-    this.onDrag && this.onDrag({ instance: this, dx, dy });
+  public triggerOnDrag(dx: number, dy: number, cameraRotationVector: Vector) {
+    const payload = { instance: this, dx, dy, cameraRotationVector };
+    this.onDrag && this.onDrag(payload);
+    this.dispatchEvent(new CustomEvent("drag", { detail: payload }));
   }
 
   public triggerOnDragFinish() {
-    this.onDragFinish && this.onDragFinish(this);
+    const payload = this;
+    this.onDragFinish && this.onDragFinish(payload);
+    this.dispatchEvent(new CustomEvent("dragend", { detail: payload }));
+  }
+
+  public override addEventListener(
+    type: InstanceEventTypes,
+    callback: EventListenerOrEventListenerObject | null
+  ): void {
+    super.addEventListener(type, callback);
+  }
+
+  public override removeEventListener(
+    type: InstanceEventTypes,
+    callback: EventListenerOrEventListenerObject | null
+  ): void {
+    super.removeEventListener(type, callback);
   }
 }
 

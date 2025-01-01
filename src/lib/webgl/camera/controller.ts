@@ -159,7 +159,7 @@ class Controller {
   private onMouseMove(e: MouseEvent) {
     if (this.isDragging) {
       this.drag(e);
-      this.pickingController?.onDrag(e);
+      this.pickingController?.onDrag(e, this.camera.getRotation());
     } else if (this.camera.isTracking() && this.followMouse) {
       this.look(e);
     }

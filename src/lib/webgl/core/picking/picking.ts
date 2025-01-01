@@ -1,4 +1,5 @@
 import { denormalizeColor } from "../../../colors.js";
+import { Vector } from "../../../math/vector.js";
 import Instance from "../../rendering/instance.js";
 import Scene from "../../rendering/scene.js";
 
@@ -183,7 +184,7 @@ class PickingController extends EventTarget {
     });
   }
 
-  public onDrag(e: MouseEvent) {
+  public onDrag(e: MouseEvent, cameraRotationVector: Vector) {
     if (!this.canDrag) {
       return;
     }
@@ -195,7 +196,7 @@ class PickingController extends EventTarget {
     const dx = this.x - this.lastX;
     const dy = this.y - this.lastY;
 
-    this.selectedObject?.triggerOnDrag(dx, dy);
+    this.selectedObject?.triggerOnDrag(dx, dy, cameraRotationVector);
   }
 
   public onDragFinish() {

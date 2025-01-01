@@ -3,8 +3,15 @@ import { Matrix4 } from "../../math/matrix.js";
 import { uuidv4 } from "../../utils.js";
 import { TextureParameters } from "../core/texture/types.js";
 import { UniformConfig } from "../core/uniform/types.js";
+import EditorController from "./editor/controller.js";
 import Instance from "./instance";
-import { EventTypes, InstanceConfiguration } from "./types.js";
+import {
+  SceneEventTypes,
+  InstanceConfiguration,
+  InstanceClickPayload,
+  InstanceDragPayload,
+  InstanceDragEndPayload,
+} from "./types.js";
 
 class Scene extends EventTarget {
   private gl: WebGL2RenderingContext;
@@ -13,8 +20,9 @@ class Scene extends EventTarget {
   private modelViewMatrix: Matrix4;
   private normalMatrix: Matrix4;
   private projectionMatrix: Matrix4;
+  private editorController?: EditorController;
 
-  constructor(gl: WebGL2RenderingContext) {
+  constructor(gl: WebGL2RenderingContext, allowEdit?: boolean) {
     super();
     this.gl = gl;
     this.modelViewMatrix = Matrix4.identity();
@@ -22,6 +30,9 @@ class Scene extends EventTarget {
     this.projectionMatrix = Matrix4.identity();
     this.objects = new Map();
     this.renderOrder = [];
+    if (allowEdit) {
+      this.editorController = new EditorController();
+    }
     this.setUp();
   }
 
@@ -34,19 +45,53 @@ class Scene extends EventTarget {
   }
 
   // Objects
-  add<A extends readonly string[], U extends readonly string[]>(
-    o: Instance<A, U>
+  public add<A extends readonly string[], U extends readonly string[]>(
+    instance: Instance<A, U>
   ) {
-    const id = o.getId() ?? uuidv4();
-    o.setId(id);
-    this.objects.set(id, o);
+    const id = instance.getId() ?? uuidv4();
+    instance.setId(id);
+    this.objects.set(id, instance);
     this.renderOrder.push(id);
+    this.addInstanceListeners(instance);
+    this.editorController?.initializeInstanceProperties(id);
   }
 
-  removeObjects() {
+  private addInstanceListeners = <
+    A extends readonly string[],
+    U extends readonly string[]
+  >(
+    instance: Instance<A, U>
+  ) => {
+    instance.addEventListener("click", this.onInstanceClick.bind(this));
+    instance.addEventListener("drag", this.onInstanceDrag.bind(this));
+    instance.addEventListener("dragend", this.onInstanceDragFinish.bind(this));
+  };
+
+  private onInstanceClick(e: CustomEventInit<InstanceClickPayload<any, any>>) {}
+
+  private onInstanceDrag(e: CustomEventInit<InstanceDragPayload<any, any>>) {
+    this.editorController?.onInstanceDrag(e.detail);
+  }
+
+  private onInstanceDragFinish(
+    e: CustomEventInit<InstanceDragEndPayload<any, any>>
+  ) {
+    this.editorController?.onInstanceDragFinish(e.detail);
+  }
+
+  public removeObjects() {
+    this.removeInstanceListeners();
     this.renderOrder = [];
     this.objects.clear();
   }
+
+  private removeInstanceListeners = () => {
+    this.traverse((instance) => {
+      instance.removeEventListener("click", this.onInstanceClick);
+      instance.removeEventListener("drag", this.onInstanceDrag);
+      instance.removeEventListener("dragend", this.onInstanceDragFinish);
+    });
+  };
 
   // Renders an item first
   renderFirst(id: string) {
@@ -276,7 +321,7 @@ class Scene extends EventTarget {
   }
 
   public override addEventListener(
-    type: EventTypes,
+    type: SceneEventTypes,
     callback: EventListenerOrEventListenerObject | null
   ): void {
     super.addEventListener(type, callback);
