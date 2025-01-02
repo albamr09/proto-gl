@@ -31,7 +31,9 @@ class Scene extends EventTarget {
     this.objects = new Map();
     this.renderOrder = [];
     if (allowEdit) {
-      this.editorController = new EditorController();
+      this.editorController = new EditorController({
+        gl,
+      });
     }
     this.setUp();
   }
@@ -70,7 +72,10 @@ class Scene extends EventTarget {
     instance.addEventListener("dragend", this.onInstanceDragFinish.bind(this));
   };
 
-  private onInstanceClick(e: CustomEventInit<InstanceClickPayload<any, any>>) {}
+  private onInstanceClick(e: CustomEventInit<InstanceClickPayload<any, any>>) {
+    if (!e.detail) return;
+    this.editorController?.moveGuidesToObject(e.detail);
+  }
 
   private onInstanceDrag(e: CustomEventInit<InstanceDragPayload<any, any>>) {
     this.editorController?.onInstanceDrag(e.detail);
@@ -247,12 +252,7 @@ class Scene extends EventTarget {
   ) {
     clear && this.clear();
     this.traverse((o) => {
-      o.updateUniform("uModelViewMatrix", this.modelViewMatrix.toFloatArray());
-      o.updateUniform("uNormalMatrix", this.normalMatrix.toFloatArray());
-      o.updateUniform(
-        "uProjectionMatrix",
-        this.projectionMatrix.toFloatArray()
-      );
+      this.updateInstanceMatrices(o);
       o.updateUniform("uOffScreen", offscreen);
       o.render({
         cb: (o) => {
@@ -260,10 +260,30 @@ class Scene extends EventTarget {
         },
       });
     });
+    this.renderEditorObjects();
     if (!offscreen) {
       this.dispatchEvent(new CustomEvent("render"));
     }
   }
+
+  private updateInstanceMatrices = (instance: Instance<any, any>) => {
+    instance.updateUniform(
+      "uModelViewMatrix",
+      this.modelViewMatrix.toFloatArray()
+    );
+    instance.updateUniform("uNormalMatrix", this.normalMatrix.toFloatArray());
+    instance.updateUniform(
+      "uProjectionMatrix",
+      this.projectionMatrix.toFloatArray()
+    );
+  };
+
+  private renderEditorObjects = () => {
+    this.editorController?.getGuides().forEach((instance) => {
+      this.updateInstanceMatrices(instance);
+      instance.render({});
+    });
+  };
 
   /**
    * Setups scene to render

@@ -80,7 +80,6 @@ const generateCylinderVertices = (
 
 const generateCylinderIndices = (segments: number, offset: number) => {
   let indices: number[] = [];
-  const topCenterIndex = 0; // The center of the top base (first vertex in the array)
   const bottomCenterIndex = 2 * segments + 1; // The center of the bottom base (last vertex in the array)
   const bottomVerticesOffset = segments;
 
@@ -88,12 +87,6 @@ const generateCylinderIndices = (segments: number, offset: number) => {
     indicesList.push(...indicesToAdd.map((i) => i + offset));
     return indicesList;
   };
-
-  // Top face (counter-clock wise)
-  for (let i = 1; i <= segments; i++) {
-    const next = (i % segments) + 1;
-    indices = addIndices(indices, [next, i, topCenterIndex]);
-  }
 
   // Bottom face (clock wise)
   for (let i = 1; i <= segments; i++) {

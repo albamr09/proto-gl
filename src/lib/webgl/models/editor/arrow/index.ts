@@ -15,15 +15,18 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
 
   constructor({
     gl,
+    id,
     properties,
   }: {
     gl: WebGL2RenderingContext;
+    id: string;
     properties?: ArrowPorperties;
   }) {
     const { vertices, indices } = Arrow.build();
     properties = { ...DefaultProperties, ...properties };
     super({
       gl,
+      id,
       vertexShaderSource,
       fragmentShaderSource,
       attributes: {
@@ -58,6 +61,15 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
       .translate(this.properties.translationVector!)
       .rotateVecDeg(this.properties.rotationVector!)
       .scale(this.properties.scaleVector!);
+  }
+
+  public updateProperties(properties: ArrowPorperties) {
+    this.properties = { ...this.properties, ...properties };
+    this.updateUniform("uMaterialDiffuse", this.properties.color!);
+    this.updateUniform(
+      "uTransform",
+      this.computeTransformMatrix().toFloatArray()
+    );
   }
 
   static build() {

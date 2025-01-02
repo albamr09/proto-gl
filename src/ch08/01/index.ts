@@ -213,16 +213,6 @@ const initData = () => {
     color: [0.1, 1, 0.2, 1],
   });
   scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
-  scene.add(
-    new Arrow({
-      gl,
-      properties: {
-        color: [0, 0, 1, 0.8],
-        rotationVector: new Vector([0, 0, 87]),
-        translationVector: new Vector([0, 0, 10]),
-      },
-    })
-  );
 };
 
 const render = () => {

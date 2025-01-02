@@ -1,5 +1,6 @@
 import { Matrix4 } from "../../../math/matrix.js";
 import { Vector } from "../../../math/vector.js";
+import Arrow from "../../models/editor/arrow/index.js";
 import Instance from "../instance.js";
 import {
   InstanceDragEndPayload,
@@ -18,10 +19,74 @@ type InstanceProperties = {
 class EditorController {
   private instancesProperties: Map<string, InstanceProperties>;
   private lastInstanceProperties: Map<string, InstanceProperties>;
+  private editorInstances: Arrow[];
 
-  constructor() {
+  constructor({ gl }: { gl: WebGL2RenderingContext }) {
     this.instancesProperties = new Map();
     this.lastInstanceProperties = new Map();
+    this.editorInstances = this.createEditorInstances(gl);
+  }
+
+  private createEditorInstances = (gl: WebGL2RenderingContext) => {
+    const arrowX = new Arrow({
+      id: "translate-x",
+      gl,
+      properties: {
+        color: [1, 0, 0, 0.9],
+        rotationVector: new Vector([0, 0, 90]),
+        translationVector: new Vector([-1, 0, 0]),
+      },
+    });
+    const arrowY = new Arrow({
+      id: "translate-y",
+      gl,
+      properties: {
+        color: [0, 1, 0, 0.9],
+        rotationVector: new Vector([0, 0, 0]),
+        translationVector: new Vector([0, 1, 0]),
+      },
+    });
+    const arrowZ = new Arrow({
+      id: "translate-z",
+      gl,
+      properties: {
+        color: [0, 0, 1, 0.9],
+        rotationVector: new Vector([90, 0, 0]),
+        translationVector: new Vector([0, 0, -1]),
+      },
+    });
+    return [arrowX, arrowY, arrowZ];
+  };
+
+  public moveGuidesToObject(instance: Instance<any, any>) {
+    const id = this.getIdFromInstance(instance);
+    const instanceProperties = this.lastInstanceProperties.get(id);
+    this.editorInstances.forEach((o) => {
+      const editorObjectId = o.getId();
+      if (editorObjectId?.includes("x")) {
+        o.updateProperties({
+          translationVector: instanceProperties?.translationVector.sum(
+            new Vector([-1, 0, 0])
+          ),
+        });
+      } else if (editorObjectId?.includes("y")) {
+        o.updateProperties({
+          translationVector: instanceProperties?.translationVector.sum(
+            new Vector([0, 1, 0])
+          ),
+        });
+      } else if (editorObjectId?.includes("z")) {
+        o.updateProperties({
+          translationVector: instanceProperties?.translationVector.sum(
+            new Vector([0, 0, -1])
+          ),
+        });
+      }
+    });
+  }
+
+  public getGuides() {
+    return this.editorInstances as Instance<any, any>[];
   }
 
   public initializeInstanceProperties(
@@ -61,6 +126,7 @@ class EditorController {
     instance.updateUniform("uTransform", newTransform);
     instance.updateUniform("uAlpha", 0.8);
     this.updateInstanceLastProperties(id, newTranslation);
+    this.moveGuidesToObject(instance);
   }
 
   private getIdFromInstance(instance: Instance<any, any>) {
