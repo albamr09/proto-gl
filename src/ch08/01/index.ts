@@ -24,7 +24,7 @@ import PickingController from "../../lib/webgl/core/picking/picking.js";
 import Scene from "../../lib/webgl/rendering/scene.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
-import EditorGuides from "../../lib/webgl/models/editor/guides/index.js";
+import Arrow from "../../lib/webgl/models/editor/arrow/index.js";
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
@@ -213,7 +213,16 @@ const initData = () => {
     color: [0.1, 1, 0.2, 1],
   });
   scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
-  scene.add(new EditorGuides({ gl }));
+  scene.add(
+    new Arrow({
+      gl,
+      properties: {
+        color: [0, 0, 1, 0.8],
+        rotationVector: new Vector([0, 0, 87]),
+        translationVector: new Vector([0, 0, 10]),
+      },
+    })
+  );
 };
 
 const render = () => {
