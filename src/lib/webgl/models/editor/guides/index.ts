@@ -2,7 +2,7 @@ import { UniformKind } from "../../../core/uniform/types.js";
 import Instance from "../../../rendering/instance.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
-import geometryData from "./data.js";
+import generateArrow from "./data.js";
 
 const DefaultAttributes = ["aPosition"] as const;
 const DefaultUniforms = ["uMaterialDiffuse"] as const;
@@ -35,7 +35,7 @@ class EditorGuides extends Instance<
   }
 
   static build() {
-    return { vertices: geometryData.vertices, indices: geometryData.indices };
+    return generateArrow();
   }
 }
 
