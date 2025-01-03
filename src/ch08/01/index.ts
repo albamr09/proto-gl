@@ -24,7 +24,6 @@ import PickingController from "../../lib/webgl/core/picking/picking.js";
 import Scene from "../../lib/webgl/rendering/scene.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
-import Arrow from "../../lib/webgl/models/editor/arrow/index.js";
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [

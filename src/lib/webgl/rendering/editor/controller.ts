@@ -1,3 +1,4 @@
+import { computeGeometryCenter, transformVertices } from "../../../math/3d.js";
 import { Matrix4 } from "../../../math/matrix.js";
 import { Vector } from "../../../math/vector.js";
 import Arrow from "../../models/editor/arrow/index.js";
@@ -32,27 +33,24 @@ class EditorController {
       id: "translate-x",
       gl,
       properties: {
-        color: [1, 0, 0, 0.9],
+        color: [1, 0, 0, 0.8],
         rotationVector: new Vector([0, 0, 90]),
-        translationVector: new Vector([-1, 0, 0]),
       },
     });
     const arrowY = new Arrow({
       id: "translate-y",
       gl,
       properties: {
-        color: [0, 1, 0, 0.9],
+        color: [0, 1, 0, 0.8],
         rotationVector: new Vector([0, 0, 0]),
-        translationVector: new Vector([0, 1, 0]),
       },
     });
     const arrowZ = new Arrow({
       id: "translate-z",
       gl,
       properties: {
-        color: [0, 0, 1, 0.9],
+        color: [0, 0, 1, 0.8],
         rotationVector: new Vector([90, 0, 0]),
-        translationVector: new Vector([0, 0, -1]),
       },
     });
     return [arrowX, arrowY, arrowZ];
@@ -61,25 +59,32 @@ class EditorController {
   public moveGuidesToObject(instance: Instance<any, any>) {
     const id = this.getIdFromInstance(instance);
     const instanceProperties = this.lastInstanceProperties.get(id);
+    const vertices = instance.getAttribute("aPosition");
+    if (!vertices) return;
+    const transformedVertices = transformVertices(
+      vertices,
+      Matrix4.identity().scale(
+        instanceProperties?.scaleVector ?? new Vector([1, 1, 1])
+      )
+    );
+    const instanceCenter = new Vector(
+      computeGeometryCenter(transformedVertices)
+    );
+    const guidesCenter =
+      instanceProperties?.translationVector.sum(instanceCenter);
     this.editorInstances.forEach((o) => {
       const editorObjectId = o.getId();
       if (editorObjectId?.includes("x")) {
         o.updateProperties({
-          translationVector: instanceProperties?.translationVector.sum(
-            new Vector([-1, 0, 0])
-          ),
+          translationVector: guidesCenter?.sum(new Vector([-1, 0, 0])),
         });
       } else if (editorObjectId?.includes("y")) {
         o.updateProperties({
-          translationVector: instanceProperties?.translationVector.sum(
-            new Vector([0, 1, 0])
-          ),
+          translationVector: guidesCenter?.sum(new Vector([0, 1, 0])),
         });
       } else if (editorObjectId?.includes("z")) {
         o.updateProperties({
-          translationVector: instanceProperties?.translationVector.sum(
-            new Vector([0, 0, -1])
-          ),
+          translationVector: guidesCenter?.sum(new Vector([0, 0, -1])),
         });
       }
     });

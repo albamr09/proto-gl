@@ -1,4 +1,4 @@
-import {Matrix4} from "./matrix.js";
+import { Matrix4 } from "./matrix.js";
 import { Vector } from "./vector.js";
 
 /**
@@ -82,11 +82,59 @@ export const calculateNormals = (
 };
 
 /*
-* Obtain transformation matrix to apply to normal vectors given the model view matrix. 
-* Reference: https://paroj.github.io/gltut/Illumination/Tut09%20Normal%20Transformation.html
-*/
+ * Obtain transformation matrix to apply to normal vectors given the model view matrix.
+ * Reference: https://paroj.github.io/gltut/Illumination/Tut09%20Normal%20Transformation.html
+ */
 
 export const computeNormalMatrix = (m: Matrix4): Matrix4 => {
   const normalMatrix = m.inverse();
   return normalMatrix.transpose() as Matrix4;
-}
+};
+
+/**
+ * Creates a list of 4d vectors (for transformations sake) from
+ * the flattened array of the input vertices
+ */
+const unFlattenVertices = (vertices: number[]) => {
+  return Array.from({ length: vertices.length / 3 }).map((_, i) => {
+    const baseIndex = i * 3;
+    return new Vector([...vertices.slice(baseIndex, baseIndex + 3), 1]);
+  });
+};
+
+/**
+ * Applies a scale, tranform or rotation transformation over
+ * the list of input vertices. The vertices are assumed to have
+ * three coordinates.
+ * */
+export const transformVertices = (
+  vertices: number[],
+  transformationMatrix: Matrix4
+) => {
+  return unFlattenVertices(vertices)
+    .map((vertex) => {
+      return transformationMatrix.multiply(vertex).elements.slice(0, 3);
+    })
+    .flat();
+};
+
+/**
+ * Computer the center of a geometry defined by the list of
+ * vertices as the average values for each coordinate component.
+ */
+export const computeGeometryCenter = (vertices: number[]) => {
+  const vertexCount = vertices.length / 3;
+  const center = [0, 0, 0];
+
+  for (let i = 0; i < vertices.length; i += 3) {
+    center[0] += vertices[i];
+    center[1] += vertices[i + 1];
+    center[2] += vertices[i + 2];
+  }
+
+  center[0] /= vertexCount;
+  center[1] /= vertexCount;
+  center[2] /= vertexCount;
+
+  return center;
+};

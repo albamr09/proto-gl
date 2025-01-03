@@ -41,6 +41,9 @@ class Instance<
   private gl: WebGL2RenderingContext;
   private program: Program<A, U>;
   private uniforms?: Uniforms<U, ConcreteUniforms>;
+  private attributes?: {
+    [P in A[number]]?: AttributeConfig;
+  };
   private vao!: WebGLVertexArrayObject | null;
   private ibo!: WebGLBuffer | null;
   private size!: number;
@@ -235,6 +238,8 @@ class Instance<
     this.gl.bindVertexArray(null);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+
+    this.attributes = { ...attributes };
   }
 
   private setupUniforms({
@@ -402,6 +407,10 @@ class Instance<
 
   public getTransformationProperties() {
     return this.transformationProperties;
+  }
+
+  public getAttribute(name: A[number]) {
+    return this.attributes?.[name]?.data;
   }
 }
 
