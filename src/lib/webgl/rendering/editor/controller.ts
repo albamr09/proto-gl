@@ -1,17 +1,18 @@
-import { computeGeometryCenter, transformVertices } from "../../../math/3d.js";
 import { Matrix4 } from "../../../math/matrix.js";
 import { Vector } from "../../../math/vector.js";
-import Arrow from "../../models/editor/arrow/index.js";
 import Instance from "../instance.js";
 import {
+  InstanceClickPayload,
   InstanceDragEndPayload,
   InstanceDragPayload,
   InstanceTransformationProperties,
 } from "../types.js";
+import GuidesController from "./guides.js";
+import { computeObjectDragTranslation } from "./math.js";
 
 const MOTION_FACTOR = 0.03;
 
-type InstanceProperties = {
+export type InstanceProperties = {
   scaleVector: Vector;
   translationVector: Vector;
   rotationVector: Vector;
@@ -20,78 +21,40 @@ type InstanceProperties = {
 class EditorController {
   private instancesProperties: Map<string, InstanceProperties>;
   private lastInstanceProperties: Map<string, InstanceProperties>;
-  private editorInstances: Arrow[];
+  private guidesController: GuidesController;
 
   constructor({ gl }: { gl: WebGL2RenderingContext }) {
     this.instancesProperties = new Map();
     this.lastInstanceProperties = new Map();
-    this.editorInstances = this.createEditorInstances(gl);
+    this.guidesController = new GuidesController({
+      gl,
+      onDragFinish: this.onDragFinish.bind(this),
+      onDrag: this.onDrag.bind(this),
+    });
   }
-
-  private createEditorInstances = (gl: WebGL2RenderingContext) => {
-    const arrowX = new Arrow({
-      id: "translate-x",
-      gl,
-      properties: {
-        color: [1, 0, 0, 0.8],
-        rotationVector: new Vector([0, 0, 90]),
-      },
-    });
-    const arrowY = new Arrow({
-      id: "translate-y",
-      gl,
-      properties: {
-        color: [0, 1, 0, 0.8],
-        rotationVector: new Vector([0, 0, 0]),
-      },
-    });
-    const arrowZ = new Arrow({
-      id: "translate-z",
-      gl,
-      properties: {
-        color: [0, 0, 1, 0.8],
-        rotationVector: new Vector([90, 0, 0]),
-      },
-    });
-    return [arrowX, arrowY, arrowZ];
-  };
 
   public moveGuidesToObject(instance: Instance<any, any>) {
     const id = this.getIdFromInstance(instance);
     const instanceProperties = this.lastInstanceProperties.get(id);
     const vertices = instance.getAttribute("aPosition");
-    if (!vertices) return;
-    const transformedVertices = transformVertices(
-      vertices,
-      Matrix4.identity().scale(
-        instanceProperties?.scaleVector ?? new Vector([1, 1, 1])
-      )
-    );
-    const instanceCenter = new Vector(
-      computeGeometryCenter(transformedVertices)
-    );
-    const guidesCenter =
-      instanceProperties?.translationVector.sum(instanceCenter);
-    this.editorInstances.forEach((o) => {
-      const editorObjectId = o.getId();
-      if (editorObjectId?.includes("x")) {
-        o.updateProperties({
-          translationVector: guidesCenter?.sum(new Vector([-1, 0, 0])),
-        });
-      } else if (editorObjectId?.includes("y")) {
-        o.updateProperties({
-          translationVector: guidesCenter?.sum(new Vector([0, 1, 0])),
-        });
-      } else if (editorObjectId?.includes("z")) {
-        o.updateProperties({
-          translationVector: guidesCenter?.sum(new Vector([0, 0, -1])),
-        });
-      }
-    });
+    if (!vertices || !instanceProperties) return;
+    this.guidesController.moveGuidesToObject(instanceProperties, vertices);
   }
 
-  public getGuides() {
-    return this.editorInstances as Instance<any, any>[];
+  public render({
+    modelViewMatrix,
+    normalMatrix,
+    projectionMatrix,
+  }: {
+    modelViewMatrix: Matrix4;
+    normalMatrix: Matrix4;
+    projectionMatrix: Matrix4;
+  }) {
+    this.guidesController.render({
+      modelViewMatrix,
+      normalMatrix,
+      projectionMatrix,
+    });
   }
 
   public initializeInstanceProperties(
@@ -113,14 +76,23 @@ class EditorController {
     if (!payload) return;
 
     const { instance, dx, dy, cameraRotationVector } = payload;
+    this.onDrag(instance, dx, dy, cameraRotationVector);
+  }
+
+  private onDrag(
+    instance: Instance<any, any>,
+    dx: number,
+    dy: number,
+    rotation: Vector
+  ) {
     const id = this.getIdFromInstance(instance);
     const instanceProperties = this.instancesProperties.get(id);
-    if (!instanceProperties) return;
+    if (!instanceProperties || !instance) return;
 
     const { translationVector, scaleVector } = instanceProperties;
 
     const newTranslation = translationVector.sum(
-      this.computeObjectDragTranslation(dx, dy, cameraRotationVector)
+      computeObjectDragTranslation(dx, dy, rotation, MOTION_FACTOR)
     );
 
     const newTransform = Matrix4.identity()
@@ -142,35 +114,6 @@ class EditorController {
     return id;
   }
 
-  private computeObjectDragTranslation(
-    dx: number,
-    dy: number,
-    cameraRotationVector: Vector
-  ) {
-    const upVector = new Vector([0, dy, 0]);
-    const rightVector = new Vector([dx, 0, 0]);
-    const { rotatedUpVector, rotatedRightVector } = this.rotateUpRightVectors(
-      upVector,
-      rightVector,
-      cameraRotationVector
-    );
-    const newTranslationValues = rotatedUpVector.elements.map((_, i) => {
-      return (rotatedUpVector.at(i) + rotatedRightVector.at(i)) * MOTION_FACTOR;
-    });
-    return new Vector(newTranslationValues);
-  }
-
-  private rotateUpRightVectors(
-    upVector: Vector,
-    rightVector: Vector,
-    rotationVector: Vector
-  ) {
-    const rotatedUpVector = upVector.rotateVecDeg(rotationVector);
-    const rotatedRightVector = rightVector.rotateVecDeg(rotationVector);
-
-    return { rotatedUpVector, rotatedRightVector };
-  }
-
   private updateInstanceLastProperties(id: string, newTranslation: Vector) {
     const lastInstanceProperties = this.lastInstanceProperties.get(id);
     if (!lastInstanceProperties) return;
@@ -183,8 +126,11 @@ class EditorController {
   }
 
   public onInstanceDragFinish(payload?: InstanceDragEndPayload<any, any>) {
-    if (!payload) return;
-    const instance = payload;
+    this.onDragFinish(payload);
+  }
+
+  private onDragFinish(instance?: Instance<any, any>) {
+    if (!instance) return;
     instance.updateUniform("uAlpha", 1);
     const id = this.getIdFromInstance(instance);
     this.updateInstanceProperties(id);
@@ -199,6 +145,24 @@ class EditorController {
       translationVector: lastInstanceProperties.translationVector,
     };
     this.instancesProperties.set(id, newInstanceProperties);
+  }
+
+  public onInstanceClick(payload: InstanceClickPayload<any, any>) {
+    this.guidesController.setInstanceWithGuides(payload);
+  }
+
+  public findLast(
+    cb: (o: Instance<any, any>) => Instance<any, any> | undefined
+  ) {
+    return this.guidesController.findLast(cb);
+  }
+
+  public showGuides() {
+    this.guidesController.setShowGuides(true);
+  }
+
+  public hideGuides() {
+    this.guidesController.setShowGuides(false);
   }
 }
 

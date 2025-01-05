@@ -17,7 +17,7 @@ class PickingController extends EventTarget {
   private lastX: number;
   private lastY: number;
   private selectedObject?: Instance<any, any>;
-  private canDrag: boolean;
+  private dragStarted: boolean;
 
   constructor(
     scene: Scene,
@@ -32,7 +32,7 @@ class PickingController extends EventTarget {
     this.y = 0;
     this.lastX = 0;
     this.lastY = 0;
-    this.canDrag = false;
+    this.dragStarted = false;
     this.getHitValue = getHitValue;
     this.createRenderBuffer(canvas);
     this.createTexture(canvas);
@@ -123,25 +123,24 @@ class PickingController extends EventTarget {
   }
 
   private onKeyPressed(e: KeyboardEvent) {
-    this.canDrag = e.ctrlKey;
+    this.setDragStarted(e.key !== "Escape");
+  }
+
+  private setDragStarted(x: boolean) {
+    this.dragStarted = x;
+    if (!this.dragStarted) {
+      this.scene.disableEditor();
+    }
   }
 
   public onClick(e: MouseEvent) {
-    if (!this.frameBuffer) {
-      console.warn("Could not pick object, framebuffer not initialized");
-      return;
-    }
     const { x, y } = this.get2DCoords(e);
     this.lastX = x;
     this.lastY = y;
-    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
-    const pixelColor = this.scene.getPixelColor(x, y);
-    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-    this.selectedObject = this.getClickedObject(
-      Array.prototype.map.call(pixelColor, (x) => x) as number[]
-    );
-    if (this.selectedObject && !this.canDrag) {
+    this.selectedObject = this.getClickedObject(x, y);
+    if (this.selectedObject) {
       this.selectedObject.triggerOnClick();
+      this.setDragStarted(true);
     }
   }
 
@@ -168,8 +167,18 @@ class PickingController extends EventTarget {
     };
   }
 
-  private getClickedObject(pixelColor: number[]) {
-    return this.scene.findLast((object) => {
+  private getClickedObject(x: number, y: number) {
+    if (!this.frameBuffer) {
+      console.warn("Could not pick object, framebuffer not initialized");
+      return;
+    }
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
+    const pixelColor = Array.prototype.map.call(
+      this.scene.getPixelColor(x, y),
+      (x) => x
+    ) as number[];
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+    return this.scene.findLastAllObjects((object) => {
       const objectColor = this.getHitValue(object);
       const denormalizedColor = denormalizeColor(objectColor);
       if (this.compare(denormalizedColor, pixelColor)) {
@@ -185,7 +194,7 @@ class PickingController extends EventTarget {
   }
 
   public onDrag(e: MouseEvent, cameraRotationVector: Vector) {
-    if (!this.canDrag) {
+    if (!this.dragStarted) {
       return;
     }
 
@@ -204,7 +213,12 @@ class PickingController extends EventTarget {
   }
 
   public isDragging() {
-    return this.canDrag;
+    return this.dragStarted;
+  }
+
+  public isCursorOverObject(e: MouseEvent) {
+    const { x, y } = this.get2DCoords(e);
+    return !!this.getClickedObject(x, y);
   }
 }
 

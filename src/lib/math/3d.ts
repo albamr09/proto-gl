@@ -118,23 +118,32 @@ export const transformVertices = (
     .flat();
 };
 
+const computeMidPoint = (vertices: Vector[], component: "x" | "y" | "z") => {
+  let componentIndex = 0;
+  if (component == "x") {
+    componentIndex = 0;
+  } else if (component == "y") {
+    componentIndex = 1;
+  } else if (component == "z") {
+    componentIndex = 2;
+  }
+  const componentValues = vertices.map((vector) => vector.at(componentIndex));
+  const maxComponent = Math.max(...componentValues);
+  const minComponent = Math.min(...componentValues);
+  const intervalDistance = maxComponent - minComponent;
+  const midPoint = minComponent + intervalDistance / 2;
+  return midPoint;
+};
+
 /**
  * Computer the center of a geometry defined by the list of
  * vertices as the average values for each coordinate component.
  */
 export const computeGeometryCenter = (vertices: number[]) => {
-  const vertexCount = vertices.length / 3;
-  const center = [0, 0, 0];
+  const unflattenedVertices = unFlattenVertices(vertices);
+  const xMidPoint = computeMidPoint(unflattenedVertices, "x");
+  const yMidPoint = computeMidPoint(unflattenedVertices, "y");
+  const zMidPoint = computeMidPoint(unflattenedVertices, "z");
 
-  for (let i = 0; i < vertices.length; i += 3) {
-    center[0] += vertices[i];
-    center[1] += vertices[i + 1];
-    center[2] += vertices[i + 2];
-  }
-
-  center[0] /= vertexCount;
-  center[1] /= vertexCount;
-  center[2] /= vertexCount;
-
-  return center;
+  return [xMidPoint, yMidPoint, zMidPoint];
 };

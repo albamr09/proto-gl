@@ -6,21 +6,52 @@ import generateArrow from "./geometry.js";
 import { Matrix4 } from "../../../../math/matrix.js";
 import { ArrowPorperties } from "./types.js";
 import { DefaultProperties } from "./constants.js";
+import {
+  InstanceDragEndPayload,
+  InstanceDragPayload,
+} from "../../../rendering/types.js";
 
 const DefaultAttributes = ["aPosition"] as const;
 const DefaultUniforms = ["uMaterialDiffuse", "uTransform"] as const;
 
 class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
   private properties: ArrowPorperties;
+  public onDrag?: ({
+    instance,
+    dx,
+    dy,
+  }: InstanceDragPayload<
+    typeof DefaultAttributes,
+    typeof DefaultUniforms
+  >) => void;
+  public onDragFinish?: (
+    o: InstanceDragEndPayload<typeof DefaultAttributes, typeof DefaultUniforms>
+  ) => void;
 
   constructor({
     gl,
     id,
     properties,
+    onDrag,
+    onDragFinish,
   }: {
     gl: WebGL2RenderingContext;
     id: string;
     properties?: ArrowPorperties;
+    onDrag?: ({
+      instance,
+      dx,
+      dy,
+    }: InstanceDragPayload<
+      typeof DefaultAttributes,
+      typeof DefaultUniforms
+    >) => void;
+    onDragFinish?: (
+      o: InstanceDragEndPayload<
+        typeof DefaultAttributes,
+        typeof DefaultUniforms
+      >
+    ) => void;
   }) {
     const { vertices, indices } = Arrow.build();
     properties = { ...DefaultProperties, ...properties };
@@ -47,6 +78,8 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
         },
       },
       indices,
+      onDrag,
+      onDragFinish,
     });
 
     this.properties = { ...properties };

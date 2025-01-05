@@ -16,6 +16,7 @@ class Controller {
   private dolly: number;
   private prevDiff: number;
   private isDragging: boolean;
+  private dragMode: "scene" | "object";
   private isTouchZoom: boolean;
   // Callbacks
   public onDollyChange: (dolly: number) => void;
@@ -38,6 +39,7 @@ class Controller {
     this.pickingController = pickingController;
     this.dolly = 0;
     this.isDragging = false;
+    this.dragMode = "scene";
     this.x = 0;
     this.y = 0;
     this.lastX = 0;
@@ -109,10 +111,6 @@ class Controller {
   }
 
   private drag(e: MouseEvent | TouchEvent) {
-    if (this.pickingController?.isDragging()) {
-      return;
-    }
-
     this.lastX = this.x;
     this.lastY = this.y;
 
@@ -143,10 +141,14 @@ class Controller {
 
   private onMouseDown(e: MouseEvent) {
     this.isDragging = true;
+    this.pickingController?.onClick(e);
+    if (this.pickingController?.isCursorOverObject(e)) {
+      this.dragMode = "object";
+      return;
+    }
+    this.dragMode = "scene";
     this.x = e.clientX;
     this.y = e.clientY;
-
-    this.pickingController?.onClick(e);
   }
 
   private onMouseUp(_e: MouseEvent) {
@@ -158,8 +160,11 @@ class Controller {
 
   private onMouseMove(e: MouseEvent) {
     if (this.isDragging) {
-      this.drag(e);
-      this.pickingController?.onDrag(e, this.camera.getRotation());
+      if (this.dragMode === "scene") {
+        this.drag(e);
+      } else {
+        this.pickingController?.onDrag(e, this.camera.getRotation());
+      }
     } else if (this.camera.isTracking() && this.followMouse) {
       this.look(e);
     }

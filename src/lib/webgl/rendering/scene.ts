@@ -75,6 +75,8 @@ class Scene extends EventTarget {
   private onInstanceClick(e: CustomEventInit<InstanceClickPayload<any, any>>) {
     if (!e.detail) return;
     this.editorController?.moveGuidesToObject(e.detail);
+    this.editorController?.showGuides();
+    this.editorController?.onInstanceClick(e.detail);
   }
 
   private onInstanceDrag(e: CustomEventInit<InstanceDragPayload<any, any>>) {
@@ -252,7 +254,11 @@ class Scene extends EventTarget {
   ) {
     clear && this.clear();
     this.traverse((o) => {
-      this.updateInstanceMatrices(o);
+      o.updateTransformationMatrices({
+        modelViewMatrix: this.modelViewMatrix,
+        projectionMatrix: this.projectionMatrix,
+        normalMatrix: this.normalMatrix,
+      });
       o.updateUniform("uOffScreen", offscreen);
       o.render({
         cb: (o) => {
@@ -260,30 +266,15 @@ class Scene extends EventTarget {
         },
       });
     });
-    this.renderEditorObjects();
+    this.editorController?.render({
+      modelViewMatrix: this.modelViewMatrix,
+      projectionMatrix: this.projectionMatrix,
+      normalMatrix: this.normalMatrix,
+    });
     if (!offscreen) {
       this.dispatchEvent(new CustomEvent("render"));
     }
   }
-
-  private updateInstanceMatrices = (instance: Instance<any, any>) => {
-    instance.updateUniform(
-      "uModelViewMatrix",
-      this.modelViewMatrix.toFloatArray()
-    );
-    instance.updateUniform("uNormalMatrix", this.normalMatrix.toFloatArray());
-    instance.updateUniform(
-      "uProjectionMatrix",
-      this.projectionMatrix.toFloatArray()
-    );
-  };
-
-  private renderEditorObjects = () => {
-    this.editorController?.getGuides().forEach((instance) => {
-      this.updateInstanceMatrices(instance);
-      instance.render({});
-    });
-  };
 
   /**
    * Setups scene to render
@@ -326,20 +317,22 @@ class Scene extends EventTarget {
     });
   }
 
-  public findLast(
+  public findLastAllObjects(
     cb: (o: Instance<any, any>) => Instance<any, any> | undefined
   ) {
-    return this.renderOrder.reduce<Instance<any, any> | undefined>(
-      (objectFound, id) => {
-        const o = this.objects.get(id);
-        if (!o) {
-          console.warn(`Object ${id} was not found on traverse`);
-          return undefined;
-        }
-        objectFound = cb(o) ? o : objectFound;
-        return objectFound;
-      },
-      undefined
+    return (
+      this.renderOrder.reduce<Instance<any, any> | undefined>(
+        (objectFound, id) => {
+          const o = this.objects.get(id);
+          if (!o) {
+            console.warn(`Object ${id} was not found on traverse`);
+            return undefined;
+          }
+          objectFound = cb(o) ? o : objectFound;
+          return objectFound;
+        },
+        undefined
+      ) ?? this.editorController?.findLast(cb)
     );
   }
 
@@ -348,6 +341,10 @@ class Scene extends EventTarget {
     callback: EventListenerOrEventListenerObject | null
   ): void {
     super.addEventListener(type, callback);
+  }
+
+  public disableEditor() {
+    this.editorController?.hideGuides();
   }
 }
 

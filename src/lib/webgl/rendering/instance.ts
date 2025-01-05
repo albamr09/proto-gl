@@ -1,3 +1,4 @@
+import { Matrix4 } from "../../math/matrix.js";
 import { Vector } from "../../math/vector.js";
 import { uuidv4 } from "../../utils.js";
 import Program from "../core/program.js";
@@ -411,6 +412,20 @@ class Instance<
 
   public getAttribute(name: A[number]) {
     return this.attributes?.[name]?.data;
+  }
+
+  public updateTransformationMatrices({
+    modelViewMatrix,
+    normalMatrix,
+    projectionMatrix,
+  }: {
+    modelViewMatrix: Matrix4;
+    normalMatrix: Matrix4;
+    projectionMatrix: Matrix4;
+  }) {
+    this.updateUniform("uModelViewMatrix", modelViewMatrix.toFloatArray());
+    this.updateUniform("uNormalMatrix", normalMatrix.toFloatArray());
+    this.updateUniform("uProjectionMatrix", projectionMatrix.toFloatArray());
   }
 }
 
