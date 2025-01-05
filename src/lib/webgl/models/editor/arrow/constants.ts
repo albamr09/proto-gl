@@ -7,3 +7,7 @@ export const DefaultProperties: ArrowPorperties = {
   translationVector: new Vector([0, 0, 0]),
   rotationVector: new Vector([0, 0, 0]),
 };
+
+export const DEFAULT_HEIGHT = 4;
+export const DEFAULT_RADIOUS = 0.5;
+export const DEFAULT_N_SEGMENTS = 12;

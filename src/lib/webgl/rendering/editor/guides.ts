@@ -7,7 +7,8 @@ import { InstanceDragPayload } from "../types.js";
 import { InstanceProperties } from "./controller.js";
 
 class GuidesController {
-  private editorInstances: Arrow[];
+  private moveGuideInstances: Arrow[];
+  private scaleGuideInstances: Arrow[];
   private shouldShowGuides: boolean;
   private instanceWithGuides?: Instance<any, any>;
   private onDrag: (
@@ -33,17 +34,20 @@ class GuidesController {
       rotation: Vector
     ) => void;
   }) {
-    this.editorInstances = this.createEditorInstances(gl);
+    this.moveGuideInstances = this.createMoveGuides(gl);
+    this.scaleGuideInstances = this.createScaleGuides(gl);
     this.shouldShowGuides = false;
     this.onDragFinish = onDragFinish;
     this.onDrag = onDrag;
+    this.editMode = "move";
     window.addEventListener("keypress", this.handleModeChange.bind(this));
   }
 
-  private createEditorInstances = (gl: WebGL2RenderingContext) => {
+  private createMoveGuides = (gl: WebGL2RenderingContext) => {
     const arrowX = new Arrow({
       id: "translate-x",
       gl,
+      arrowHead: "cone",
       properties: {
         color: [1, 0, 0, 0.8],
         rotationVector: new Vector([0, 0, 90]),
@@ -58,6 +62,7 @@ class GuidesController {
     const arrowY = new Arrow({
       id: "translate-y",
       gl,
+      arrowHead: "cone",
       properties: {
         color: [0, 1, 0, 0.8],
         rotationVector: new Vector([0, 0, 0]),
@@ -72,6 +77,7 @@ class GuidesController {
     const arrowZ = new Arrow({
       id: "translate-z",
       gl,
+      arrowHead: "cone",
       properties: {
         color: [0, 0, 1, 0.8],
         rotationVector: new Vector([90, 0, 0]),
@@ -81,6 +87,55 @@ class GuidesController {
       },
       onDragFinish: () => {
         this.onDragFinish(this.instanceWithGuides);
+      },
+    });
+    return [arrowX, arrowY, arrowZ];
+  };
+
+  private createScaleGuides = (gl: WebGL2RenderingContext) => {
+    const arrowX = new Arrow({
+      id: "scale-x",
+      gl,
+      arrowHead: "cube",
+      properties: {
+        color: [1, 0, 0, 0.8],
+        rotationVector: new Vector([0, 0, 90]),
+      },
+      onDrag: (e) => {
+        //this.onInstanceXDrag(e);
+      },
+      onDragFinish: () => {
+        //this.onDragFinish(this.instanceWithGuides);
+      },
+    });
+    const arrowY = new Arrow({
+      id: "scale-y",
+      gl,
+      arrowHead: "cube",
+      properties: {
+        color: [0, 1, 0, 0.8],
+        rotationVector: new Vector([0, 0, 0]),
+      },
+      onDrag: (e) => {
+        //this.onInstanceYDrag(e);
+      },
+      onDragFinish: () => {
+        //this.onDragFinish(this.instanceWithGuides);
+      },
+    });
+    const arrowZ = new Arrow({
+      id: "scale-z",
+      gl,
+      arrowHead: "cube",
+      properties: {
+        color: [0, 0, 1, 0.8],
+        rotationVector: new Vector([90, 0, 0]),
+      },
+      onDrag: (e) => {
+        //this.onInstanceZDrag(e);
+      },
+      onDragFinish: () => {
+        //this.onDragFinish(this.instanceWithGuides);
       },
     });
     return [arrowX, arrowY, arrowZ];
@@ -139,7 +194,7 @@ class GuidesController {
     projectionMatrix: Matrix4;
   }) {
     if (!this.shouldShowGuides) return;
-    this.editorInstances.forEach((instance) => {
+    this.getCurrentModeGuides().forEach((instance) => {
       instance.updateTransformationMatrices({
         modelViewMatrix: modelViewMatrix,
         projectionMatrix: projectionMatrix,
@@ -165,11 +220,15 @@ class GuidesController {
     );
     const guidesCenter =
       instanceProperties?.translationVector.sum(instanceCenter);
-    this.editorInstances.forEach((o) => {
+    this.getAllGuides().forEach((o) => {
       o.updateProperties({
         translationVector: guidesCenter,
       });
     });
+  }
+
+  private getAllGuides() {
+    return [...this.moveGuideInstances, ...this.scaleGuideInstances];
   }
 
   public setShowGuides(x: boolean) {
@@ -179,7 +238,7 @@ class GuidesController {
   public findLast(
     cb: (o: Instance<any, any>) => Instance<any, any> | undefined
   ) {
-    return this.editorInstances.reduce<Instance<any, any> | undefined>(
+    return this.getCurrentModeGuides().reduce<Instance<any, any> | undefined>(
       (objectFound, instance) => {
         objectFound = cb(instance as Instance<any, any>)
           ? (instance as Instance<any, any>)
@@ -188,6 +247,15 @@ class GuidesController {
       },
       undefined
     );
+  }
+
+  private getCurrentModeGuides() {
+    if (this.editMode == "move") {
+      return this.moveGuideInstances;
+    } else if (this.editMode == "scale") {
+      return this.scaleGuideInstances;
+    }
+    return [];
   }
 
   public setInstanceWithGuides(instance: Instance<any, any>) {

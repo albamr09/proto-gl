@@ -4,7 +4,7 @@ import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 import generateArrow from "./geometry.js";
 import { Matrix4 } from "../../../../math/matrix.js";
-import { ArrowPorperties } from "./types.js";
+import { ArrowHead, ArrowPorperties } from "./types.js";
 import { DefaultProperties } from "./constants.js";
 import {
   InstanceDragEndPayload,
@@ -34,6 +34,7 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
     properties,
     onDrag,
     onDragFinish,
+    arrowHead,
   }: {
     gl: WebGL2RenderingContext;
     id: string;
@@ -52,8 +53,9 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
         typeof DefaultUniforms
       >
     ) => void;
+    arrowHead: ArrowHead;
   }) {
-    const { vertices, indices } = Arrow.build();
+    const { vertices, indices } = Arrow.build(arrowHead);
     properties = { ...DefaultProperties, ...properties };
     super({
       gl,
@@ -105,8 +107,8 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
     );
   }
 
-  static build() {
-    return generateArrow({});
+  static build(arrowHead: ArrowHead) {
+    return generateArrow({ arrowHead });
   }
 }
 

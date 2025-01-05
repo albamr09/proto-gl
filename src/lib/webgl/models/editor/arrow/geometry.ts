@@ -1,6 +1,54 @@
-const DEFAULT_HEIGHT = 4;
-const DEFAULT_RADIOUS = 0.5;
-const DEFAULT_N_SEGMENTS = 12;
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_N_SEGMENTS,
+  DEFAULT_RADIOUS,
+} from "./constants.js";
+import { ArrowHead } from "./types.js";
+
+const generateCubeVertices = (length: number, heightOffset: number) => {
+  const vertices = [];
+  const x = length / 2;
+  const z = length / 2;
+  const y = heightOffset + length;
+
+  // Bottom square
+  vertices.push(-x, heightOffset, -z);
+  vertices.push(x, heightOffset, -z);
+  vertices.push(x, heightOffset, z);
+  vertices.push(-x, heightOffset, z);
+
+  // Top square
+  vertices.push(-x, y, -z);
+  vertices.push(x, y, -z);
+  vertices.push(x, y, z);
+  vertices.push(-x, y, z);
+
+  return vertices;
+};
+
+const generateCubeIndices = () => {
+  const indices = [];
+
+  // Bottom Square
+  indices.push(0, 1, 2);
+  indices.push(2, 3, 0);
+
+  // Sides
+  indices.push(0, 4, 5);
+  indices.push(5, 1, 0);
+  indices.push(1, 5, 6);
+  indices.push(6, 2, 1);
+  indices.push(0, 3, 7);
+  indices.push(7, 4, 0);
+  indices.push(6, 7, 3);
+  indices.push(3, 2, 6);
+
+  // Top Square
+  indices.push(4, 7, 6);
+  indices.push(6, 5, 4);
+
+  return indices;
+};
 
 const generateConeVertices = (
   radius: number,
@@ -112,35 +160,44 @@ const generateArrow = ({
   height = DEFAULT_HEIGHT,
   radius = DEFAULT_RADIOUS,
   nSegments = DEFAULT_N_SEGMENTS,
+  arrowHead,
 }: {
   height?: number;
   radius?: number;
   nSegments?: number;
+  arrowHead: ArrowHead;
 }) => {
-  const coneRadious = radius;
   const cylinderRadious = radius / 3;
-  const coneHeight = height / 4;
-  const cylinderHeight = height - coneHeight;
-  const coneVertices = generateConeVertices(
-    coneRadious,
-    coneHeight,
-    nSegments,
-    cylinderHeight
-  );
-  const coneIndices = generateConeIndices(nSegments);
+  const arrowHeight = height / 4;
+  const cylinderHeight = height - arrowHeight;
+  let arrowHeadVertices: number[];
+  let arrowHeadIndices: number[];
+  if (arrowHead == "cone") {
+    const coneRadious = radius;
+    arrowHeadVertices = generateConeVertices(
+      coneRadious,
+      arrowHeight,
+      nSegments,
+      cylinderHeight
+    );
+    arrowHeadIndices = generateConeIndices(nSegments);
+  } else {
+    arrowHeadVertices = generateCubeVertices(arrowHeight, cylinderHeight);
+    arrowHeadIndices = generateCubeIndices();
+  }
   const cylinderVertices = generateCylinderVertices(
     cylinderRadious,
     cylinderHeight,
     nSegments
   );
-  const cylinderIndicesOffset = coneVertices.length / 3;
+  const cylinderIndicesOffset = arrowHeadVertices.length / 3;
   const cylinderIndices = generateCylinderIndices(
     nSegments,
     cylinderIndicesOffset
   );
   return {
-    vertices: [...coneVertices, ...cylinderVertices],
-    indices: [...coneIndices, ...cylinderIndices],
+    vertices: [...arrowHeadVertices, ...cylinderVertices],
+    indices: [...arrowHeadIndices, ...cylinderIndices],
   };
 };
 
