@@ -10,8 +10,6 @@ import {
 import GuidesController from "./guides.js";
 import { computeObjectDragTranslation } from "./math.js";
 
-const MOTION_FACTOR = 0.03;
-
 export type InstanceProperties = {
   scaleVector: Vector;
   translationVector: Vector;
@@ -75,15 +73,16 @@ class EditorController {
   public onInstanceDrag(payload?: InstanceDragPayload<any, any>) {
     if (!payload) return;
 
-    const { instance, dx, dy, cameraRotationVector } = payload;
-    this.onDrag(instance, dx, dy, cameraRotationVector);
+    const { instance, dx, dy, cameraRotationVector, cameraDistance } = payload;
+    this.onDrag(instance, dx, dy, cameraRotationVector, cameraDistance);
   }
 
   private onDrag(
     instance: Instance<any, any>,
     dx: number,
     dy: number,
-    rotation: Vector
+    rotation: Vector,
+    distance: number
   ) {
     const id = this.getIdFromInstance(instance);
     const instanceProperties = this.instancesProperties.get(id);
@@ -91,8 +90,19 @@ class EditorController {
 
     const { translationVector, scaleVector } = instanceProperties;
 
+    const computeMotionFactor = (x: number) => {
+      return 0.00122419 * Math.pow(x, 2) - 0.00447683 * x + 0.015259;
+    };
+
+    const motionFactorBasedOnDistance = computeMotionFactor(distance);
+
     const newTranslation = translationVector.sum(
-      computeObjectDragTranslation(dx, dy, rotation, MOTION_FACTOR)
+      computeObjectDragTranslation(
+        dx,
+        dy,
+        rotation,
+        motionFactorBasedOnDistance
+      )
     );
 
     const newTransform = Matrix4.identity()

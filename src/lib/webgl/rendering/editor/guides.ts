@@ -1,6 +1,7 @@
 import { computeGeometryCenter, transformVertices } from "../../../math/3d.js";
 import { Matrix4 } from "../../../math/matrix.js";
 import { Vector } from "../../../math/vector.js";
+import { Angle } from "../../../math/angle.js";
 import Arrow from "../../models/editor/arrow/index.js";
 import Instance from "../instance.js";
 import { InstanceDragPayload } from "../types.js";
@@ -15,7 +16,8 @@ class GuidesController {
     instance: Instance<any, any>,
     dx: number,
     dy: number,
-    rotation: Vector
+    rotation: Vector,
+    disnance: number
   ) => void;
   private onDragFinish: (instance?: Instance<any, any>) => void;
   private editMode: "move" | "scale" | "rotate";
@@ -31,7 +33,8 @@ class GuidesController {
       instance: Instance<any, any>,
       dx: number,
       dy: number,
-      rotation: Vector
+      rotation: Vector,
+      distance: number
     ) => void;
   }) {
     this.moveGuideInstances = this.createMoveGuides(gl);
@@ -154,15 +157,39 @@ class GuidesController {
   private onInstanceXDrag(payload?: InstanceDragPayload<any, any>) {
     if (!payload || !this.instanceWithGuides) return;
 
-    const { dx, dy } = payload;
-    this.onDrag(this.instanceWithGuides, dx + dy, 0, new Vector([0, 0, 0]));
+    const { dx, dy, cameraDistance, cameraRotationVector } = payload;
+    this.onDrag(
+      this.instanceWithGuides,
+      this.getXTranslationSign(cameraRotationVector) * (dx + dy),
+      0,
+      new Vector([0, 0, 0]),
+      cameraDistance
+    );
+  }
+  private getXTranslationSign(cameraRotationVector: Vector) {
+    const safeXAngle = Angle.safeDegAngle(cameraRotationVector.at(0));
+    const safeYAngle = Angle.safeDegAngle(cameraRotationVector.at(1));
+    const isUpsideDown = safeXAngle > 90 && safeXAngle < 270;
+    const isBackwards = safeYAngle > 90 && safeYAngle < 270;
+
+    if (isUpsideDown) {
+      return isBackwards ? 1.0 : -1.0;
+    } else {
+      return isBackwards ? -1.0 : 1.0;
+    }
   }
 
   private onInstanceYDrag(payload?: InstanceDragPayload<any, any>) {
     if (!payload || !this.instanceWithGuides) return;
 
-    const { dx, dy } = payload;
-    this.onDrag(this.instanceWithGuides, 0, dx + dy, new Vector([0, 0, 0]));
+    const { dx, dy, cameraDistance } = payload;
+    this.onDrag(
+      this.instanceWithGuides,
+      0,
+      dx + dy,
+      new Vector([0, 0, 0]),
+      cameraDistance
+    );
   }
 
   /** We "fool" the drag logic by rotating the camera 90º on the y
@@ -180,8 +207,27 @@ class GuidesController {
   private onInstanceZDrag(payload?: InstanceDragPayload<any, any>) {
     if (!payload || !this.instanceWithGuides) return;
 
-    const { dx, dy } = payload;
-    this.onDrag(this.instanceWithGuides, dx + dy, 0, new Vector([0, 90, 0]));
+    const { dx, dy, cameraDistance, cameraRotationVector } = payload;
+    this.onDrag(
+      this.instanceWithGuides,
+      this.getZTranslationSign(cameraRotationVector) * (dx + dy),
+      0,
+      new Vector([0, 90, 0]),
+      cameraDistance
+    );
+  }
+
+  private getZTranslationSign(cameraRotationVector: Vector) {
+    const safeXAngle = Angle.safeDegAngle(cameraRotationVector.at(0));
+    const safeYAngle = Angle.safeDegAngle(cameraRotationVector.at(1));
+    const isUpsideDown = safeXAngle > 90 && safeXAngle < 270;
+    const isBackwards = safeYAngle > 180 && safeYAngle < 360;
+
+    if (isUpsideDown) {
+      return isBackwards ? 1.0 : -1.0;
+    } else {
+      return isBackwards ? -1.0 : 1.0;
+    }
   }
 
   public render({

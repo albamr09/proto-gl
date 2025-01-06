@@ -380,8 +380,19 @@ class Instance<
     this.onClick && this.onClick(payload);
     this.dispatchEvent(new CustomEvent("click", { detail: payload }));
   }
-  public triggerOnDrag(dx: number, dy: number, cameraRotationVector: Vector) {
-    const payload = { instance: this, dx, dy, cameraRotationVector };
+  public triggerOnDrag(
+    dx: number,
+    dy: number,
+    cameraRotationVector: Vector,
+    cameraDistance: number
+  ) {
+    const payload = {
+      instance: this,
+      dx,
+      dy,
+      cameraRotationVector,
+      cameraDistance,
+    };
     this.onDrag && this.onDrag(payload);
     this.dispatchEvent(new CustomEvent("drag", { detail: payload }));
   }

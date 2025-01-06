@@ -34,6 +34,7 @@ export type InstanceDragPayload<
   dx: number;
   dy: number;
   cameraRotationVector: Vector;
+  cameraDistance: number;
 };
 
 export type InstanceClickPayload<

@@ -72,74 +72,72 @@ class Camera {
     });
   }
 
-  updateProjectionParams(gl?: WebGL2RenderingContext) {
+  private updateProjectionParams(gl?: WebGL2RenderingContext) {
     this.aspectRatio = (gl?.canvas?.width ?? 0) / (gl?.canvas?.height ?? 1);
     this.width = gl?.canvas.width ?? 0;
     this.height = gl?.canvas.height ?? 1;
     this.updateProjection();
   }
 
-  isOrbiting() {
+  public isOrbiting() {
     return this.type === CameraType.ORBITING;
   }
 
-  isTracking() {
+  public isTracking() {
     return this.type === CameraType.TRACKING;
   }
 
-  setType(type: CameraType) {
+  public setType(type: CameraType) {
     this.type = type;
     this.updateModelView();
   }
 
-  setProjection(projection: ProjectionType) {
+  public setProjection(projection: ProjectionType) {
     this.projection = projection;
     this.updateProjection();
   }
 
-  setFov(x: number) {
+  public setFov(x: number) {
     this.fov = x;
     this.updateProjection();
   }
 
-  setFar(x: number) {
+  public setFar(x: number) {
     this.far = x;
     this.updateProjection();
   }
 
-  setNear(x: number) {
+  public setNear(x: number) {
     this.near = x;
     this.updateProjection();
   }
 
-  setTransposeProjection(x: boolean) {
+  public setTransposeProjection(x: boolean) {
     this.transposeProjection = x;
     this.updateProjection();
   }
 
-  isProjectionTransposed() {
+  public isProjectionTransposed() {
     return this.transposeProjection;
   }
 
-  setPerspectiveParams(fov: number, far: number, near: number) {
+  public setPerspectiveParams(fov: number, far: number, near: number) {
     this.fov = fov;
     this.far = far;
     this.near = near;
     this.updateProjection();
   }
 
-  // Obtain model-view transform
-  getViewTransform() {
+  public getViewTransform() {
     return this.modelViewMatrix.copy() as Matrix4;
   }
 
-  // Obtain projection transform
-  getProjectionTransform() {
+  public getProjectionTransform() {
     return this.projectionMatrix.copy() as Matrix4;
   }
 
   // Sets the rotation on Y axis
-  setAzimuth(azimuth: number) {
+  public setAzimuth(azimuth: number) {
     // Compute rotation difference
     const diffAzimuth = azimuth - this.azimuth;
     // Update rotation angle constrained on [0, 360]
@@ -148,7 +146,7 @@ class Camera {
   }
 
   // Sets the rotation on X axis
-  setElevation(elevation: number) {
+  public setElevation(elevation: number) {
     // Compute rotation difference
     const diffElevation = elevation - this.elevation;
     // Update rotation angle constrained on [0, 360]
@@ -162,29 +160,28 @@ class Camera {
    * The up vector: Y axis
    * The normal vector: Z axis
    */
-  computeOrientation() {
+  private computeOrientation() {
     this.right = this.modelViewMatrix.rightVector();
     this.up = this.modelViewMatrix.upVector();
     this.normal = this.modelViewMatrix.normalVector();
   }
 
-  // Change camera position
-  setInitialPosition(position: Vector) {
+  public setInitialPosition(position: Vector) {
     this.initialPosition = position.copy();
   }
 
-  getPosition() {
+  public getPosition() {
     return this.position.copy();
   }
 
   // Change camera initial position for reset
-  setPosition(position: Vector) {
+  public setPosition(position: Vector) {
     this.position = position.copy();
     this.updateModelView();
   }
 
   // Moves backwards/towards on the space newSpace units
-  dolly(newSteps: number) {
+  public dolly(newSteps: number) {
     let newPosition;
     const normal = this.normal.normalize();
 
@@ -221,7 +218,7 @@ class Camera {
   }
 
   // Set initial values
-  reset() {
+  public reset() {
     this.elevation = 0;
     this.azimuth = 0;
     this.fov = 45;
@@ -230,7 +227,7 @@ class Camera {
   }
 
   // Updates camera transformation matrix
-  updateModelView() {
+  private updateModelView() {
     this.modelViewMatrix = Matrix4.identity();
     // As you know the position of the camera
     // is obtained by moving the objects on the
@@ -272,14 +269,14 @@ class Camera {
    * Updates the projection matrix taking into account the type
    * of projection: perspective or orthographic.
    */
-  updateProjection() {
+  private updateProjection() {
     if (this.projection == ProjectionType.PERSPECTIVE) {
       this.projectionMatrix = Matrix4.perspective(
         this.fov,
         this.aspectRatio,
         this.near,
         this.far,
-        this.transposeProjection
+        this.isProjectionTransposed()
       );
     } else if (this.projection == ProjectionType.ORTHOGRAPHIC) {
       this.projectionMatrix = Matrix4.ortho(
@@ -289,13 +286,13 @@ class Camera {
         this.height / this.fov,
         -this.far,
         this.far,
-        this.transposeProjection
+        this.isProjectionTransposed()
       );
     }
     this.scene?.updateProjectionMatrix(this.projectionMatrix);
   }
 
-  getRotation() {
+  public getRotation() {
     return new Vector([this.elevation, this.azimuth, 0]);
   }
 }

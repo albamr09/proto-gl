@@ -193,7 +193,11 @@ class PickingController extends EventTarget {
     });
   }
 
-  public onDrag(e: MouseEvent, cameraRotationVector: Vector) {
+  public onDrag(
+    e: MouseEvent,
+    cameraRotationVector: Vector,
+    cameraDistance: number
+  ) {
     if (!this.dragStarted) {
       return;
     }
@@ -205,7 +209,12 @@ class PickingController extends EventTarget {
     const dx = this.x - this.lastX;
     const dy = this.y - this.lastY;
 
-    this.selectedObject?.triggerOnDrag(dx, dy, cameraRotationVector);
+    this.selectedObject?.triggerOnDrag(
+      dx,
+      dy,
+      cameraRotationVector,
+      cameraDistance
+    );
   }
 
   public onDragFinish() {

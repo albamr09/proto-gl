@@ -163,7 +163,11 @@ class Controller {
       if (this.dragMode === "scene") {
         this.drag(e);
       } else {
-        this.pickingController?.onDrag(e, this.camera.getRotation());
+        this.pickingController?.onDrag(
+          e,
+          this.camera.getRotation(),
+          this.camera.getPosition().module()
+        );
       }
     } else if (this.camera.isTracking() && this.followMouse) {
       this.look(e);
