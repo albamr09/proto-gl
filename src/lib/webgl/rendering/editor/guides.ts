@@ -20,12 +20,22 @@ class GuidesController {
     disnance: number
   ) => void;
   private onDragFinish: (instance?: Instance<any, any>) => void;
+  private onScale: (
+    instance: Instance<any, any>,
+    dx: number,
+    dy: number,
+    rotation: Vector,
+    disnance: number
+  ) => void;
+  private onScaleFinish: (instance?: Instance<any, any>) => void;
   private editMode: "move" | "scale" | "rotate";
 
   constructor({
     gl,
     onDragFinish,
     onDrag,
+    onScale,
+    onScaleFinish,
   }: {
     gl: WebGL2RenderingContext;
     onDragFinish: (instance?: Instance<any, any>) => void;
@@ -36,12 +46,22 @@ class GuidesController {
       rotation: Vector,
       distance: number
     ) => void;
+    onScale: (
+      instance: Instance<any, any>,
+      dx: number,
+      dy: number,
+      rotation: Vector,
+      disnance: number
+    ) => void;
+    onScaleFinish: (instance?: Instance<any, any>) => void;
   }) {
     this.moveGuideInstances = this.createMoveGuides(gl);
     this.scaleGuideInstances = this.createScaleGuides(gl);
     this.shouldShowGuides = false;
     this.onDragFinish = onDragFinish;
     this.onDrag = onDrag;
+    this.onScale = onScale;
+    this.onScaleFinish = onScaleFinish;
     this.editMode = "move";
     window.addEventListener("keypress", this.handleModeChange.bind(this));
   }
@@ -56,7 +76,7 @@ class GuidesController {
         rotationVector: new Vector([0, 0, 90]),
       },
       onDrag: (e) => {
-        this.onInstanceXDrag(e);
+        this.onDragX(e);
       },
       onDragFinish: () => {
         this.onDragFinish(this.instanceWithGuides);
@@ -71,7 +91,7 @@ class GuidesController {
         rotationVector: new Vector([0, 0, 0]),
       },
       onDrag: (e) => {
-        this.onInstanceYDrag(e);
+        this.onDragY(e);
       },
       onDragFinish: () => {
         this.onDragFinish(this.instanceWithGuides);
@@ -86,7 +106,7 @@ class GuidesController {
         rotationVector: new Vector([90, 0, 0]),
       },
       onDrag: (e) => {
-        this.onInstanceZDrag(e);
+        this.onDragZ(e);
       },
       onDragFinish: () => {
         this.onDragFinish(this.instanceWithGuides);
@@ -105,10 +125,10 @@ class GuidesController {
         rotationVector: new Vector([0, 0, 90]),
       },
       onDrag: (e) => {
-        //this.onInstanceXDrag(e);
+        this.onScaleX(e);
       },
       onDragFinish: () => {
-        //this.onDragFinish(this.instanceWithGuides);
+        this.onScaleFinish(this.instanceWithGuides);
       },
     });
     const arrowY = new Arrow({
@@ -120,10 +140,10 @@ class GuidesController {
         rotationVector: new Vector([0, 0, 0]),
       },
       onDrag: (e) => {
-        //this.onInstanceYDrag(e);
+        this.onScaleY(e);
       },
       onDragFinish: () => {
-        //this.onDragFinish(this.instanceWithGuides);
+        this.onScaleFinish(this.instanceWithGuides);
       },
     });
     const arrowZ = new Arrow({
@@ -135,10 +155,10 @@ class GuidesController {
         rotationVector: new Vector([90, 0, 0]),
       },
       onDrag: (e) => {
-        //this.onInstanceZDrag(e);
+        this.onScaleZ(e);
       },
       onDragFinish: () => {
-        //this.onDragFinish(this.instanceWithGuides);
+        this.onScaleFinish(this.instanceWithGuides);
       },
     });
     return [arrowX, arrowY, arrowZ];
@@ -154,7 +174,7 @@ class GuidesController {
     }
   }
 
-  private onInstanceXDrag(payload?: InstanceDragPayload<any, any>) {
+  private onDragX(payload?: InstanceDragPayload<any, any>) {
     if (!payload || !this.instanceWithGuides) return;
 
     const { dx, dy, cameraDistance, cameraRotationVector } = payload;
@@ -179,7 +199,7 @@ class GuidesController {
     }
   }
 
-  private onInstanceYDrag(payload?: InstanceDragPayload<any, any>) {
+  private onDragY(payload?: InstanceDragPayload<any, any>) {
     if (!payload || !this.instanceWithGuides) return;
 
     const { dx, dy, cameraDistance } = payload;
@@ -204,7 +224,7 @@ class GuidesController {
    * |                |
    * |___________ X   |___________ Z
    * */
-  private onInstanceZDrag(payload?: InstanceDragPayload<any, any>) {
+  private onDragZ(payload?: InstanceDragPayload<any, any>) {
     if (!payload || !this.instanceWithGuides) return;
 
     const { dx, dy, cameraDistance, cameraRotationVector } = payload;
@@ -228,6 +248,46 @@ class GuidesController {
     } else {
       return isBackwards ? -1.0 : 1.0;
     }
+  }
+
+  private onScaleX(payload?: InstanceDragPayload<any, any>) {
+    if (!payload || !this.instanceWithGuides) return;
+    const { dx, dy, cameraDistance, cameraRotationVector } = payload;
+
+    this.onScale(
+      this.instanceWithGuides,
+      this.getXTranslationSign(cameraRotationVector) * (dx + dy),
+      0,
+      new Vector([0, 0, 0]),
+      cameraDistance
+    );
+  }
+
+  private onScaleY(payload?: InstanceDragPayload<any, any>) {
+    if (!payload || !this.instanceWithGuides) return;
+
+    const { dx, dy, cameraDistance } = payload;
+    this.onScale(
+      this.instanceWithGuides,
+      0,
+      dx + dy,
+      new Vector([0, 0, 0]),
+      cameraDistance
+    );
+  }
+
+  // Set onDrag event for more info
+  private onScaleZ(payload?: InstanceDragPayload<any, any>) {
+    if (!payload || !this.instanceWithGuides) return;
+
+    const { dx, dy, cameraDistance, cameraRotationVector } = payload;
+    this.onScale(
+      this.instanceWithGuides,
+      -this.getZTranslationSign(cameraRotationVector) * (dx + dy),
+      0,
+      new Vector([0, 90, 0]),
+      cameraDistance
+    );
   }
 
   public render({
@@ -306,6 +366,10 @@ class GuidesController {
 
   public setInstanceWithGuides(instance: Instance<any, any>) {
     this.instanceWithGuides = instance;
+  }
+
+  public getEditMode() {
+    return this.editMode;
   }
 }
 

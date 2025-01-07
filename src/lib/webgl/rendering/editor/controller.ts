@@ -8,7 +8,7 @@ import {
   InstanceTransformationProperties,
 } from "../types.js";
 import GuidesController from "./guides.js";
-import { computeObjectDragTranslation } from "./math.js";
+import { computeDragFctor, computeObjectDragTranslation } from "./math.js";
 
 export type InstanceProperties = {
   scaleVector: Vector;
@@ -26,8 +26,10 @@ class EditorController {
     this.lastInstanceProperties = new Map();
     this.guidesController = new GuidesController({
       gl,
-      onDragFinish: this.onDragFinish.bind(this),
+      onDragFinish: this.onEditionFinished.bind(this),
       onDrag: this.onDrag.bind(this),
+      onScale: this.onScale.bind(this),
+      onScaleFinish: this.onEditionFinished.bind(this),
     });
   }
 
@@ -74,7 +76,12 @@ class EditorController {
     if (!payload) return;
 
     const { instance, dx, dy, cameraRotationVector, cameraDistance } = payload;
-    this.onDrag(instance, dx, dy, cameraRotationVector, cameraDistance);
+    const editMode = this.guidesController.getEditMode();
+    if (editMode == "move") {
+      this.onDrag(instance, dx, dy, cameraRotationVector, cameraDistance);
+    } else if (editMode == "scale") {
+      this.onScale(instance, dx, dy, cameraRotationVector, cameraDistance);
+    }
   }
 
   private onDrag(
@@ -88,15 +95,12 @@ class EditorController {
     const instanceProperties = this.instancesProperties.get(id);
     if (!instanceProperties || !instance) return;
 
-    const { translationVector, scaleVector } = instanceProperties;
+    const { translationVector, scaleVector, rotationVector } =
+      instanceProperties;
 
-    const computeMotionFactor = (x: number) => {
-      return 0.00122419 * Math.pow(x, 2) - 0.00447683 * x + 0.015259;
-    };
+    const motionFactorBasedOnDistance = computeDragFctor(distance);
 
-    const motionFactorBasedOnDistance = computeMotionFactor(distance);
-
-    const newTranslation = translationVector.sum(
+    const newTranslationVector = translationVector.sum(
       computeObjectDragTranslation(
         dx,
         dy,
@@ -105,15 +109,60 @@ class EditorController {
       )
     );
 
+    this.updateInstanceTransform(id, instance, {
+      translationVector: newTranslationVector,
+      scaleVector,
+      rotationVector,
+    });
+    this.moveGuidesToObject(instance);
+  }
+
+  private updateInstanceTransform(
+    id: string,
+    instance: Instance<any, any>,
+    transform: InstanceProperties
+  ) {
     const newTransform = Matrix4.identity()
-      .translate(newTranslation)
-      .scale(scaleVector)
+      .translate(transform.translationVector)
+      .scale(transform.scaleVector)
       .toFloatArray();
 
     instance.updateUniform("uTransform", newTransform);
     instance.updateUniform("uAlpha", 0.8);
-    this.updateInstanceLastProperties(id, newTranslation);
-    this.moveGuidesToObject(instance);
+    this.updateInstanceLastProperties(id, transform);
+  }
+
+  private onScale(
+    instance: Instance<any, any>,
+    dx: number,
+    dy: number,
+    rotation: Vector,
+    distance: number
+  ) {
+    const id = this.getIdFromInstance(instance);
+    const instanceProperties = this.instancesProperties.get(id);
+    if (!instanceProperties || !instance) return;
+
+    const { translationVector, scaleVector, rotationVector } =
+      instanceProperties;
+
+    const motionFactorBasedOnDistance = computeDragFctor(distance);
+    const newScaleVector = scaleVector
+      .sum(
+        computeObjectDragTranslation(
+          dx,
+          dy,
+          rotation,
+          motionFactorBasedOnDistance
+        )
+      )
+      .absoluteValue();
+
+    this.updateInstanceTransform(id, instance, {
+      translationVector,
+      scaleVector: newScaleVector,
+      rotationVector,
+    });
   }
 
   private getIdFromInstance(instance: Instance<any, any>) {
@@ -124,22 +173,25 @@ class EditorController {
     return id;
   }
 
-  private updateInstanceLastProperties(id: string, newTranslation: Vector) {
+  private updateInstanceLastProperties(
+    id: string,
+    properties: Partial<InstanceProperties>
+  ) {
     const lastInstanceProperties = this.lastInstanceProperties.get(id);
     if (!lastInstanceProperties) return;
 
     const newInstanceProperties = {
       ...lastInstanceProperties,
-      translationVector: newTranslation,
+      ...properties,
     };
     this.lastInstanceProperties.set(id, newInstanceProperties);
   }
 
   public onInstanceDragFinish(payload?: InstanceDragEndPayload<any, any>) {
-    this.onDragFinish(payload);
+    this.onEditionFinished(payload);
   }
 
-  private onDragFinish(instance?: Instance<any, any>) {
+  private onEditionFinished(instance?: Instance<any, any>) {
     if (!instance) return;
     instance.updateUniform("uAlpha", 1);
     const id = this.getIdFromInstance(instance);
@@ -152,7 +204,7 @@ class EditorController {
     if (!instanceProperties || !lastInstanceProperties) return;
     const newInstanceProperties = {
       ...instanceProperties,
-      translationVector: lastInstanceProperties.translationVector,
+      ...lastInstanceProperties,
     };
     this.instancesProperties.set(id, newInstanceProperties);
   }

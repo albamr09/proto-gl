@@ -246,4 +246,12 @@ export class Vector {
       }, 0)
     );
   }
+
+  absoluteValue() {
+    return new Vector(
+      this.elements.map((component) => {
+        return Math.abs(component);
+      }, 0)
+    );
+  }
 }
