@@ -2,19 +2,22 @@ import { UniformKind } from "../../../core/uniform/types.js";
 import Instance from "../../../rendering/instance.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
-import generateArrow from "./geometry.js";
 import { Matrix4 } from "../../../../math/matrix.js";
-import { ArrowHead, GuideProperties } from "../types.js";
+import { GuideProperties } from "../types.js";
 import { DefaultProperties } from "./constants.js";
 import {
   InstanceDragEndPayload,
   InstanceDragPayload,
 } from "../../../rendering/types.js";
+import { generateCircle } from "./geometry.js";
 
 const DefaultAttributes = ["aPosition"] as const;
 const DefaultUniforms = ["uMaterialDiffuse", "uTransform"] as const;
 
-class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
+class Circle extends Instance<
+  typeof DefaultAttributes,
+  typeof DefaultUniforms
+> {
   private properties: GuideProperties;
   public onDrag?: ({
     instance,
@@ -34,7 +37,6 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
     properties,
     onDrag,
     onDragFinish,
-    arrowHead,
   }: {
     gl: WebGL2RenderingContext;
     id: string;
@@ -53,9 +55,8 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
         typeof DefaultUniforms
       >
     ) => void;
-    arrowHead: ArrowHead;
   }) {
-    const { vertices, indices } = Arrow.build(arrowHead);
+    const { vertices, indices } = Circle.build();
     properties = { ...DefaultProperties, ...properties };
     super({
       gl,
@@ -107,9 +108,9 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
     );
   }
 
-  static build(arrowHead: ArrowHead) {
-    return generateArrow({ arrowHead });
+  static build() {
+    return generateCircle();
   }
 }
 
-export default Arrow;
+export default Circle;

@@ -6,10 +6,12 @@ import Arrow from "../../models/editor/arrow/index.js";
 import Instance from "../instance.js";
 import { InstanceDragPayload } from "../types.js";
 import { InstanceProperties } from "./controller.js";
+import Circle from "../../models/editor/circle/index.js";
 
 class GuidesController {
   private moveGuideInstances: Arrow[];
   private scaleGuideInstances: Arrow[];
+  private rotateGuideInstances: Circle[];
   private shouldShowGuides: boolean;
   private instanceWithGuides?: Instance<any, any>;
   private onDrag: (
@@ -28,6 +30,14 @@ class GuidesController {
     disnance: number
   ) => void;
   private onScaleFinish: (instance?: Instance<any, any>) => void;
+  private onRotate: (
+    instance: Instance<any, any>,
+    dx: number,
+    dy: number,
+    rotation: Vector,
+    disnance: number
+  ) => void;
+  private onRotateFinish: (instance?: Instance<any, any>) => void;
   private editMode: "move" | "scale" | "rotate";
 
   constructor({
@@ -36,9 +46,10 @@ class GuidesController {
     onDrag,
     onScale,
     onScaleFinish,
+    onRotate,
+    onRotateFinish,
   }: {
     gl: WebGL2RenderingContext;
-    onDragFinish: (instance?: Instance<any, any>) => void;
     onDrag: (
       instance: Instance<any, any>,
       dx: number,
@@ -46,6 +57,7 @@ class GuidesController {
       rotation: Vector,
       distance: number
     ) => void;
+    onDragFinish: (instance?: Instance<any, any>) => void;
     onScale: (
       instance: Instance<any, any>,
       dx: number,
@@ -54,14 +66,25 @@ class GuidesController {
       disnance: number
     ) => void;
     onScaleFinish: (instance?: Instance<any, any>) => void;
+    onRotate: (
+      instance: Instance<any, any>,
+      dx: number,
+      dy: number,
+      rotation: Vector,
+      disnance: number
+    ) => void;
+    onRotateFinish: (instance?: Instance<any, any>) => void;
   }) {
     this.moveGuideInstances = this.createMoveGuides(gl);
     this.scaleGuideInstances = this.createScaleGuides(gl);
+    this.rotateGuideInstances = this.createRotateGuides(gl);
     this.shouldShowGuides = false;
-    this.onDragFinish = onDragFinish;
     this.onDrag = onDrag;
+    this.onDragFinish = onDragFinish;
     this.onScale = onScale;
     this.onScaleFinish = onScaleFinish;
+    this.onRotate = onRotate;
+    this.onRotateFinish = onRotateFinish;
     this.editMode = "move";
     window.addEventListener("keypress", this.handleModeChange.bind(this));
   }
@@ -163,6 +186,52 @@ class GuidesController {
     });
     return [arrowX, arrowY, arrowZ];
   };
+
+  private createRotateGuides(gl: WebGL2RenderingContext) {
+    const circleX = new Circle({
+      id: "rotate-x",
+      gl,
+      properties: {
+        color: [1, 0, 0, 0.8],
+        rotationVector: new Vector([0, 90, 0]),
+      },
+      onDrag: (e) => {
+        this.onRotateX(e);
+      },
+      onDragFinish: () => {
+        this.onRotateFinish(this.instanceWithGuides);
+      },
+    });
+    const circleY = new Circle({
+      id: "rotate-y",
+      gl,
+      properties: {
+        color: [0, 1, 0, 0.8],
+        rotationVector: new Vector([90, 0, 0]),
+      },
+      onDrag: (e) => {
+        this.onRotateY(e);
+      },
+      onDragFinish: () => {
+        this.onRotateFinish(this.instanceWithGuides);
+      },
+    });
+    const circleZ = new Circle({
+      id: "rotate-z",
+      gl,
+      properties: {
+        color: [0, 0, 1, 0.8],
+        rotationVector: new Vector([0, 0, 0]),
+      },
+      onDrag: (e) => {
+        this.onRotateZ(e);
+      },
+      onDragFinish: () => {
+        this.onRotateFinish(this.instanceWithGuides);
+      },
+    });
+    return [circleX, circleY, circleZ];
+  }
 
   private handleModeChange(e: KeyboardEvent) {
     if (e.key == "m") {
@@ -276,7 +345,7 @@ class GuidesController {
     );
   }
 
-  // Set onDrag event for more info
+  // See onDrag event for more info
   private onScaleZ(payload?: InstanceDragPayload<any, any>) {
     if (!payload || !this.instanceWithGuides) return;
 
@@ -290,6 +359,45 @@ class GuidesController {
     );
   }
 
+  private onRotateX(payload: InstanceDragPayload<any, any>) {
+    if (!payload || !this.instanceWithGuides) return;
+
+    const { dx, dy, cameraDistance } = payload;
+    this.onRotate(
+      this.instanceWithGuides,
+      0,
+      dx + dy,
+      new Vector([0, 0, 0]),
+      cameraDistance
+    );
+  }
+
+  private onRotateY(payload: InstanceDragPayload<any, any>) {
+    if (!payload || !this.instanceWithGuides) return;
+
+    const { dx, dy, cameraDistance } = payload;
+    this.onRotate(
+      this.instanceWithGuides,
+      dx + dy,
+      0,
+      new Vector([0, 0, 0]),
+      cameraDistance
+    );
+  }
+
+  // See onDrag event for more info
+  private onRotateZ(payload: InstanceDragPayload<any, any>) {
+    if (!payload || !this.instanceWithGuides) return;
+
+    const { dx, dy, cameraDistance } = payload;
+    this.onRotate(
+      this.instanceWithGuides,
+      dx + dy,
+      0,
+      new Vector([90, 0, 0]),
+      cameraDistance
+    );
+  }
   public render({
     modelViewMatrix,
     normalMatrix,
@@ -306,7 +414,7 @@ class GuidesController {
         projectionMatrix: projectionMatrix,
         normalMatrix: normalMatrix,
       });
-      instance.render({});
+      instance.render({ depthTest: false });
     });
   }
 
@@ -334,7 +442,11 @@ class GuidesController {
   }
 
   private getAllGuides() {
-    return [...this.moveGuideInstances, ...this.scaleGuideInstances];
+    return [
+      ...this.moveGuideInstances,
+      ...this.scaleGuideInstances,
+      ...this.rotateGuideInstances,
+    ];
   }
 
   public setShowGuides(x: boolean) {
@@ -344,15 +456,11 @@ class GuidesController {
   public findLast(
     cb: (o: Instance<any, any>) => Instance<any, any> | undefined
   ) {
-    return this.getCurrentModeGuides().reduce<Instance<any, any> | undefined>(
-      (objectFound, instance) => {
-        objectFound = cb(instance as Instance<any, any>)
-          ? (instance as Instance<any, any>)
-          : objectFound;
-        return objectFound;
-      },
-      undefined
-    );
+    return (this.getCurrentModeGuides() as Instance<any, any>[]).reduce<
+      Instance<any, any> | undefined
+    >((objectFound, instance) => {
+      return cb(instance) ? instance : objectFound;
+    }, undefined);
   }
 
   private getCurrentModeGuides() {
@@ -360,6 +468,8 @@ class GuidesController {
       return this.moveGuideInstances;
     } else if (this.editMode == "scale") {
       return this.scaleGuideInstances;
+    } else if (this.editMode == "rotate") {
+      return this.rotateGuideInstances;
     }
     return [];
   }

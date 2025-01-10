@@ -329,10 +329,17 @@ class Instance<
 
   public render({
     cb = () => {},
+    depthTest = true,
   }: {
     cb?: (o: Instance<A, U>, gl: WebGL2RenderingContext) => void;
+    depthTest?: boolean;
   }) {
     if (!this.configuration.visible) return;
+    const hadDepthTest = this.gl.getParameter(this.gl.DEPTH_TEST);
+    const shouldChangeDepthTest = depthTest !== hadDepthTest;
+    if (shouldChangeDepthTest) {
+      this.gl[depthTest ? "enable" : "disable"](this.gl.DEPTH_TEST);
+    }
     // Use this program instance
     this.program.use();
     // Bind vertices and indices
@@ -373,6 +380,10 @@ class Instance<
     // Unbind
     this.gl.bindVertexArray(null);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+
+    if (shouldChangeDepthTest) {
+      this.gl[hadDepthTest ? "enable" : "disable"](this.gl.DEPTH_TEST);
+    }
   }
 
   public triggerOnClick() {

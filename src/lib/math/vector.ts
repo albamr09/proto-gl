@@ -242,7 +242,7 @@ export class Vector {
   module() {
     return Math.sqrt(
       this.elements.reduce((sum, component) => {
-        return (sum + component) ^ 2;
+        return sum + Math.pow(component, 2);
       }, 0)
     );
   }

@@ -8,7 +8,7 @@ import {
   InstanceTransformationProperties,
 } from "../types.js";
 import GuidesController from "./guides.js";
-import { computeDragFctor, computeObjectDragTranslation } from "./math.js";
+import { computeMotionFactorForZoom, computeDragVector } from "./math.js";
 
 export type InstanceProperties = {
   scaleVector: Vector;
@@ -26,10 +26,12 @@ class EditorController {
     this.lastInstanceProperties = new Map();
     this.guidesController = new GuidesController({
       gl,
-      onDragFinish: this.onEditionFinished.bind(this),
       onDrag: this.onDrag.bind(this),
+      onDragFinish: this.onEditionFinished.bind(this),
       onScale: this.onScale.bind(this),
       onScaleFinish: this.onEditionFinished.bind(this),
+      onRotate: this.onRotate.bind(this),
+      onRotateFinish: this.onEditionFinished.bind(this),
     });
   }
 
@@ -81,6 +83,8 @@ class EditorController {
       this.onDrag(instance, dx, dy, cameraRotationVector, cameraDistance);
     } else if (editMode == "scale") {
       this.onScale(instance, dx, dy, cameraRotationVector, cameraDistance);
+    } else if (editMode == "rotate") {
+      this.onRotate(instance, dx, dy, cameraRotationVector, cameraDistance);
     }
   }
 
@@ -95,41 +99,35 @@ class EditorController {
     const instanceProperties = this.instancesProperties.get(id);
     if (!instanceProperties || !instance) return;
 
-    const { translationVector, scaleVector, rotationVector } =
-      instanceProperties;
+    const { translationVector } = instanceProperties;
 
-    const motionFactorBasedOnDistance = computeDragFctor(distance);
-
+    const motionFactorBasedOnDistance = computeMotionFactorForZoom(distance);
     const newTranslationVector = translationVector.sum(
-      computeObjectDragTranslation(
-        dx,
-        dy,
-        rotation,
-        motionFactorBasedOnDistance
-      )
+      computeDragVector(dx, dy, rotation, motionFactorBasedOnDistance)
     );
 
-    this.updateInstanceTransform(id, instance, {
+    this.updateInstanceProperties(id, instance, {
+      ...instanceProperties,
       translationVector: newTranslationVector,
-      scaleVector,
-      rotationVector,
     });
     this.moveGuidesToObject(instance);
   }
 
-  private updateInstanceTransform(
+  private updateInstanceProperties(
     id: string,
     instance: Instance<any, any>,
     transform: InstanceProperties
   ) {
     const newTransform = Matrix4.identity()
       .translate(transform.translationVector)
+      .rotateVecDeg(transform.rotationVector)
       .scale(transform.scaleVector)
       .toFloatArray();
 
     instance.updateUniform("uTransform", newTransform);
     instance.updateUniform("uAlpha", 0.8);
     this.updateInstanceLastProperties(id, transform);
+    this.moveGuidesToObject(instance);
   }
 
   private onScale(
@@ -143,25 +141,43 @@ class EditorController {
     const instanceProperties = this.instancesProperties.get(id);
     if (!instanceProperties || !instance) return;
 
-    const { translationVector, scaleVector, rotationVector } =
-      instanceProperties;
+    const { scaleVector } = instanceProperties;
 
-    const motionFactorBasedOnDistance = computeDragFctor(distance);
+    const motionFactorBasedOnDistance = computeMotionFactorForZoom(distance);
     const newScaleVector = scaleVector
-      .sum(
-        computeObjectDragTranslation(
-          dx,
-          dy,
-          rotation,
-          motionFactorBasedOnDistance
-        )
-      )
+      .sum(computeDragVector(dx, dy, rotation, motionFactorBasedOnDistance))
       .absoluteValue();
 
-    this.updateInstanceTransform(id, instance, {
-      translationVector,
+    this.updateInstanceProperties(id, instance, {
+      ...instanceProperties,
       scaleVector: newScaleVector,
-      rotationVector,
+    });
+  }
+
+  private onRotate(
+    instance: Instance<any, any>,
+    dx: number,
+    dy: number,
+    rotation: Vector,
+    distance: number
+  ) {
+    const id = this.getIdFromInstance(instance);
+    const instanceProperties = this.instancesProperties.get(id);
+    if (!instanceProperties || !instance) return;
+
+    const { rotationVector } = instanceProperties;
+
+    const motionFactorBasedOnDistance = computeMotionFactorForZoom(distance);
+    const mousePositionVector = computeDragVector(
+      dy,
+      dx,
+      rotation,
+      10 * motionFactorBasedOnDistance
+    );
+
+    this.updateInstanceProperties(id, instance, {
+      ...instanceProperties,
+      rotationVector: rotationVector.sum(mousePositionVector),
     });
   }
 
@@ -195,10 +211,10 @@ class EditorController {
     if (!instance) return;
     instance.updateUniform("uAlpha", 1);
     const id = this.getIdFromInstance(instance);
-    this.updateInstanceProperties(id);
+    this.syncInstancePropertiesWithLast(id);
   }
 
-  private updateInstanceProperties(id: string) {
+  private syncInstancePropertiesWithLast(id: string) {
     const instanceProperties = this.instancesProperties.get(id);
     const lastInstanceProperties = this.lastInstanceProperties.get(id);
     if (!instanceProperties || !lastInstanceProperties) return;

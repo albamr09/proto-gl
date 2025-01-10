@@ -44,14 +44,6 @@ let scene: Scene;
 let camera: Camera;
 let pickingController: PickingController;
 let program: Program<typeof attributes, typeof uniforms>;
-let titleElement: HTMLDivElement;
-let sliders: {
-  labelElement: HTMLLabelElement;
-  textInput: HTMLInputElement;
-  sliderInput: HTMLInputElement;
-}[];
-let selectedInstance: Instance<typeof attributes, typeof uniforms>;
-let objectProperties: { [x: string]: ObjectProperties } = {};
 
 const initProgram = () => {
   scene = new Scene(gl, true);
@@ -103,7 +95,6 @@ const loadObject = (path: string, id: string, properties: ObjectProperties) => {
       type: UniformKind.VECTOR_FLOAT,
     },
   };
-  objectProperties[id] = { ...properties };
   loadData(path).then((data) => {
     const { vertices, indices, diffuse } = data;
     const instance = new Instance<typeof attributes, typeof uniforms>({
@@ -145,12 +136,6 @@ const loadObject = (path: string, id: string, properties: ObjectProperties) => {
         },
         ...ligthUniforms,
       },
-      onClick: (o) => {
-        selectedInstance = o;
-        titleElement.textContent = `Selected element ${o.getId() ?? "None"}`;
-        const instanceProperties = getInstanceProperties(instance);
-        updateControls(instanceProperties);
-      },
       transformationProperties: {
         scaleVector: properties.scale,
         translationVector: properties.translate,
@@ -158,28 +143,6 @@ const loadObject = (path: string, id: string, properties: ObjectProperties) => {
     });
     scene.add(instance);
   });
-};
-
-const getInstanceProperties = (
-  o: Instance<typeof attributes, typeof uniforms>
-) => {
-  const id = o.getId();
-  if (!id) {
-    throw new Error("Cannot access properties of an object without id");
-  }
-  return { ...objectProperties[id] };
-};
-
-const updateInstanceProperties = (
-  o: Instance<typeof attributes, typeof uniforms>,
-  property: keyof ObjectProperties,
-  value: any
-) => {
-  const id = o.getId();
-  if (!id) {
-    return;
-  }
-  objectProperties[id][property] = value;
 };
 
 const initData = () => {
@@ -219,59 +182,10 @@ const render = () => {
   requestAnimationFrame(render);
 };
 
-const updateControls = (properties: ObjectProperties) => {
-  sliders.forEach((_, i) => {
-    sliders[i].labelElement.style.visibility = "visible";
-    sliders[i].sliderInput.style.visibility = "visible";
-    sliders[i].textInput.style.visibility = "visible";
-    sliders[i].sliderInput.value = `${properties.scale.at(i)}`;
-    sliders[i].textInput.value = `${properties.scale.at(i)}`;
-  });
-};
-
-const createControls = () => {
-  initController();
-  const controlContainer = document.getElementById("control-container");
-
-  titleElement = document.createElement("div");
-  titleElement.textContent = "No object is selected";
-  titleElement.style.fontSize = "16px";
-  titleElement.style.fontWeight = "bold";
-  titleElement.style.marginBottom = "10px";
-  controlContainer?.appendChild(titleElement);
-
-  sliders = createVector3dSliders({
-    labels: ["Scale on X", "Scale on Y", "Scale on Z"],
-    value: [1, 1, 1],
-    min: 0,
-    max: 5,
-    step: 0.1,
-    onChange: (scaleVector) => {
-      const selectedInstanceProperties =
-        getInstanceProperties(selectedInstance);
-      updateInstanceProperties(
-        selectedInstance,
-        "scale",
-        new Vector(scaleVector)
-      );
-      const newTransform = Matrix4.identity()
-        .translate(selectedInstanceProperties.translate)
-        .scale(new Vector(scaleVector))
-        .toFloatArray();
-      selectedInstance.updateUniform("uTransform", newTransform);
-    },
-  });
-  sliders.forEach((slider) => {
-    slider.labelElement.style.visibility = "hidden";
-    slider.sliderInput.style.visibility = "hidden";
-    slider.textInput.style.visibility = "hidden";
-  });
-};
-
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "This is an example on how to implement picking based on the color of each object using an offscreen framebuffer. On this example you can click objects as well as drag them around the scene when the Ctrl key is pressed."
+    "This is an example on how to implement picking based on the color of each object using an offscreen framebuffer. On this example you can click objects in order to edit them (translate, scale and rotate them). To change between each edition mode use the keys: M (translate the object), S (scale the object) and R (rotate the object). To exit the edition mode press the ESC key."
   );
 
   gl = getGLContext();
@@ -281,7 +195,6 @@ const init = () => {
   initProgram();
   initData();
   render();
-  createControls();
 };
 
 window.onload = init;

@@ -1,6 +1,6 @@
-import { Vector } from "../../../../math/vector.js";
+import { Vector } from "../../../math/vector.js";
 
-export type ArrowPorperties = {
+export type GuideProperties = {
   color?: number[];
   scaleVector?: Vector;
   translationVector?: Vector;
