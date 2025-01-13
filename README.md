@@ -111,6 +111,22 @@ yarn test
 - [Uniform Arrays](./src/ch06/03/): show how to render different light sources on the same scene by using uniform arrays.
 - [Spot Lights](./src/ch06/04/): show how to use spotlights or what we call directional point lights.
 - [Attenuated Lights](./src/ch06/05/): show how to use spotlights or what we call directional point lights. . But with a twist! We know add an attenuation factor based on the angle between the light and the surface that makes for a more realistic effect.
+- [Blending](./src/ch06/06/): see how different blending configuration changes the scene.
+- [Face Culling](./src/ch06/07): showcase how face culling works.
+- [Rendering Order](./src/ch06/08): shows how rendering ordering affects the effect of transparency.
+
+### Chapter 7: Textures
+
+- [Rendering a Texture](./src/ch07/01/): show how to render a simple texture.
+- [Rendering Different Textures](./src/ch07/02): on this example we show how to pick between different images to act as a texture.
+- [Texture Filtering Modes](./src/ch07/03): we show how different texture filter modes work.
+- [Texture Wrapping Modes](./src/ch07/04): we show how to use the different texture wrapping modes.
+- [Multiple Textures](./src/ch07/05/): this example shows how to use multiple textures.
+- [Cube Maps](./src/ch07/06/): on this example we demonstrate how to use cube maps.
+
+### Chapter 8: Picking
+
+- [Editor](./src/ch08/01): on this example we display a very simple scene editor that uses picking techniches to transform objects.
 
 ---
 

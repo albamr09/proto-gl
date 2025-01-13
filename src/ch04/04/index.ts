@@ -27,8 +27,8 @@ import Scene from "../../lib/webgl/rendering/scene.js";
 import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import fragmentShaderSource from "./fs.gl.js";
 import vertexShaderSource from "./vs.gl.js";
-import { CameraType } from "../../lib/webgl/camera/types.js";
-import Camera from "../../lib/webgl/camera/camera.js";
+import { CameraType } from "../../lib/webgl/core/camera/types.js";
+import Camera from "../../lib/webgl/core/camera/camera.js";
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [

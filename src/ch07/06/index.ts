@@ -6,9 +6,12 @@ import {
   configureCanvas,
   getGLContext,
 } from "../../lib/web-gl.js";
-import Camera from "../../lib/webgl/camera/camera.js";
-import Controller from "../../lib/webgl/camera/controller.js";
-import { CameraType, ProjectionType } from "../../lib/webgl/camera/types.js";
+import Camera from "../../lib/webgl/core/camera/camera.js";
+import Controller from "../../lib/webgl/core/events/controller.js";
+import {
+  CameraType,
+  ProjectionType,
+} from "../../lib/webgl/core/camera/types.js";
 import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import Axis from "../../lib/webgl/models/axis/index.js";
 import Floor from "../../lib/webgl/models/floor/index.js";

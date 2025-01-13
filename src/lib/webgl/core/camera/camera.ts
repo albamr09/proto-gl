@@ -1,7 +1,7 @@
-import { Angle } from "../../math/angle.js";
-import { Matrix4 } from "../../math/matrix.js";
-import { Vector } from "../../math/vector.js";
-import Scene from "../rendering/scene.js";
+import { Angle } from "../../../math/angle.js";
+import { Matrix4 } from "../../../math/matrix.js";
+import { Vector } from "../../../math/vector.js";
+import Scene from "../../rendering/scene.js";
 import { CameraType, ProjectionType } from "./types.js";
 
 class Camera {
