@@ -18,7 +18,8 @@ export const computeDragVector = (
   return new Vector(combinedVector);
 };
 
-// TODO: fix this
 export const computeMotionFactorForZoom = (distance: number) => {
-  return 0.00447683 * distance + 0.015259;
+  return (
+    0.00000104067 * Math.pow(distance, 2) + 0.000610653 * distance - 0.000139826
+  );
 };

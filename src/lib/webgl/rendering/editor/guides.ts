@@ -389,10 +389,10 @@ class GuidesController {
   private onRotateZ(payload: InstanceDragPayload<any, any>) {
     if (!payload || !this.instanceWithGuides) return;
 
-    const { dx, dy, cameraDistance } = payload;
+    const { dx, dy, cameraDistance, cameraRotationVector } = payload;
     this.onRotate(
       this.instanceWithGuides,
-      dx + dy,
+      -this.getZTranslationSign(cameraRotationVector) * (dx + dy),
       0,
       new Vector([90, 0, 0]),
       cameraDistance
