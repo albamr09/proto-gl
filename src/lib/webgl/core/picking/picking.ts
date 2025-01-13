@@ -144,22 +144,32 @@ class PickingController extends EventTarget {
     }
   }
 
-  // TODO: review this
+  /**
+   * Calculates the 2D coordinates of a mouse event relative to the canvas element.
+   *
+   * This method computes the position of a mouse event on a canvas, accounting for
+   * the canvas's position within the document and the current scroll position.
+   * It also transforms the vertical coordinate from a top-left origin to a
+   * bottom-left origin.
+   *
+   * @param e - The mouse event containing the cursor's position relative to the viewport.
+   * @returns An object with the calculated `x` and `y` coordinates:
+   *   - `x`: The horizontal position of the mouse relative to the canvas.
+   *   - `y`: The vertical position of the mouse relative to the canvas, with the origin at the bottom-left corner.
+   */
   private get2DCoords(e: MouseEvent) {
     let top = 0,
       left = 0,
       canvas: HTMLCanvasElement | null = this.canvas;
 
-    while (canvas && canvas.tagName !== "BODY") {
+    while (canvas instanceof HTMLElement && canvas.tagName !== "BODY") {
       top += canvas.offsetTop;
       left += canvas.offsetLeft;
-      // TODO: type well
-      // @ts-ignore
-      canvas = canvas.offsetParent;
+      canvas = canvas.offsetParent as typeof canvas;
     }
 
-    left += window.pageXOffset;
-    top -= window.pageYOffset;
+    left += window.scrollX;
+    top -= window.scrollY;
 
     return {
       x: e.clientX - left,
@@ -169,8 +179,7 @@ class PickingController extends EventTarget {
 
   private getClickedObject(x: number, y: number) {
     if (!this.frameBuffer) {
-      console.warn("Could not pick object, framebuffer not initialized");
-      return;
+      throw Error("Could not pick object, framebuffer not initialized");
     }
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
     const pixelColor = Array.prototype.map.call(
