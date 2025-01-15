@@ -1,10 +1,5 @@
 import { loadData } from "../../lib/files.js";
-import {
-  createDescriptionPanel,
-  createVector3dSliders,
-  initController,
-  initGUI,
-} from "../../lib/gui/index.js";
+import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
 import { calculateNormals } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
 import { Vector } from "../../lib/math/vector.js";

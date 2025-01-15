@@ -189,6 +189,7 @@ class PickingController extends EventTarget {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
     return this.scene.findLastAllObjects((object) => {
       const objectColor = this.getHitValue(object);
+      if (!objectColor) return;
       const denormalizedColor = denormalizeColor(objectColor);
       if (this.compare(denormalizedColor, pixelColor)) {
         return object;
