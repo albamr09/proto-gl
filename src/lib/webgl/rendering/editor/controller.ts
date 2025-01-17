@@ -242,6 +242,10 @@ class EditorController {
   public hideGuides() {
     this.guidesController.setShowGuides(false);
   }
+
+  public getInstances() {
+    return this.guidesController.getAllGuides();
+  }
 }
 
 export default EditorController;

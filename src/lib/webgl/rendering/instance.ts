@@ -391,6 +391,7 @@ class Instance<
     this.onClick && this.onClick(payload);
     this.dispatchEvent(new CustomEvent("click", { detail: payload }));
   }
+
   public triggerOnDrag(
     dx: number,
     dy: number,

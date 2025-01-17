@@ -27,6 +27,7 @@ import vertexShaderSource from "./vs.glsl.js";
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
+  "uLabelColor",
   "uMaterialDiffuse",
   "uTransform",
   "uLightPosition",
@@ -49,14 +50,7 @@ const initProgram = () => {
     gl,
     scene
   );
-  const pickingController = new PickingController(
-    scene,
-    canvas,
-    (instance: Instance<typeof attributes, typeof uniforms>) => {
-      //@ts-ignore
-      return instance.getUniform("uMaterialDiffuse")?.getData();
-    }
-  );
+  const pickingController = new PickingController(scene, canvas);
   new Controller({ camera, canvas, pickingController });
   camera.setPosition(new Vector([0, 0, 40]));
   camera.setElevation(-40);
@@ -130,6 +124,10 @@ const loadObject = (
           data: properties?.color ?? [1, 1, 1, 1],
           type: UniformKind.VECTOR_FLOAT,
         },
+        uLabelColor: {
+          data: [0, 0, 0, 1],
+          type: UniformKind.VECTOR_FLOAT,
+        },
         uTransform: {
           data: Matrix4.identity()
             .translate(properties?.translationVector ?? new Vector([0, 0, 0]))
@@ -163,7 +161,7 @@ const initData = () => {
       color: [Math.random(), Math.random(), Math.random(), 1],
     });
   });
-  scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
+  scene.add(new Floor({ gl, dimension: 82, lines: 4 }));
   scene.add(new Axis({ gl, dimension: 82 }));
 };
 

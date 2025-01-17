@@ -441,7 +441,7 @@ class GuidesController {
     });
   }
 
-  private getAllGuides() {
+  public getAllGuides() {
     return [
       ...this.moveGuideInstances,
       ...this.scaleGuideInstances,

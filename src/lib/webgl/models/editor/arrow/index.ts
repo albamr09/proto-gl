@@ -12,7 +12,12 @@ import {
 } from "../../../rendering/types.js";
 
 const DefaultAttributes = ["aPosition"] as const;
-const DefaultUniforms = ["uMaterialDiffuse", "uTransform"] as const;
+const DefaultUniforms = [
+  "uOffScreen",
+  "uMaterialDiffuse",
+  "uTransform",
+  "uLabelColor",
+] as const;
 
 class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
   private properties: GuideProperties;
@@ -77,6 +82,14 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
         uTransform: {
           data: Matrix4.identity().toFloatArray(),
           type: UniformKind.MATRIX,
+        },
+        uLabelColor: {
+          data: [0, 0, 0, 0],
+          type: UniformKind.VECTOR_FLOAT,
+        },
+        uOffScreen: {
+          data: 0,
+          type: UniformKind.SCALAR_INT,
         },
       },
       indices,

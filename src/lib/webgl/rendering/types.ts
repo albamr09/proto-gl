@@ -47,7 +47,12 @@ export type InstanceDragEndPayload<
   U extends readonly string[]
 > = Instance<A, U>;
 
-export type SceneEventTypes = "render";
+export type InstanceAddedPayload<
+  A extends readonly string[],
+  U extends readonly string[]
+> = Instance<A, U>;
+
+export type SceneEventTypes = "render" | "instanceadded";
 
 export type InstanceEventTypes = "click" | "drag" | "dragend";
 

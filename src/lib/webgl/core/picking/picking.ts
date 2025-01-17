@@ -1,7 +1,9 @@
 import { denormalizeColor } from "../../../colors.js";
 import { Vector } from "../../../math/vector.js";
+import { GuideIntances } from "../../models/editor/types.js";
 import Instance from "../../rendering/instance.js";
 import Scene from "../../rendering/scene.js";
+import { InstanceAddedPayload } from "../../rendering/types.js";
 
 class PickingController extends EventTarget {
   private canvas: HTMLCanvasElement;
@@ -10,8 +12,7 @@ class PickingController extends EventTarget {
   private renderBuffer?: WebGLRenderbuffer | null;
   private texture?: WebGLTexture | null;
   private frameBuffer?: WebGLFramebuffer | null;
-  private getHitValue: (o: Instance<any, any>) => number[];
-  // State
+  private instanceLabels: Set<number[]>;
   private x: number;
   private y: number;
   private lastX: number;
@@ -19,11 +20,7 @@ class PickingController extends EventTarget {
   private selectedObject?: Instance<any, any>;
   private dragStarted: boolean;
 
-  constructor(
-    scene: Scene,
-    canvas: HTMLCanvasElement,
-    getHitValue: (o: Instance<any, any>) => number[]
-  ) {
+  constructor(scene: Scene, canvas: HTMLCanvasElement) {
     super();
     this.canvas = canvas;
     this.gl = scene.getContext();
@@ -33,12 +30,17 @@ class PickingController extends EventTarget {
     this.lastX = 0;
     this.lastY = 0;
     this.dragStarted = false;
-    this.getHitValue = getHitValue;
+    this.instanceLabels = new Set();
     this.createRenderBuffer(canvas);
     this.createTexture(canvas);
     this.createFrameBuffer();
 
     this.scene.addEventListener("render", () => this.render());
+    this.scene.addEventListener(
+      "instanceadded",
+      this.onInstanceAdded.bind(this)
+    );
+    this.addEditorInstances();
     window.addEventListener("keydown", this.onKeyPressed.bind(this));
     window.addEventListener("keyup", this.onKeyPressed.bind(this));
   }
@@ -122,6 +124,28 @@ class PickingController extends EventTarget {
     }
   }
 
+  private onInstanceAdded(e: CustomEventInit<InstanceAddedPayload<any, any>>) {
+    const { detail: instance } = e;
+    if (!instance) return;
+    this.registerNewInstance(instance);
+  }
+
+  private registerNewInstance(instance: Instance<any, any> | GuideIntances) {
+    const newColor = [Math.random(), Math.random(), Math.random(), 1];
+    if (!this.instanceLabels.has(newColor)) {
+      this.instanceLabels.add(newColor);
+      instance.updateUniform("uLabelColor", newColor);
+    } else {
+      this.registerNewInstance(instance);
+    }
+  }
+
+  private addEditorInstances() {
+    this.scene.getEditorInstances()?.forEach((instance) => {
+      this.registerNewInstance(instance);
+    });
+  }
+
   private onKeyPressed(e: KeyboardEvent) {
     this.setDragStarted(e.key !== "Escape");
   }
@@ -195,6 +219,11 @@ class PickingController extends EventTarget {
         return object;
       }
     });
+  }
+
+  private getHitValue(instance: Instance<any, any>) {
+    const labelColor = instance.getUniform("uLabelColor");
+    return labelColor?.getData() as [number, number, number, number];
   }
 
   private compare(objectColor: number[], pixelColor: number[]) {

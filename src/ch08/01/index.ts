@@ -51,12 +51,7 @@ const initProgram = () => {
     gl,
     scene
   );
-  const getHitValue = (o: Instance<typeof attributes, typeof uniforms>) => {
-    // @ts-ignore
-    const data = o.getUniform("uMaterialDiffuse")?.getData();
-    return data;
-  };
-  pickingController = new PickingController(scene, canvas, getHitValue);
+  pickingController = new PickingController(scene, canvas);
   new Controller({ camera, canvas, pickingController });
   camera.setPosition(new Vector([0, 0, 40]));
   camera.setElevation(-40);

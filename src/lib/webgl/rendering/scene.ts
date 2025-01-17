@@ -59,6 +59,7 @@ class Scene extends EventTarget {
       id,
       instance.getTransformationProperties()
     );
+    this.dispatchEvent(new CustomEvent("instanceadded", { detail: instance }));
   }
 
   private addInstanceListeners = <
@@ -345,6 +346,14 @@ class Scene extends EventTarget {
 
   public disableEditor() {
     this.editorController?.hideGuides();
+  }
+
+  public getInstances() {
+    return this.objects;
+  }
+
+  public getEditorInstances() {
+    return this.editorController?.getInstances();
   }
 }
 
