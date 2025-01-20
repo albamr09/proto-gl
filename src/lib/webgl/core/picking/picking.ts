@@ -3,7 +3,10 @@ import { Vector } from "../../../math/vector.js";
 import { GuideIntances } from "../../models/editor/types.js";
 import Instance from "../../rendering/instance.js";
 import Scene from "../../rendering/scene.js";
-import { InstanceAddedPayload } from "../../rendering/types.js";
+import {
+  InstanceAddedPayload,
+  InstanceRemovedPayload,
+} from "../../rendering/types.js";
 
 class PickingController extends EventTarget {
   private canvas: HTMLCanvasElement;
@@ -39,6 +42,10 @@ class PickingController extends EventTarget {
     this.scene.addEventListener(
       "instanceadded",
       this.onInstanceAdded.bind(this)
+    );
+    this.scene.addEventListener(
+      "instanceremoved",
+      this.onInstanceRemoved.bind(this)
     );
     this.addEditorInstances();
     window.addEventListener("keydown", this.onKeyPressed.bind(this));
@@ -144,6 +151,19 @@ class PickingController extends EventTarget {
     this.scene.getEditorInstances()?.forEach((instance) => {
       this.registerNewInstance(instance);
     });
+  }
+
+  private onInstanceRemoved(
+    e: CustomEventInit<InstanceRemovedPayload<any, any>>
+  ) {
+    const { detail: instance } = e;
+    const labelColor = instance
+      ?.getUniform("uLabelColor")
+      ?.getData() as number[];
+    if (!labelColor) {
+      return;
+    }
+    this.instanceLabels.delete(labelColor);
   }
 
   private onKeyPressed(e: KeyboardEvent) {

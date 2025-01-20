@@ -165,6 +165,7 @@ const loadObject = (
         if (!previousColor || previousColor.length != 4) return;
         instance.updateUniform("uMaterialDiffuse", previousColor);
         previousColor = [];
+        scene.remove(id);
       },
     });
     scene.add(ballInstance);
@@ -176,12 +177,19 @@ const initData = () => {
   const maxX = 30;
   const maxZ = 30;
   Array.from({ length: nObjects }).forEach((_, i) => {
+    const isCylinder = i % 2 == 0;
     const generatedX = Math.random() * maxX - maxX / 2;
     const generatedZ = Math.random() * maxZ - maxZ / 2;
     const color = Math.random();
-    loadObject("/data/models/geometries/ball.json", `ball-${i}`, {
+    const scale = isCylinder
+      ? Math.min(Math.random() / 3, 0.4)
+      : Math.max(1.0, Math.random() + 0.3);
+    const path = isCylinder
+      ? "/data/models/geometries/cylinder.json"
+      : "/data/models/geometries/ball.json";
+    loadObject(path, `object-${i}`, {
       translationVector: new Vector([generatedX, 0, generatedZ]),
-      scaleVector: new Vector([0.7, 0.7, 0.7]),
+      scaleVector: new Vector([scale, scale, scale]),
       color: [color, color, color, 1],
     });
   });

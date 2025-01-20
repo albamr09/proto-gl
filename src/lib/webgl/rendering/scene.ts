@@ -77,6 +77,22 @@ class Scene extends EventTarget {
     instance.addEventListener("dragend", this.onInstanceDragFinish.bind(this));
   };
 
+  public remove(id: string) {
+    const instance = this.objects.get(id);
+    if (!instance) return;
+    instance.removeEventListener("click", this.onInstanceClick.bind(this));
+    instance.removeEventListener("drag", this.onInstanceDrag.bind(this));
+    instance.removeEventListener(
+      "dragend",
+      this.onInstanceDragFinish.bind(this)
+    );
+    this.objects.delete(id);
+    this.renderOrder = this.renderOrder.filter((objectId) => objectId != id);
+    this.dispatchEvent(
+      new CustomEvent("instanceremoved", { detail: instance })
+    );
+  }
+
   private onInstanceClick(e: CustomEventInit<InstanceClickPayload<any, any>>) {
     if (!e.detail) return;
     this.editorController?.moveGuidesToObject(e.detail);

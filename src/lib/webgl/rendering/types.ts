@@ -52,7 +52,12 @@ export type InstanceAddedPayload<
   U extends readonly string[]
 > = Instance<A, U>;
 
-export type SceneEventTypes = "render" | "instanceadded";
+export type InstanceRemovedPayload<
+  A extends readonly string[],
+  U extends readonly string[]
+> = Instance<A, U>;
+
+export type SceneEventTypes = "render" | "instanceadded" | "instanceremoved";
 
 export type InstanceEventTypes = "click" | "drag" | "dragend";
 
