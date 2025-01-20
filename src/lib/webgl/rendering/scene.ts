@@ -22,7 +22,10 @@ class Scene extends EventTarget {
   private projectionMatrix: Matrix4;
   private editorController?: EditorController;
 
-  constructor(gl: WebGL2RenderingContext, allowEdit?: boolean) {
+  constructor(
+    gl: WebGL2RenderingContext,
+    editorConfiguration?: { allow?: boolean; showGuides?: boolean }
+  ) {
     super();
     this.gl = gl;
     this.modelViewMatrix = Matrix4.identity();
@@ -30,9 +33,10 @@ class Scene extends EventTarget {
     this.projectionMatrix = Matrix4.identity();
     this.objects = new Map();
     this.renderOrder = [];
-    if (allowEdit) {
+    if (editorConfiguration?.allow) {
       this.editorController = new EditorController({
         gl,
+        showGuides: !!editorConfiguration?.showGuides,
       });
     }
     this.setUp();
@@ -271,6 +275,7 @@ class Scene extends EventTarget {
       modelViewMatrix: this.modelViewMatrix,
       projectionMatrix: this.projectionMatrix,
       normalMatrix: this.normalMatrix,
+      offscreen,
     });
     if (!offscreen) {
       this.dispatchEvent(new CustomEvent("render"));

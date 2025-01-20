@@ -20,10 +20,18 @@ class EditorController {
   private instancesProperties: Map<string, InstanceProperties>;
   private lastInstanceProperties: Map<string, InstanceProperties>;
   private guidesController: GuidesController;
+  private shouldShowGuides: boolean;
 
-  constructor({ gl }: { gl: WebGL2RenderingContext }) {
+  constructor({
+    gl,
+    showGuides,
+  }: {
+    gl: WebGL2RenderingContext;
+    showGuides: boolean;
+  }) {
     this.instancesProperties = new Map();
     this.lastInstanceProperties = new Map();
+    this.shouldShowGuides = showGuides;
     this.guidesController = new GuidesController({
       gl,
       onDrag: this.onDrag.bind(this),
@@ -33,6 +41,9 @@ class EditorController {
       onRotate: this.onRotate.bind(this),
       onRotateFinish: this.onEditionFinished.bind(this),
     });
+    if (!this.shouldShowGuides) {
+      this.hideGuides();
+    }
   }
 
   public moveGuidesToObject(instance: Instance<any, any>) {
@@ -47,15 +58,18 @@ class EditorController {
     modelViewMatrix,
     normalMatrix,
     projectionMatrix,
+    offscreen,
   }: {
     modelViewMatrix: Matrix4;
     normalMatrix: Matrix4;
     projectionMatrix: Matrix4;
+    offscreen: boolean;
   }) {
     this.guidesController.render({
       modelViewMatrix,
       normalMatrix,
       projectionMatrix,
+      offscreen,
     });
   }
 
@@ -236,6 +250,7 @@ class EditorController {
   }
 
   public showGuides() {
+    if (!this.shouldShowGuides) return;
     this.guidesController.setShowGuides(true);
   }
 

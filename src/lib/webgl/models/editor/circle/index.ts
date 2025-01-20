@@ -12,7 +12,12 @@ import {
 import { generateCircle } from "./geometry.js";
 
 const DefaultAttributes = ["aPosition"] as const;
-const DefaultUniforms = ["uMaterialDiffuse", "uTransform"] as const;
+const DefaultUniforms = [
+  "uMaterialDiffuse",
+  "uTransform",
+  "uOffScreen",
+  "uLabelColor",
+] as const;
 
 class Circle extends Instance<
   typeof DefaultAttributes,
@@ -78,6 +83,14 @@ class Circle extends Instance<
         uTransform: {
           data: Matrix4.identity().toFloatArray(),
           type: UniformKind.MATRIX,
+        },
+        uLabelColor: {
+          data: [0, 0, 0, 0],
+          type: UniformKind.VECTOR_FLOAT,
+        },
+        uOffScreen: {
+          data: false,
+          type: UniformKind.SCALAR_INT,
         },
       },
       indices,

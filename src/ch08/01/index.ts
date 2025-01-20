@@ -31,6 +31,7 @@ const uniforms = [
   "uLightAmbient",
   "uLightDiffuse",
   "uOffScreen",
+  "uLabelColor",
   "uAlpha",
 ] as const;
 
@@ -44,7 +45,7 @@ let pickingController: PickingController;
 let program: Program<typeof attributes, typeof uniforms>;
 
 const initProgram = () => {
-  scene = new Scene(gl, true);
+  scene = new Scene(gl, { allow: true, showGuides: true });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -126,6 +127,10 @@ const loadObject = (path: string, id: string, properties: ObjectProperties) => {
         uAlpha: {
           data: 1,
           type: UniformKind.SCALAR_FLOAT,
+        },
+        uLabelColor: {
+          data: [0, 0, 0, 0],
+          type: UniformKind.VECTOR_FLOAT,
         },
         ...ligthUniforms,
       },

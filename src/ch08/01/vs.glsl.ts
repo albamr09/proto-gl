@@ -13,6 +13,7 @@ uniform vec3 uLightPosition;
 uniform float uAlpha;
 
 uniform bool uOffScreen;
+uniform vec4 uLabelColor;
 
 in vec3 aPosition;
 in vec3 aNormal;
@@ -23,7 +24,7 @@ void main(void) {
   gl_Position = uProjectionMatrix * uModelViewMatrix * uTransform * vec4(aPosition, 1.0);
 
   if (uOffScreen) {
-    vColor = uMaterialDiffuse;
+    vColor = uLabelColor;
   } else {
     vec4 Ia = uLightAmbient;
 

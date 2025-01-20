@@ -402,10 +402,12 @@ class GuidesController {
     modelViewMatrix,
     normalMatrix,
     projectionMatrix,
+    offscreen,
   }: {
     modelViewMatrix: Matrix4;
     normalMatrix: Matrix4;
     projectionMatrix: Matrix4;
+    offscreen: boolean;
   }) {
     if (!this.shouldShowGuides) return;
     this.getCurrentModeGuides().forEach((instance) => {
@@ -414,6 +416,7 @@ class GuidesController {
         projectionMatrix: projectionMatrix,
         normalMatrix: normalMatrix,
       });
+      instance.updateUniform("uOffScreen", offscreen);
       instance.render({ depthTest: false });
     });
   }

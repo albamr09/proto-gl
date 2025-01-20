@@ -1,6 +1,10 @@
-import { vertices } from "../../ch03/data/data.js";
 import { loadData } from "../../lib/files.js";
-import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
+import {
+  createCheckboxInputForm,
+  createDescriptionPanel,
+  initController,
+  initGUI,
+} from "../../lib/gui/index.js";
 import { calculateNormals } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
 import { Vector } from "../../lib/math/vector.js";
@@ -17,7 +21,10 @@ import {
 import Controller from "../../lib/webgl/core/events/controller.js";
 import PickingController from "../../lib/webgl/core/picking/picking.js";
 import Program from "../../lib/webgl/core/program.js";
-import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
+import {
+  ConcreteUniforms,
+  UniformKind,
+} from "../../lib/webgl/core/uniform/types.js";
 import Axis from "../../lib/webgl/models/axis/index.js";
 import Floor from "../../lib/webgl/models/floor/index.js";
 import Instance from "../../lib/webgl/rendering/instance.js";
@@ -41,9 +48,10 @@ let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let program: Program<typeof attributes, typeof uniforms>;
+let showOffscreenBuffer = false;
 
 const initProgram = () => {
-  scene = new Scene(gl, true);
+  scene = new Scene(gl, { allow: true, showGuides: false });
   const camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -98,6 +106,7 @@ const loadObject = (
   };
   loadData(path).then((data) => {
     const { vertices, indices } = data;
+    let previousColor: number[];
     const ballInstance = new Instance({
       id,
       gl,
@@ -143,6 +152,20 @@ const loadObject = (
         ...ligthUniforms,
       },
       transformationProperties: { ...properties },
+      onClick: (instance) => {
+        previousColor = (
+          instance.getUniform("uMaterialDiffuse") as ConcreteUniforms
+        ).getData() as number[];
+        const labelColor = (
+          instance.getUniform("uLabelColor") as ConcreteUniforms
+        ).getData();
+        instance.updateUniform("uMaterialDiffuse", labelColor);
+      },
+      onDragFinish: (instance) => {
+        if (!previousColor || previousColor.length != 4) return;
+        instance.updateUniform("uMaterialDiffuse", previousColor);
+        previousColor = [];
+      },
     });
     scene.add(ballInstance);
   });
@@ -155,10 +178,11 @@ const initData = () => {
   Array.from({ length: nObjects }).forEach((_, i) => {
     const generatedX = Math.random() * maxX - maxX / 2;
     const generatedZ = Math.random() * maxZ - maxZ / 2;
+    const color = Math.random();
     loadObject("/data/models/geometries/ball.json", `ball-${i}`, {
       translationVector: new Vector([generatedX, 0, generatedZ]),
       scaleVector: new Vector([0.7, 0.7, 0.7]),
-      color: [Math.random(), Math.random(), Math.random(), 1],
+      color: [color, color, color, 1],
     });
   });
   scene.add(new Floor({ gl, dimension: 82, lines: 4 }));
@@ -166,8 +190,19 @@ const initData = () => {
 };
 
 const render = () => {
-  scene.render();
+  scene.render(() => {}, true, showOffscreenBuffer);
   requestAnimationFrame(render);
+};
+
+const initControls = () => {
+  initController();
+  createCheckboxInputForm({
+    label: "Show Offscreen Framebuffer",
+    value: showOffscreenBuffer,
+    onChange: (v) => {
+      showOffscreenBuffer = v;
+    },
+  });
 };
 
 const init = () => {
@@ -183,7 +218,7 @@ const init = () => {
   initProgram();
   initData();
   render();
-  // Controls
+  initControls();
 };
 
 window.onload = init;
