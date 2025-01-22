@@ -13,8 +13,14 @@ uniform vec4 uLightAmbientColor;
 uniform vec4 uMaterialSpecularColor;
 uniform vec4 uLightSpecularColor;
 
+out vec4 vColor;
+
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
+
+  // Ambient
+  // Diffuse
+  // Specular
 }
 `;
 
