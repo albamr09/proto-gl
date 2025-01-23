@@ -29,7 +29,7 @@ import { calculateNormals } from "../../lib/math/3d.js";
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
-let shininessValue = 0.5;
+let shininessValue = 1.0;
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
@@ -147,7 +147,7 @@ const initControls = () => {
     label: "Shininess",
     value: shininessValue,
     min: 0,
-    max: 1,
+    max: 50,
     step: 0.01,
     onChange: (v) => {
       shininessValue = v;
