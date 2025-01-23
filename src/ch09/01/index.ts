@@ -1,4 +1,10 @@
-import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
+import {
+  createCheckboxInputForm,
+  createDescriptionPanel,
+  createNumericInput,
+  initController,
+  initGUI,
+} from "../../lib/gui/index.js";
 import {
   autoResizeCanvas,
   configureCanvas,
@@ -14,17 +20,18 @@ import Floor from "../../lib/webgl/models/floor/index.js";
 import Scene from "../../lib/webgl/rendering/scene.js";
 import { loadData } from "../../lib/files.js";
 import Instance from "../../lib/webgl/rendering/instance.js";
-import Program from "../../lib/webgl/core/program.js";
 import vertexShaderSource from "./vs.gsls.js";
 import fragmentShaderSource from "./fs.gsls.js";
 import { Vector } from "../../lib/math/vector.js";
 import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
+import { calculateNormals } from "../../lib/math/3d.js";
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
+let shininessValue = 0.5;
 
-const attributes = ["aPosition"] as const;
+const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
   "uLightPositions",
   "uLightAmbient",
@@ -33,30 +40,25 @@ const uniforms = [
   "uMaterialDiffuse",
   "uMaterialAmbient",
   "uMaterialSpecular",
+  "uShininess",
 ] as const;
 
 const initProgram = () => {
   scene = new Scene(gl);
   const camera = new Camera(
-    CameraType.TRACKING,
+    CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
     gl,
     scene
   );
   new Controller({ camera, canvas });
   camera.setPosition(new Vector([0, 0.5, 5]));
-  camera.setAzimuth(25);
+  camera.setAzimuth(-25);
   camera.setElevation(-10);
 };
 
 const initData = () => {
   scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
-
-  const program = new Program<typeof attributes, typeof uniforms>(
-    gl,
-    vertexShaderSource,
-    fragmentShaderSource
-  );
 
   const lightPositions = {
     farLeft: [-1000, 1000, -1000],
@@ -74,14 +76,21 @@ const initData = () => {
         Kd: diffuse,
         Ks: specular,
       } = data;
+
       const instance = new Instance<typeof attributes, typeof uniforms>({
         id: `model${i}`,
         gl,
-        program,
+        vertexShaderSource,
+        fragmentShaderSource,
         indices,
         attributes: {
           aPosition: {
             data: vertices,
+            size: 3,
+            type: gl.FLOAT,
+          },
+          aNormal: {
+            data: calculateNormals(vertices, indices, 3),
             size: 3,
             type: gl.FLOAT,
           },
@@ -121,11 +130,30 @@ const initData = () => {
             data: [...specular, 1.0],
             type: UniformKind.VECTOR_FLOAT,
           },
+          uShininess: {
+            data: shininessValue,
+            type: UniformKind.SCALAR_FLOAT,
+          },
         },
       });
       scene.add(instance);
     });
   }
+};
+
+const initControls = () => {
+  initController();
+  createNumericInput({
+    label: "Shininess",
+    value: shininessValue,
+    min: 0,
+    max: 1,
+    step: 0.01,
+    onChange: (v) => {
+      shininessValue = v;
+      scene.updateUniform("uShininess", shininessValue);
+    },
+  });
 };
 
 const render = () => {
@@ -146,7 +174,7 @@ const init = () => {
   initProgram();
   initData();
   render();
-  // Controls
+  initControls();
 };
 
 window.onload = init;
