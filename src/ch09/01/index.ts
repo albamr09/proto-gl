@@ -1,5 +1,5 @@
 import {
-  createCheckboxInputForm,
+  createColorInputForm,
   createDescriptionPanel,
   createNumericInput,
   initController,
@@ -25,18 +25,25 @@ import fragmentShaderSource from "./fs.gsls.js";
 import { Vector } from "../../lib/math/vector.js";
 import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import { calculateNormals } from "../../lib/math/3d.js";
+import {
+  denormalizeColor,
+  hexToRgb,
+  normalizeColor,
+  rgbToHex,
+} from "../../lib/colors.js";
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let shininessValue = 0.5;
+const paintAlias = "BMW";
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
   "uLightPositions",
   "uLightAmbient",
-  "uLightDiffuse",
-  "uLightSpecular",
+  "uLightDiffuseColors",
+  "uLightSpecularColors",
   "uMaterialDiffuse",
   "uMaterialAmbient",
   "uMaterialSpecular",
@@ -63,6 +70,13 @@ const initProgram = () => {
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 };
 
+const generateLightColors = () => {
+  return Array.from({ length: 16 }).map(() => Math.random());
+};
+
+const diffuseLightColors = generateLightColors();
+const specularLightColors = generateLightColors();
+
 const initData = () => {
   scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
 
@@ -76,6 +90,7 @@ const initData = () => {
   for (let i = 1; i < 25; i++) {
     loadData(`/data/models/bmw-i8/part${i}.json`).then((data) => {
       const {
+        alias: id,
         vertices,
         indices,
         Ka: ambient,
@@ -87,7 +102,7 @@ const initData = () => {
       } = data;
 
       const instance = new Instance<typeof attributes, typeof uniforms>({
-        id: `model${i}`,
+        id,
         gl,
         vertexShaderSource,
         fragmentShaderSource,
@@ -119,13 +134,15 @@ const initData = () => {
             data: [0, 0, 0, 1],
             type: UniformKind.VECTOR_FLOAT,
           },
-          uLightDiffuse: {
-            data: [0.4, 0.4, 0.4, 1],
+          uLightDiffuseColors: {
+            data: diffuseLightColors,
             type: UniformKind.VECTOR_FLOAT,
+            size: 4,
           },
-          uLightSpecular: {
-            data: [0.8, 0.8, 0.8, 1],
+          uLightSpecularColors: {
+            data: specularLightColors,
             type: UniformKind.VECTOR_FLOAT,
+            size: 4,
           },
           uMaterialDiffuse: {
             data: [...diffuse, 1.0],
@@ -158,19 +175,100 @@ const initData = () => {
   }
 };
 
+const updateInstancesWithPaintAttribute = (
+  cb: (instance: Instance<any, any>) => void
+) => {
+  scene.getInstances().forEach((instance) => {
+    if (instance.getId()?.includes(paintAlias)) {
+      cb(instance);
+    }
+  });
+};
+
+const getSubArray = (originalArray: number[], start: number, size = 4) => {
+  return originalArray.slice(start, start + size);
+};
+
 const initControls = () => {
   initController();
+  createColorInputForm({
+    label: "Car color",
+    value: "#ffffff",
+    onChange: (v) => {
+      updateInstancesWithPaintAttribute((instance) => {
+        const newColor = normalizeColor(hexToRgb(v));
+        instance.updateUniform("uMaterialDiffuse", [...newColor, 1]);
+      });
+    },
+  });
   createNumericInput({
-    label: "Shininess",
+    label: "Specular Color",
     value: shininessValue,
     min: 0,
     max: 50,
     step: 0.01,
     onChange: (v) => {
-      shininessValue = v;
-      scene.updateUniform("uShininess", shininessValue);
+      updateInstancesWithPaintAttribute((instance) => {
+        instance.updateUniform("uMaterialSpecular", [v, v, v, 1]);
+      });
     },
   });
+  ["Far Left", "Far Right", "Near Left", "Near Right"].forEach(
+    (label, index) => {
+      createLightColorController(label, index);
+    }
+  );
+};
+
+const createLightColorController = (label: string, index: number) => {
+  createColorInputForm({
+    label: `${label} Diffuse Color`,
+    value: rgbToHex(
+      denormalizeColor(getSubArray(diffuseLightColors, index * 4))
+    ),
+    onChange: (v) => {
+      updateLightColor(v, index, "uLightDiffuseColors");
+    },
+  });
+  createColorInputForm({
+    label: `${label} Specular Color`,
+    value: rgbToHex(
+      denormalizeColor(getSubArray(specularLightColors, index * 4))
+    ),
+    onChange: (v) => {
+      updateLightColor(v, index, "uLightSpecularColors");
+    },
+  });
+};
+
+const updateLightColor = (
+  value: string,
+  index: number,
+  lightUniformName: "uLightDiffuseColors" | "uLightSpecularColors"
+) => {
+  scene.getInstances().forEach((instance) => {
+    const ligthDiffuseColors = instance
+      .getUniform("uLightDiffuseColors")
+      ?.getData() as number[];
+    if (!ligthDiffuseColors) return;
+    const newColor = normalizeColor(hexToRgb(value));
+    const newArrayColors = replaceArrayValues(
+      ligthDiffuseColors,
+      [...newColor, 1],
+      index * 4
+    );
+    instance.updateUniform(lightUniformName, newArrayColors);
+  });
+};
+
+const replaceArrayValues = (
+  array: number[],
+  newValues: number[],
+  start: number
+) => {
+  const arrayCopy = [...array];
+  arrayCopy.splice(start, start + newValues.length, ...newValues);
+  return arrayCopy;
 };
 
 const render = () => {

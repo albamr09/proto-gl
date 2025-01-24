@@ -5,11 +5,11 @@ precision mediump float;
 const int numLights = 4;
 
 uniform vec4 uMaterialDiffuse;
-uniform vec4 uLightDiffuse;
+uniform vec4 uLightDiffuseColors[numLights];
 uniform vec4 uMaterialAmbient;
 uniform vec4 uLightAmbient;
 uniform vec4 uMaterialSpecular;
-uniform vec4 uLightSpecular;
+uniform vec4 uLightSpecularColors[numLights];
 uniform float uShininess;
 uniform int uIlluminationType;
 uniform float uAlpha;
@@ -40,13 +40,13 @@ void main() {
     // Diffuse
     if (uIlluminationType == 1 || uIlluminationType == 2) {
       float lamberTerm = clamp(dot(-L, N), 0.0, 1.0);
-      Id += uMaterialDiffuse * uLightDiffuse * lamberTerm;
+      Id += uMaterialDiffuse * uLightDiffuseColors[i] * lamberTerm;
     }
     // Specular
     if (uIlluminationType == 2) {
       vec3 R = reflect(L, N);
       float specularTerm = max(dot(R, E), 0.0);
-      Is += uMaterialSpecular * uLightSpecular * pow(specularTerm, uShininess) * 4.0;
+      Is += uMaterialSpecular * uLightSpecularColors[i] * pow(specularTerm, uShininess) * 4.0;
     }
   }
 
