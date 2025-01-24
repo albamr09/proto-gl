@@ -29,7 +29,7 @@ import { calculateNormals } from "../../lib/math/3d.js";
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
-let shininessValue = 1.0;
+let shininessValue = 0.5;
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
@@ -41,6 +41,8 @@ const uniforms = [
   "uMaterialAmbient",
   "uMaterialSpecular",
   "uShininess",
+  "uIlluminationType",
+  "uAlpha",
 ] as const;
 
 const initProgram = () => {
@@ -55,6 +57,10 @@ const initProgram = () => {
   camera.setPosition(new Vector([0, 0.5, 5]));
   camera.setAzimuth(-25);
   camera.setElevation(-10);
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LESS);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 };
 
 const initData = () => {
@@ -75,6 +81,9 @@ const initData = () => {
         Ka: ambient,
         Kd: diffuse,
         Ks: specular,
+        illum,
+        d: alpha,
+        Ns: shininess,
       } = data;
 
       const instance = new Instance<typeof attributes, typeof uniforms>({
@@ -131,7 +140,15 @@ const initData = () => {
             type: UniformKind.VECTOR_FLOAT,
           },
           uShininess: {
-            data: shininessValue,
+            data: shininess,
+            type: UniformKind.SCALAR_FLOAT,
+          },
+          uIlluminationType: {
+            data: illum,
+            type: UniformKind.SCALAR_INT,
+          },
+          uAlpha: {
+            data: alpha,
             type: UniformKind.SCALAR_FLOAT,
           },
         },

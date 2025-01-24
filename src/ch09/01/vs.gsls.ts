@@ -23,7 +23,7 @@ void main() {
   vEyeVector = -vertex.xyz;
 
   for(int i = 0; i < numLights; i++) {
-    vLightRay[i] = normalize(vertex.xyz - uLightPositions[i]);
+    vLightRay[i] = vertex.xyz - uLightPositions[i];
   }
 }
 `;

@@ -11,6 +11,8 @@ uniform vec4 uLightAmbient;
 uniform vec4 uMaterialSpecular;
 uniform vec4 uLightSpecular;
 uniform float uShininess;
+uniform int uIlluminationType;
+uniform float uAlpha;
 
 in vec3 vNormal;
 in vec3 vLightRay[numLights];
@@ -19,6 +21,10 @@ in vec3 vEyeVector;
 out vec4 fragColor;
 
 void main() {
+  if (uIlluminationType == 0) {
+    fragColor = vec4(uMaterialDiffuse.rgb, uAlpha);
+    return;
+  }
 
   vec3 N = normalize(vNormal);
   vec3 E = normalize(vEyeVector);
@@ -32,15 +38,19 @@ void main() {
   for(int i = 0; i < numLights; i++) {
     vec3 L = normalize(vLightRay[i]);
     // Diffuse
-    float lamberTerm = clamp(dot(-L, N), 0.0, 1.0);
-    Id += uMaterialDiffuse * uLightDiffuse * lamberTerm;
+    if (uIlluminationType == 1 || uIlluminationType == 2) {
+      float lamberTerm = clamp(dot(-L, N), 0.0, 1.0);
+      Id += uMaterialDiffuse * uLightDiffuse * lamberTerm;
+    }
     // Specular
-    vec3 R = reflect(L, N);
-    float specularTerm = max(dot(R, E), 0.0);
-    Is += uMaterialSpecular * uLightSpecular * pow(specularTerm, uShininess);
+    if (uIlluminationType == 2) {
+      vec3 R = reflect(L, N);
+      float specularTerm = max(dot(R, E), 0.0);
+      Is += uMaterialSpecular * uLightSpecular * pow(specularTerm, uShininess) * 4.0;
+    }
   }
 
-  fragColor = vec4((Ia + Id + Is).xyz, 1.0);
+  fragColor = vec4((Ia + Id + Is).xyz, uAlpha);
 }
 `;
 
