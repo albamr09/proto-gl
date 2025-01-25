@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createCheckboxInputForm,
   createDescriptionPanel,
   createNumericInput,
@@ -186,7 +187,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createCheckboxInputForm({
+  const { container: useLambertInput } = createCheckboxInputForm({
     label: "Use Lambert",
     value: useLambert,
     onInit: (v) => {
@@ -197,7 +198,7 @@ const initControls = () => {
       scene.updateUniform("uUseLambert", v);
     },
   });
-  createCheckboxInputForm({
+  const { container: usePerVertexInput } = createCheckboxInputForm({
     label: "Use Per-Vertex",
     value: usePerVertex,
     onInit: (v) => {
@@ -208,7 +209,7 @@ const initControls = () => {
       scene.updateUniform("uUsePerVertexColoring", v);
     },
   });
-  createCheckboxInputForm({
+  const { container: showComplexCubeInput } = createCheckboxInputForm({
     label: "Show Complex Cube",
     value: showComplexCube,
     onInit: (v) => {
@@ -220,7 +221,7 @@ const initControls = () => {
       scene.setConfigurationValue("visible", !v, "cube-simple");
     },
   });
-  createNumericInput({
+  const alphaInput = createNumericInput({
     label: "Alpha Value",
     value: alphaValue,
     min: 0,
@@ -246,6 +247,13 @@ const initControls = () => {
       }
     },
   });
+
+  addChildrenToController([
+    useLambertInput,
+    usePerVertexInput,
+    showComplexCubeInput,
+    alphaInput,
+  ]);
 };
 
 const init = () => {

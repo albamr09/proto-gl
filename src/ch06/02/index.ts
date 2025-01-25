@@ -1,5 +1,7 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
+  createCollapsibleComponent,
   createDescriptionPanel,
   createNumericInput,
   createVector3dSliders,
@@ -221,7 +223,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createVector3dSliders({
+  const redLightInputs = createVector3dSliders({
     labels: ["Red Light X", "Red Light Y", "Red Light Z"],
     value: redLightPosition,
     min: -100,
@@ -231,8 +233,12 @@ const initControls = () => {
       scene.updateUniform("uTranslate", v, "red-light");
       scene.updateUniform("uRedLightPosition", v, "wall");
     },
+  }).map(({ container }) => container);
+  const redLightsCollapsible = createCollapsibleComponent({
+    label: "Red Light",
+    children: redLightInputs,
   });
-  createVector3dSliders({
+  const greeLightInputs = createVector3dSliders({
     labels: ["Green Light X", "Green Light Y", "Green Light Z"],
     value: greenLightPosition,
     min: -100,
@@ -242,8 +248,12 @@ const initControls = () => {
       scene.updateUniform("uTranslate", v, "green-light");
       scene.updateUniform("uGreenLightPosition", v, "wall");
     },
+  }).map(({ container }) => container);
+  const greenLightsCollapsible = createCollapsibleComponent({
+    label: "Green Light",
+    children: greeLightInputs,
   });
-  createVector3dSliders({
+  const blueLightInputs = createVector3dSliders({
     labels: ["Blue Light X", "Blue Light Y", "Blue Light Z"],
     value: blueLightPosition,
     min: -100,
@@ -253,8 +263,12 @@ const initControls = () => {
       scene.updateUniform("uTranslate", v, "blue-light");
       scene.updateUniform("uBlueLightPosition", v, "wall");
     },
+  }).map(({ container }) => container);
+  const blueLightsCollapsible = createCollapsibleComponent({
+    label: "Blue Light",
+    children: blueLightInputs,
   });
-  createNumericInput({
+  const lightCutoffInput = createNumericInput({
     label: "Light Cutoff",
     value: lightCutOff,
     max: 100,
@@ -264,6 +278,13 @@ const initControls = () => {
       scene.updateUniform("uLightCutOff", v, "wall");
     },
   });
+
+  addChildrenToController([
+    redLightsCollapsible,
+    greenLightsCollapsible,
+    blueLightsCollapsible,
+    lightCutoffInput,
+  ]);
 };
 
 const init = () => {

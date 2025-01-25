@@ -1,9 +1,9 @@
 import {
+  addChildrenToController,
   createCollapsibleComponent,
   createColorInputForm,
   createDescriptionPanel,
   createNumericInput,
-  getControllerContainer,
   initController,
   initGUI,
 } from "../../lib/gui/index.js";
@@ -202,8 +202,7 @@ const initControls = () => {
         instance.updateUniform("uMaterialDiffuse", [...newColor, 1]);
       });
     },
-    addToContainer: false,
-  }) as HTMLDivElement;
+  });
   const shininessInput = createNumericInput({
     label: "Specular Color",
     value: shininessValue,
@@ -215,15 +214,12 @@ const initControls = () => {
         instance.updateUniform("uMaterialSpecular", [v, v, v, 1]);
       });
     },
-    addToContainer: false,
-  }) as HTMLDivElement;
+  });
   const carCollapsible = createCollapsibleComponent({
     label: "Car",
     children: [carColorInput, shininessInput],
     openByDefault: true,
   });
-
-  getControllerContainer()?.appendChild(carCollapsible);
 
   const lightCollapsibles = [
     "Far Left",
@@ -238,8 +234,8 @@ const initControls = () => {
     label: "Lights",
     children: lightCollapsibles,
   });
-  getControllerContainer()?.appendChild(lightCollapsible);
-  getControllerContainer()?.appendChild(lightCollapsible);
+
+  addChildrenToController([carCollapsible, lightCollapsible]);
 };
 
 const createLightColorController = (label: string, index: number) => {
@@ -251,8 +247,7 @@ const createLightColorController = (label: string, index: number) => {
     onChange: (v) => {
       updateLightColor(v, index, "uLightDiffuseColors");
     },
-    addToContainer: false,
-  }) as HTMLDivElement;
+  });
   const specularInputForm = createColorInputForm({
     label: `${label} Specular Color`,
     value: rgbToHex(
@@ -261,8 +256,7 @@ const createLightColorController = (label: string, index: number) => {
     onChange: (v) => {
       updateLightColor(v, index, "uLightSpecularColors");
     },
-    addToContainer: false,
-  }) as HTMLDivElement;
+  });
 
   const collapsibleComponent = createCollapsibleComponent({
     label: label,

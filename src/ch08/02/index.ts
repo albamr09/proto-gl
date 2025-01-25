@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createCheckboxInputForm,
   createDescriptionPanel,
   initController,
@@ -204,13 +205,14 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createCheckboxInputForm({
+  const { container: showOffscreenFrameBufferInput } = createCheckboxInputForm({
     label: "Show Offscreen Framebuffer",
     value: showOffscreenBuffer,
     onChange: (v) => {
       showOffscreenBuffer = v;
     },
   });
+  addChildrenToController([showOffscreenFrameBufferInput]);
 };
 
 const init = () => {

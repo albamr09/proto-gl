@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createSelectorForm,
   createSliderInputForm,
   initController,
@@ -160,7 +161,7 @@ const initData = () => {
 
 const initControls = () => {
   initController();
-  createSelectorForm({
+  const { container: cameraTypeInput } = createSelectorForm({
     label: "Camera type",
     value: CameraType.ORBITING,
     options: Object.values(CameraType),
@@ -168,7 +169,7 @@ const initControls = () => {
       camera.setType(v);
     },
   });
-  createSelectorForm({
+  const { container: renderingOrderInput } = createSelectorForm({
     label: "Rendering order",
     value: RenderingOrder.CONE,
     options: Object.values(RenderingOrder),
@@ -186,7 +187,7 @@ const initControls = () => {
       }
     },
   });
-  createSliderInputForm({
+  const { container: wallAlphaInput } = createSliderInputForm({
     label: "Wall Alpha",
     value: 1,
     min: 0,
@@ -205,7 +206,7 @@ const initControls = () => {
       }
     },
   });
-  createSliderInputForm({
+  const { container: coneAlphaInput } = createSliderInputForm({
     label: "Cone Alpha",
     value: 1,
     min: 0,
@@ -223,6 +224,12 @@ const initControls = () => {
       }
     },
   });
+  addChildrenToController([
+    cameraTypeInput,
+    renderingOrderInput,
+    wallAlphaInput,
+    coneAlphaInput,
+  ]);
 };
 
 const draw = () => {

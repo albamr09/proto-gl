@@ -9,6 +9,8 @@ import {
   createVector3dSliders,
   initController,
   initGUI,
+  createCollapsibleComponent,
+  addChildrenToController,
 } from "../../lib/gui/index.js";
 import { calculateNormals } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
@@ -156,7 +158,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createSelectorForm({
+  const { container: coordinateSystemInput } = createSelectorForm({
     label: "Coordinate System",
     value: coordinateSystem,
     options: Object.values(COORDINATE_SYSTEM),
@@ -164,7 +166,7 @@ const initControls = () => {
       coordinateSystem = v;
     },
   });
-  createVector3dSliders({
+  const translationInputs = createVector3dSliders({
     labels: ["Translation X", "Translation Y", "Translation Z"],
     value: modelTranslation,
     min: -500,
@@ -173,8 +175,8 @@ const initControls = () => {
     onChange: (v) => {
       modelTranslation = v;
     },
-  });
-  createVector3dSliders({
+  }).map(({ container }) => container);
+  const rotationInputs = createVector3dSliders({
     labels: ["Rotation X", "Rotation Y", "Rotation Z"],
     value: modelRotation,
     min: -180,
@@ -183,7 +185,20 @@ const initControls = () => {
     onChange: (v) => {
       modelRotation = v;
     },
+  }).map(({ container }) => container);
+  const rotationCollapsible = createCollapsibleComponent({
+    label: "Rotation",
+    children: rotationInputs,
   });
+  const translationCollapsible = createCollapsibleComponent({
+    label: "Translation",
+    children: translationInputs,
+  });
+  addChildrenToController([
+    coordinateSystemInput,
+    translationCollapsible,
+    rotationCollapsible,
+  ]);
 };
 
 const init = async () => {

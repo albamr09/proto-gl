@@ -6,7 +6,9 @@ import {
   normalizeColor,
 } from "../../lib/colors.js";
 import {
+  addChildrenToController,
   createCheckboxInputForm,
+  createCollapsibleComponent,
   createColorInputForm,
   createDescriptionPanel,
   createSelectorForm,
@@ -221,7 +223,7 @@ const getEnableOrDisable = (x: boolean) => {
 
 const initControls = () => {
   initController();
-  createCheckboxInputForm({
+  const { container: enableBlendInput } = createCheckboxInputForm({
     label: "Blending",
     value: true,
     onInit: (v) => {
@@ -231,7 +233,7 @@ const initControls = () => {
       gl[getEnableOrDisable(v)](gl.BLEND);
     },
   });
-  createCheckboxInputForm({
+  const { container: enableDepthTestInput } = createCheckboxInputForm({
     label: "Depth Test",
     value: true,
     onInit: (v) => {
@@ -241,7 +243,7 @@ const initControls = () => {
       gl[getEnableOrDisable(v)](gl.BLEND);
     },
   });
-  createCheckboxInputForm({
+  const { container: enableFaceCullingInput } = createCheckboxInputForm({
     label: "Face culling",
     value: true,
     onInit: (v) => {
@@ -251,14 +253,14 @@ const initControls = () => {
       gl[getEnableOrDisable(v)](gl.CULL_FACE);
     },
   });
-  createCheckboxInputForm({
+  const { container: useLambertInput } = createCheckboxInputForm({
     label: "Use Lambert Term",
     value: true,
     onChange: (v) => {
       scene.updateUniform("uUseLambert", v);
     },
   });
-  createColorInputForm({
+  const sphereColorInput = createColorInputForm({
     label: "Sphere Color",
     value: rgbToHex(denormalizeColor(sphereColor ?? [0, 0, 0])),
     onChange: (v) => {
@@ -271,7 +273,7 @@ const initControls = () => {
       );
     },
   });
-  createSliderInputForm({
+  const { container: sphereAlphaInput } = createSliderInputForm({
     label: "Sphere Alpha",
     value: sphereAlpha,
     min: 0,
@@ -282,7 +284,7 @@ const initControls = () => {
       scene.updateUniform("uMaterialDiffuse", [...sphereColor, v], "sphere");
     },
   });
-  createColorInputForm({
+  const coneColorInput = createColorInputForm({
     label: "Cone Color",
     value: rgbToHex(denormalizeColor(coneColor ?? [0, 0, 0])),
     onChange: (v) => {
@@ -291,7 +293,7 @@ const initControls = () => {
       scene.updateUniform("uMaterialDiffuse", [...color, coneAlpha], "cone");
     },
   });
-  createSliderInputForm({
+  const { container: coneAlphaInput } = createSliderInputForm({
     label: "Cone Alpha",
     value: coneAlpha,
     min: 0,
@@ -302,7 +304,7 @@ const initControls = () => {
       scene.updateUniform("uMaterialDiffuse", [...coneColor, v], "cone");
     },
   });
-  createSelectorForm({
+  const { container: blendEquationInput } = createSelectorForm({
     label: "Blend Function",
     value: BlendEquation.FUNC_ADD,
     options: Object.values(BlendEquation),
@@ -313,7 +315,7 @@ const initControls = () => {
       gl.blendEquation(gl[v]);
     },
   });
-  createSelectorForm({
+  const { container: sourceFunctionInput } = createSelectorForm({
     label: "Source Function",
     value: sourceFunction,
     options: Object.values(BlendFunc),
@@ -326,7 +328,7 @@ const initControls = () => {
       gl.blendFunc(gl[v], gl[destinationFunction]);
     },
   });
-  createSelectorForm({
+  const { container: destinationFunctionInput } = createSelectorForm({
     label: "Destination Function",
     value: destinationFunction,
     options: Object.values(BlendFunc),
@@ -339,7 +341,7 @@ const initControls = () => {
       gl.blendFunc(gl[sourceFunction], gl[v]);
     },
   });
-  createColorInputForm({
+  const blendColorInput = createColorInputForm({
     label: "Blend color",
     value: rgbToHex(denormalizeColor(blendColor)),
     onInit: (v) => {
@@ -351,7 +353,7 @@ const initControls = () => {
       gl.blendColor(blendColor[0], blendColor[1], blendColor[2], alphaValue);
     },
   });
-  createSliderInputForm({
+  const { container: alphaValueInput } = createSliderInputForm({
     label: "Alpha Value",
     value: alphaValue,
     min: 0,
@@ -362,7 +364,7 @@ const initControls = () => {
       gl.blendColor(blendColor[0], blendColor[1], blendColor[2], alphaValue);
     },
   });
-  createSelectorForm({
+  const { container: renderingOrderInput } = createSelectorForm({
     label: "Render order",
     value: renderingOrder,
     options: Object.values(Order),
@@ -380,6 +382,30 @@ const initControls = () => {
       }
     },
   });
+  const blendCollapsible = createCollapsibleComponent({
+    label: "Blend",
+    children: [
+      enableBlendInput,
+      blendEquationInput,
+      sourceFunctionInput,
+      destinationFunctionInput,
+      blendColorInput,
+    ],
+  });
+  const depthCollapsible = createCollapsibleComponent({
+    label: "Depth",
+    children: [enableDepthTestInput, alphaValueInput, enableFaceCullingInput],
+  });
+  addChildrenToController([
+    blendCollapsible,
+    depthCollapsible,
+    useLambertInput,
+    sphereColorInput,
+    sphereAlphaInput,
+    coneColorInput,
+    coneAlphaInput,
+    renderingOrderInput,
+  ]);
 };
 
 const init = () => {

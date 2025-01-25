@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createDescriptionPanel,
   createNumericInput,
   createSelectorForm,
@@ -255,7 +256,7 @@ const render = (timestamp: number) => {
 const initControls = () => {
   initController();
 
-  createSelectorForm({
+  const { container: interpolationMethodInput } = createSelectorForm({
     label: "Interpolation Method",
     value: interpolationMethod,
     options: Object.values(INTERPOLATION),
@@ -277,7 +278,7 @@ const initControls = () => {
     },
   });
 
-  createNumericInput({
+  const interpolationStepsInput = createNumericInput({
     label: "Interpolation Steps",
     value: interpolationSteps,
     min: 0,
@@ -292,6 +293,8 @@ const initControls = () => {
       computeInterpolatedPositions(interpolationMethod, interpolationSteps);
     },
   });
+
+  addChildrenToController([interpolationMethodInput, interpolationStepsInput]);
 };
 
 const init = () => {

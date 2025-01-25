@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createCheckboxInputForm,
   createDescriptionPanel,
   createImageInputForm,
@@ -164,7 +165,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createCheckboxInputForm({
+  const { container: useLambertInput } = createCheckboxInputForm({
     label: "Use Lambert",
     value: useLambert,
     onInit: (v) => {
@@ -175,7 +176,7 @@ const initControls = () => {
       scene.updateUniform("uUseLambert", v);
     },
   });
-  createCheckboxInputForm({
+  const { container: usePerVertexInput } = createCheckboxInputForm({
     label: "Use Per-Vertex",
     value: usePerVertex,
     onInit: (v) => {
@@ -186,7 +187,7 @@ const initControls = () => {
       scene.updateUniform("uUsePerVertexColoring", v);
     },
   });
-  createNumericInput({
+  const alphaValueInput = createNumericInput({
     label: "Alpha Value",
     value: alphaValue,
     min: 0,
@@ -200,7 +201,7 @@ const initControls = () => {
       scene.updateUniform("uAlpha", v, "cube");
     },
   });
-  createImageInputForm({
+  const { container: textureImageInput } = createImageInputForm({
     label: "Texture Image",
     value: "/data/images/webgl.png",
     onInit: (v) => {
@@ -222,6 +223,13 @@ const initControls = () => {
       gl.bindTexture(gl.TEXTURE_2D, null);
     },
   });
+
+  addChildrenToController([
+    useLambertInput,
+    usePerVertexInput,
+    alphaValueInput,
+    textureImageInput,
+  ]);
 };
 
 const init = () => {

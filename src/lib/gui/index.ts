@@ -38,7 +38,6 @@ export const createNumericInput = ({
   step,
   onInit = () => {},
   onChange,
-  addToContainer = true,
 }: {
   label: string;
   value: number;
@@ -47,7 +46,6 @@ export const createNumericInput = ({
   step: number;
   onInit?: (v: number) => void;
   onChange: (v: number) => void;
-  addToContainer?: boolean;
 }) => {
   // Create a div container
   const formContainer = document.createElement("div");
@@ -91,11 +89,7 @@ export const createNumericInput = ({
   // Append the form to the container
   formContainer.appendChild(form);
 
-  if (addToContainer) {
-    document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
-  } else {
-    return formContainer;
-  }
+  return formContainer;
 };
 
 export const createSelectorForm = <T>({
@@ -111,22 +105,18 @@ export const createSelectorForm = <T>({
   onInit?: (v: T) => void;
   onChange: (v: T) => void;
 }) => {
-  // Create a div container
   const formContainer = document.createElement("div");
   formContainer.classList.add("controller-element");
 
-  // Create the form element
   const form = document.createElement("div");
   form.classList.add("form-container");
 
-  // Create a label for the input
   const labelElement = document.createElement("label");
   labelElement.setAttribute("for", "userInput");
   const labelSpan = document.createElement("span");
   labelSpan.innerHTML = label;
   labelElement.appendChild(labelSpan);
 
-  // Create a select element
   const select = document.createElement("select");
   select.setAttribute("id", "userInput");
   select.setAttribute("name", "userInput");
@@ -145,22 +135,16 @@ export const createSelectorForm = <T>({
     onInit(value);
   }
 
-  // Add an event listener for the "change" event on the select element
   select.addEventListener("change", function () {
-    // Call the onChange function with the selected value
     onChange(select.value as T);
   });
 
-  // Append the label, select to the form
   form.appendChild(labelElement);
   form.appendChild(select);
 
-  // Append the form to the container
   formContainer.appendChild(form);
 
-  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
-  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
-  return select;
+  return { selectInput: select, container: formContainer };
 };
 
 export const createButtonForm = ({
@@ -170,25 +154,20 @@ export const createButtonForm = ({
   label: string;
   onClick: () => void;
 }) => {
-  // Create a div container
   const formContainer = document.createElement("div");
   formContainer.classList.add("controller-element");
 
-  // Create the form element
   const form = document.createElement("div");
   form.classList.add("form-container");
 
-  // Create the button element
   const button = document.createElement("button");
   button.innerHTML = label;
   button.addEventListener("click", onClick);
   form.appendChild(button);
 
-  // Append the form to the container
   formContainer.appendChild(form);
 
-  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
-  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+  return formContainer;
 };
 
 export const createColorInputForm = ({
@@ -196,30 +175,24 @@ export const createColorInputForm = ({
   value,
   onInit = () => {},
   onChange,
-  addToContainer = true,
 }: {
   label: string;
   value: string;
   onInit?: (v: string) => void;
   onChange: (v: string) => void;
-  addToContainer?: boolean;
 }) => {
-  // Create a div container
   const formContainer = document.createElement("div");
   formContainer.classList.add("controller-element");
 
-  // Create the form element
   const form = document.createElement("div");
   form.classList.add("form-container");
 
-  // Create a label for the input
   const labelElement = document.createElement("label");
   labelElement.setAttribute("for", "userInput");
   const labelSpan = document.createElement("span");
   labelSpan.innerHTML = label;
   labelElement.appendChild(labelSpan);
 
-  // Create an input element of type "color"
   const colorInput = document.createElement("input");
   colorInput.setAttribute("type", "color");
   colorInput.setAttribute("id", "userInput");
@@ -231,24 +204,15 @@ export const createColorInputForm = ({
     onInit(value);
   }
 
-  // Add an event listener for the "input" event on the color input
   colorInput.addEventListener("input", function () {
-    // Call the onChange function with the selected color value
     onChange(colorInput.value);
   });
 
-  // Append the label, color input to the form
   form.appendChild(labelElement);
   form.appendChild(colorInput);
 
-  // Append the form to the container
   formContainer.appendChild(form);
-
-  if (addToContainer) {
-    document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
-  } else {
-    return formContainer;
-  }
+  return formContainer;
 };
 
 export const createImageInputForm = ({
@@ -262,27 +226,22 @@ export const createImageInputForm = ({
   onInit?: (file: HTMLImageElement) => void;
   onChange: (file: HTMLImageElement) => void;
 }) => {
-  // Create a div container
   const formContainer = document.createElement("div");
   formContainer.classList.add("controller-element");
 
-  // Create the form element
   const form = document.createElement("div");
   form.classList.add("form-container");
 
-  // Create a label for the input
   const labelElement = document.createElement("label");
   labelElement.setAttribute("for", "imageInput");
   const labelSpan = document.createElement("span");
   labelSpan.innerHTML = label;
   labelElement.appendChild(labelSpan);
 
-  // Create an input element of type "file"
   const imageInput = document.createElement("input");
   imageInput.setAttribute("type", "file");
   imageInput.setAttribute("id", "imageInput");
   imageInput.setAttribute("name", "imageInput");
-  // Accept only image files
   imageInput.setAttribute("accept", "image/*");
 
   if (value) {
@@ -291,13 +250,10 @@ export const createImageInputForm = ({
     });
   }
 
-  // Add an event listener for the "change" event on the file input
   imageInput.addEventListener("change", function () {
-    // Get the selected file from the input
     const file = imageInput.files ? imageInput.files[0] : null;
     if (!file) return;
 
-    // Create a FileReader to read the image file
     const reader = new FileReader();
     reader.onload = function (event) {
       const src = event.target?.result as string;
@@ -306,19 +262,15 @@ export const createImageInputForm = ({
       });
     };
 
-    // Read the file as a data URL
     reader.readAsDataURL(file);
   });
 
-  // Append the label and file input to the form
   form.appendChild(labelElement);
   form.appendChild(imageInput);
 
-  // Append the form to the container
   formContainer.appendChild(form);
 
-  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
-  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+  return { container: formContainer };
 };
 
 export const createSliderInputForm = ({
@@ -338,34 +290,28 @@ export const createSliderInputForm = ({
   onInit?: (v: number) => void;
   onChange: (v: number) => void;
 }) => {
-  // Create a div container
   const formContainer = document.createElement("div");
   formContainer.classList.add("controller-element");
 
-  // Create the form element
   const form = document.createElement("div");
   form.classList.add("form-container");
 
-  // Create a label for the input
   const labelElement = document.createElement("label");
   labelElement.setAttribute("for", "userInput");
   const labelSpan = document.createElement("span");
   labelSpan.innerHTML = label;
   labelElement.appendChild(labelSpan);
 
-  // Create a text input element
   const textInput = document.createElement("input");
   textInput.setAttribute("type", "number");
   textInput.setAttribute("name", "userInputText");
   textInput.classList.add("numeric-input");
 
-  // Set the initial value of the text input
   if (value !== undefined && value !== null) {
     onInit(value);
     textInput.value = value.toString();
   }
 
-  // Add an event listener for the "input" event on the text input
   textInput.addEventListener("input", function () {
     const parsedValue = parseFloat(textInput.value);
     if (parsedValue < max && parsedValue > min) {
@@ -376,7 +322,6 @@ export const createSliderInputForm = ({
     }
   });
 
-  // Create an input element of type "range"
   const sliderInput = document.createElement("input");
   sliderInput.setAttribute("type", "range");
   sliderInput.setAttribute("name", "userInput");
@@ -389,14 +334,11 @@ export const createSliderInputForm = ({
     sliderInput.value = value.toString();
   }
 
-  // Add an event listener for the "input" event on the slider input
   sliderInput.addEventListener("input", function () {
-    // Call the onChange function with the selected value
     onChange(parseFloat(sliderInput.value)); // Convert the value to a float
     textInput.value = sliderInput.value;
   });
 
-  // Append the label, slider input to the form
   form.appendChild(labelElement);
   form.appendChild(sliderInput);
   form.appendChild(textInput);
@@ -404,9 +346,7 @@ export const createSliderInputForm = ({
   // Append the form to the container
   formContainer.appendChild(form);
 
-  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
-  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
-  return { labelElement, sliderInput, textInput };
+  return { labelElement, sliderInput, textInput, container: formContainer };
 };
 
 /**
@@ -460,47 +400,36 @@ export const createCheckboxInputForm = ({
   onInit?: (v: boolean) => void;
   onChange: (v: boolean) => void;
 }) => {
-  // Create a div container
   const formContainer = document.createElement("div");
   formContainer.classList.add("controller-element");
 
-  // Create the form element
   const form = document.createElement("div");
   form.classList.add("form-container");
 
-  // Create a label for the input
   const labelElement = document.createElement("label");
   labelElement.setAttribute("for", label);
   const labelSpan = document.createElement("span");
   labelSpan.innerHTML = label;
   labelElement.appendChild(labelSpan);
 
-  // Create an input element of type "checkbox"
   const checkboxInput = document.createElement("input");
   checkboxInput.setAttribute("type", "checkbox");
   checkboxInput.setAttribute("id", label);
   checkboxInput.setAttribute("name", label);
 
-  // Set the initial value of the checkbox input
   checkboxInput.checked = value;
   onInit(value);
 
-  // Add an event listener for the "change" event on the checkbox input
   checkboxInput.addEventListener("change", function () {
-    // Call the onChange function with the checked value
     onChange(checkboxInput.checked);
   });
 
-  // Append the label and checkbox input to the form
   form.appendChild(labelElement);
   form.appendChild(checkboxInput);
 
-  // Append the form to the container
   formContainer.appendChild(form);
 
-  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
-  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
-  return checkboxInput;
+  return { checkboxInput, container: formContainer };
 };
 
 export const createDescriptionPanel = (description: string) => {
@@ -581,14 +510,12 @@ export const createCollapsibleComponent = ({
   openByDefault = false,
 }: {
   label: string;
-  children: HTMLElement | HTMLElement[]; // Accept single or multiple children
+  children: HTMLElement | HTMLElement[];
   openByDefault?: boolean;
 }) => {
-  // Create a div for the collapsible container
   const collapsibleContainer = document.createElement("div");
   collapsibleContainer.classList.add("collapsible-container");
 
-  // Create a button for toggling the collapse
   const toggleButton = document.createElement("button");
   toggleButton.classList.add("collapsible-toggle");
   toggleButton.textContent = label;
@@ -603,16 +530,13 @@ export const createCollapsibleComponent = ({
     caret.classList.remove("open");
   };
 
-  // Toggle button
   const caret = document.createElement("span");
   caret.className = "caret";
   toggleButton.appendChild(caret);
 
-  // Create a div to hold the collapsible content (children)
   const collapsibleContent = document.createElement("div");
   collapsibleContent.classList.add("collapsible-content");
 
-  // Append the children to the collapsible content
   if (Array.isArray(children)) {
     children.forEach((child) => collapsibleContent.appendChild(child));
   } else {
@@ -635,13 +559,21 @@ export const createCollapsibleComponent = ({
     }
   });
 
-  // Append the button and collapsible content to the container
   collapsibleContainer.appendChild(toggleButton);
   collapsibleContainer.appendChild(collapsibleContent);
 
   return collapsibleContainer;
 };
 
-export const getControllerContainer = () => {
-  return document.getElementById(CONTROL_CONTAINER_ID);
+export const addChildrenToController = (
+  children: HTMLElement | HTMLElement[]
+) => {
+  const controller = document.getElementById(CONTROL_CONTAINER_ID);
+  if (!controller) return;
+  // Append the children to the collapsible content
+  if (Array.isArray(children)) {
+    children.forEach((child) => controller.appendChild(child));
+  } else {
+    controller.appendChild(children);
+  }
 };

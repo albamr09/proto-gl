@@ -11,6 +11,8 @@ import {
   updateMatrixElement,
   createMatrixElement,
   createCheckboxInputForm,
+  createCollapsibleComponent,
+  addChildrenToController,
 } from "../../lib/gui/index.js";
 import { calculateNormals } from "../../lib/math/3d.js";
 import { Vector } from "../../lib/math/vector.js";
@@ -61,10 +63,12 @@ let followMouse = false;
 let rotateSelectors: {
   textInput: HTMLInputElement;
   sliderInput: HTMLInputElement;
+  container: HTMLDivElement;
 }[];
 let dollySelector: {
   textInput: HTMLInputElement;
   sliderInput: HTMLInputElement;
+  container: HTMLDivElement;
 };
 
 const initProgram = () => {
@@ -179,16 +183,20 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  const cameraTypeSelector = createSelectorForm({
-    label: "Camera Type",
-    value: cameraType,
-    options: Object.values(CameraType),
-    onChange: (v) => {
-      cameraType = v;
-      camera.setType(v);
-    },
-  });
-  const projectionTypeSelector = createSelectorForm({
+  const { selectInput: cameraTypeSelector, container: cameraTypeInput } =
+    createSelectorForm({
+      label: "Camera Type",
+      value: cameraType,
+      options: Object.values(CameraType),
+      onChange: (v) => {
+        cameraType = v;
+        camera.setType(v);
+      },
+    });
+  const {
+    selectInput: projectionTypeSelector,
+    container: projectionTypeInput,
+  } = createSelectorForm({
     label: "Projection Type",
     value: porjectionType,
     options: Object.values(ProjectionType),
@@ -251,24 +259,28 @@ const initControls = () => {
       camera.setFov(v);
     },
   });
-  const usetStaticLightCheck = createCheckboxInputForm({
+  const {
+    checkboxInput: usetStaticLightCheck,
+    container: useStaticLightInput,
+  } = createCheckboxInputForm({
     label: "Static Light",
     value: useStaticLight,
     onChange: (v) => {
       scene.updateUniform("uStaticLight", v);
     },
   });
-  const followMouseCheck = createCheckboxInputForm({
-    label: "Follow mouse (TRACKING)",
-    value: followMouse,
-    onInit: (v) => {
-      controller.setFollowMouse(v);
-    },
-    onChange: (v) => {
-      controller.setFollowMouse(v);
-    },
-  });
-  createButtonForm({
+  const { checkboxInput: followMouseCheck, container: followMouseInput } =
+    createCheckboxInputForm({
+      label: "Follow mouse (TRACKING)",
+      value: followMouse,
+      onInit: (v) => {
+        controller.setFollowMouse(v);
+      },
+      onChange: (v) => {
+        controller.setFollowMouse(v);
+      },
+    });
+  const resetButton = createButtonForm({
     label: "Reset",
     onClick: () => {
       camera.reset();
@@ -291,6 +303,33 @@ const initControls = () => {
       projectionTypeSelector.value = ProjectionType.PERSPECTIVE;
     },
   });
+
+  const cameraCollapsible = createCollapsibleComponent({
+    label: "Camera",
+    children: [
+      cameraTypeInput,
+      projectionTypeInput,
+      dollySelector.container,
+      fovSlider.container,
+    ],
+    openByDefault: true,
+  });
+  const translationCollapsible = createCollapsibleComponent({
+    label: "Translation",
+    children: translateSelectors.map(({ container }) => container),
+  });
+  const rotationCollapsible = createCollapsibleComponent({
+    label: "Rotation",
+    children: rotateSelectors.map(({ container }) => container),
+  });
+  addChildrenToController([
+    cameraCollapsible,
+    translationCollapsible,
+    rotationCollapsible,
+    useStaticLightInput,
+    followMouseInput,
+    resetButton,
+  ]);
 };
 
 const init = () => {

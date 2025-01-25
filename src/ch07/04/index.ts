@@ -1,6 +1,8 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createCheckboxInputForm,
+  createCollapsibleComponent,
   createDescriptionPanel,
   createImageInputForm,
   createSelectorForm,
@@ -180,21 +182,21 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createCheckboxInputForm({
+  const { container: useVertexColorsInput } = createCheckboxInputForm({
     label: "Use Vertex Colors",
     value: false,
     onChange: (v) => {
       scene.updateUniform("uUsePerVertexColoring", v, "cube");
     },
   });
-  createCheckboxInputForm({
+  const { container: useLambertInput } = createCheckboxInputForm({
     label: "Use Lambert Term",
     value: true,
     onChange: (v) => {
       scene.updateUniform("uUseLambert", v, "cube");
     },
   });
-  createSliderInputForm({
+  const { container: alphaValueInput } = createSliderInputForm({
     label: "Alpha value",
     value: 1,
     min: 0,
@@ -204,14 +206,14 @@ const initControls = () => {
       scene.updateUniform("uAlpha", v, "cube");
     },
   });
-  createImageInputForm({
+  const { container: textureImageInput } = createImageInputForm({
     label: "Texture Image",
     value: "/data/images/webgl.png",
     onChange: (v) => {
       scene.updateTexture({ id: "cube", texture: { index: 0, data: v } });
     },
   });
-  createSelectorForm({
+  const { container: magnificationFilterInput } = createSelectorForm({
     label: "Magnification Filter",
     value: MagFilter.NEAREST,
     options: Object.values(MagFilter),
@@ -222,7 +224,7 @@ const initControls = () => {
       });
     },
   });
-  createSelectorForm({
+  const { container: minificationFilterInput } = createSelectorForm({
     label: "Minification Filter",
     value: MinFilter.NEAREST,
     options: Object.values(MinFilter),
@@ -233,7 +235,7 @@ const initControls = () => {
       });
     },
   });
-  createSelectorForm({
+  const { container: sWrapInput } = createSelectorForm({
     label: "Wrap on S",
     value: WrapOptions.CLAMP_TO_EDGE,
     options: Object.values(WrapOptions),
@@ -244,7 +246,7 @@ const initControls = () => {
       });
     },
   });
-  createSelectorForm({
+  const { container: tWrapInput } = createSelectorForm({
     label: "Wrap on T",
     value: WrapOptions.CLAMP_TO_EDGE,
     options: Object.values(WrapOptions),
@@ -255,6 +257,22 @@ const initControls = () => {
       });
     },
   });
+  const textureCollapsible = createCollapsibleComponent({
+    label: "Texture Options",
+    children: [
+      textureImageInput,
+      magnificationFilterInput,
+      minificationFilterInput,
+      sWrapInput,
+      tWrapInput,
+    ],
+  });
+  addChildrenToController([
+    useVertexColorsInput,
+    useLambertInput,
+    alphaValueInput,
+    textureCollapsible,
+  ]);
 };
 
 const init = () => {

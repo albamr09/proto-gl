@@ -6,6 +6,8 @@ import {
 } from "../../lib/colors.js";
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
+  createCollapsibleComponent,
   createColorInputForm,
   createDescriptionPanel,
   createSliderInputForm,
@@ -193,7 +195,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createColorInputForm({
+  const lightDiffuseInput = createColorInputForm({
     label: "Light Diffuse Color",
     value: rgbToHex(denormalizeColor(lightDiffuseColor)),
     onInit: (v) => {
@@ -211,7 +213,7 @@ const initControls = () => {
       ]);
     },
   });
-  createColorInputForm({
+  const lighSpecularInput = createColorInputForm({
     label: "Light Specular Color",
     value: rgbToHex(denormalizeColor(lightSpecularColor)),
     onInit: (v) => {
@@ -229,7 +231,7 @@ const initControls = () => {
       ]);
     },
   });
-  createColorInputForm({
+  const lightAmbientInput = createColorInputForm({
     label: "Light Ambient Color",
     value: rgbToHex(denormalizeColor(lightAmbientColor)),
     onInit: (v) => {
@@ -247,7 +249,7 @@ const initControls = () => {
       ]);
     },
   });
-  createSliderInputForm({
+  const { container: shininessInput } = createSliderInputForm({
     label: "Shininess",
     value: 20,
     min: 0,
@@ -260,7 +262,7 @@ const initControls = () => {
       gl.uniform1f(program.uniforms.uShininess, v);
     },
   });
-  createVector3dSliders({
+  const carPositionInputs = createVector3dSliders({
     labels: ["Car X", "Car Y", "Car Z"],
     value: modelTranslation,
     min: -200,
@@ -272,8 +274,8 @@ const initControls = () => {
     onChange: (v) => {
       modelTranslation = v;
     },
-  });
-  createVector3dSliders({
+  }).map(({ container }) => container);
+  const lightsPositionInputs = createVector3dSliders({
     labels: ["Light X", "Light Y", "Light Z"],
     value: lightPosition,
     min: -500,
@@ -285,7 +287,23 @@ const initControls = () => {
     onChange: (v) => {
       gl.uniform3fv(program.uniforms.uLightPosition, v);
     },
+  }).map(({ container }) => container);
+
+  const lightsCollapsible = createCollapsibleComponent({
+    label: "Lights",
+    children: [
+      lightDiffuseInput,
+      lightAmbientInput,
+      lighSpecularInput,
+      ...lightsPositionInputs,
+    ],
   });
+
+  addChildrenToController([
+    ...carPositionInputs,
+    shininessInput,
+    lightsCollapsible,
+  ]);
 };
 
 const init = () => {

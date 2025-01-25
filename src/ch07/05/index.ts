@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createCheckboxInputForm,
   createDescriptionPanel,
   createImageInputForm,
@@ -171,21 +172,21 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createCheckboxInputForm({
+  const { container: useVertexColorsInput } = createCheckboxInputForm({
     label: "Use Vertex Colors",
     value: false,
     onChange: (v) => {
       scene.updateUniform("uUsePerVertexColoring", v, "cube");
     },
   });
-  createCheckboxInputForm({
+  const { container: useLambertInput } = createCheckboxInputForm({
     label: "Use Lambert Term",
     value: true,
     onChange: (v) => {
       scene.updateUniform("uUseLambert", v, "cube");
     },
   });
-  createSliderInputForm({
+  const { container: alphaValueInput } = createSliderInputForm({
     label: "Alpha value",
     value: 1,
     min: 0,
@@ -195,27 +196,35 @@ const initControls = () => {
       scene.updateUniform("uAlpha", v, "cube");
     },
   });
-  createCheckboxInputForm({
+  const { container: useMultipleTextureInput } = createCheckboxInputForm({
     label: "Use Multiply Texture",
     value: true,
     onChange: (v) => {
       scene.updateUniform("uUseMultiply", v, "cube");
     },
   });
-  createImageInputForm({
+  const { container: textureImageInput } = createImageInputForm({
     label: "Texture Image",
     value: "/data/images/webgl.png",
     onChange: (v) => {
       scene.updateTexture({ id: "cube", texture: { index: 0, data: v } });
     },
   });
-  createImageInputForm({
-    label: "Texture Image",
+  const { container: lightTextureImageInput } = createImageInputForm({
+    label: "Overlay Texture Image",
     value: "/data/images/light.png",
     onChange: (v) => {
       scene.updateTexture({ id: "cube", texture: { index: 1, data: v } });
     },
   });
+  addChildrenToController([
+    useVertexColorsInput,
+    useLambertInput,
+    alphaValueInput,
+    useMultipleTextureInput,
+    textureImageInput,
+    lightTextureImageInput,
+  ]);
 };
 
 const init = () => {

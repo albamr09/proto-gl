@@ -13,6 +13,8 @@ import {
   initGUI,
   createSliderInputForm,
   createColorInputForm,
+  addChildrenToController,
+  createCollapsibleComponent,
 } from "../../lib/gui/index.js";
 import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
@@ -256,7 +258,7 @@ const initLights = () => {
 
 const initGUIControl = () => {
   initController();
-  createColorInputForm({
+  const spehereColorInput = createColorInputForm({
     label: "Sphere color",
     value: rgbToHex(
       denormalizeColor(
@@ -269,7 +271,7 @@ const initGUIControl = () => {
       obj.diffuse = [...normalizeColor(hexToRgb(v)), 1.0];
     },
   });
-  createColorInputForm({
+  const coneColorInput = createColorInputForm({
     label: "Cone color",
     value: rgbToHex(
       denormalizeColor(
@@ -282,7 +284,7 @@ const initGUIControl = () => {
       obj.diffuse = [...normalizeColor(hexToRgb(v)), 1.0];
     },
   });
-  createNumericInput({
+  const shininessInput = createNumericInput({
     label: "Shininess",
     value: shininess,
     min: 0,
@@ -295,8 +297,8 @@ const initGUIControl = () => {
       gl.uniform1f(program.uShininess, v);
     },
   });
-  createSliderInputForm({
-    label: "Translate Z",
+  const { container: translateZInput } = createSliderInputForm({
+    label: "Camera Z",
     value: modelViewTranslation[2],
     min: -200,
     max: 200,
@@ -308,7 +310,7 @@ const initGUIControl = () => {
       modelViewTranslation[2] = v;
     },
   });
-  createVector3dSliders({
+  const lightPositionInputs = createVector3dSliders({
     labels: ["Light X", "Light Y", "Light Z"],
     value: lightPosition,
     min: -200,
@@ -322,7 +324,21 @@ const initGUIControl = () => {
       lightPosition = v;
       gl.uniform3fv(program.uLightPosition, v);
     },
+  }).map(({ container }) => container);
+
+  const lightsCollapsible = createCollapsibleComponent({
+    label: "Lights",
+    children: lightPositionInputs,
+    openByDefault: true,
   });
+
+  addChildrenToController([
+    spehereColorInput,
+    coneColorInput,
+    shininessInput,
+    translateZInput,
+    lightsCollapsible,
+  ]);
 };
 
 const init = async () => {

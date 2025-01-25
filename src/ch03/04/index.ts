@@ -5,6 +5,8 @@ import {
   rgbToHex,
 } from "../../lib/colors.js";
 import {
+  addChildrenToController,
+  createCollapsibleComponent,
   createColorInputForm,
   createDescriptionPanel,
   createSliderInputForm,
@@ -198,7 +200,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createColorInputForm({
+  const materialAmbientInput = createColorInputForm({
     label: "Material Ambient Color",
     value: rgbToHex(denormalizeColor(materialAmbientColor)),
     onInit: (v) => {
@@ -214,7 +216,7 @@ const initControls = () => {
       ]);
     },
   });
-  createColorInputForm({
+  const materialDiffuseInput = createColorInputForm({
     label: "Material Diffuse Color",
     value: rgbToHex(denormalizeColor(materialDiffuseColor)),
     onInit: (v) => {
@@ -230,7 +232,7 @@ const initControls = () => {
       ]);
     },
   });
-  createColorInputForm({
+  const materialSpecularInput = createColorInputForm({
     label: "Material Specular Color",
     value: rgbToHex(denormalizeColor(materialSpecularColor)),
     onInit: (v) => {
@@ -246,7 +248,15 @@ const initControls = () => {
       ]);
     },
   });
-  createColorInputForm({
+  const materialCollapsible = createCollapsibleComponent({
+    label: "Material",
+    children: [
+      materialAmbientInput,
+      materialDiffuseInput,
+      materialSpecularInput,
+    ],
+  });
+  const lightAmbientInput = createColorInputForm({
     label: "Light Ambient Color",
     value: rgbToHex(denormalizeColor(lightAmbientColor)),
     onInit: (v) => {
@@ -262,7 +272,7 @@ const initControls = () => {
       ]);
     },
   });
-  createColorInputForm({
+  const lightDiffuseInput = createColorInputForm({
     label: "Light Diffuse Color",
     value: rgbToHex(denormalizeColor(lightDiffuseColor)),
     onInit: (v) => {
@@ -278,7 +288,7 @@ const initControls = () => {
       ]);
     },
   });
-  createColorInputForm({
+  const lightSpecularInput = createColorInputForm({
     label: "Light Specular Color",
     value: rgbToHex(denormalizeColor(lightSpecularColor)),
     onInit: (v) => {
@@ -294,7 +304,7 @@ const initControls = () => {
       ]);
     },
   });
-  createVector3dSliders({
+  const lightPositionsInput = createVector3dSliders({
     labels: ["Light X", "Light Y", "Light Z"],
     value: lighDirection,
     min: -2,
@@ -306,8 +316,18 @@ const initControls = () => {
     onChange: (v) => {
       gl.uniform3fv(program.uLightDirection, v);
     },
+  }).map(({ container }) => container);
+
+  const lightCollapsible = createCollapsibleComponent({
+    label: "Lights",
+    children: [
+      lightAmbientInput,
+      lightDiffuseInput,
+      lightSpecularInput,
+      ...lightPositionsInput,
+    ],
   });
-  createSliderInputForm({
+  const { container: shininessInput } = createSliderInputForm({
     label: "Shininess",
     value: shininess,
     min: 0.1,
@@ -320,6 +340,11 @@ const initControls = () => {
       gl.uniform1f(program.uShininess, v);
     },
   });
+  addChildrenToController([
+    materialCollapsible,
+    lightCollapsible,
+    shininessInput,
+  ]);
 };
 
 const init = () => {

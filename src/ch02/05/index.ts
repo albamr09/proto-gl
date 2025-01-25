@@ -13,6 +13,7 @@ import {
   initController,
   createSelectorForm,
   createDescriptionPanel,
+  addChildrenToController,
 } from "../../lib/gui/index.js";
 
 let gl: WebGL2RenderingContext,
@@ -183,7 +184,7 @@ const draw = () => {
 const initControls = () => {
   // Initialize form
   initController();
-  createSelectorForm({
+  const { container: renderingModeInput } = createSelectorForm({
     label: "Rendering mode",
     value: currentRenderingMode,
     options: [
@@ -199,6 +200,7 @@ const initControls = () => {
       currentRenderingMode = value;
     },
   });
+  addChildrenToController(renderingModeInput);
 };
 
 /** Initialize application */

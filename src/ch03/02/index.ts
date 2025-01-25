@@ -9,6 +9,7 @@ import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import { vertices, indices } from "../data/data.js";
 import {
+  addChildrenToController,
   createColorInputForm,
   createDescriptionPanel,
   createVector3dSliders,
@@ -187,7 +188,7 @@ const render = (time: number) => {
 
 const initControls = () => {
   initController();
-  createColorInputForm({
+  const sphereColorInput = createColorInputForm({
     label: "Sphere color",
     value: rgbToHex(denormalizeColor(sphereColor)),
     onInit: (v) => {
@@ -197,7 +198,7 @@ const initControls = () => {
       gl.uniform3fv(program.uMaterialColor, normalizeColor(hexToRgb(v)));
     },
   });
-  createColorInputForm({
+  const lightColorInput = createColorInputForm({
     label: "Light color",
     value: rgbToHex(denormalizeColor(lightColor)),
     onInit: (v) => {
@@ -207,7 +208,7 @@ const initControls = () => {
       gl.uniform3fv(program.uLightColor, normalizeColor(hexToRgb(v)));
     },
   });
-  createVector3dSliders({
+  const lightPositionsInput = createVector3dSliders({
     labels: ["Light X Translate", "Light Y Translate", "Light Z Translate"],
     value: lightDirection,
     min: -MAX_LIGHT_TRANSLATION_VALUE,
@@ -221,7 +222,12 @@ const initControls = () => {
       lightDirection = v;
       gl.uniform3fv(program.uLightDirection, lightDirection);
     },
-  });
+  }).map(({ container }) => container);
+  addChildrenToController([
+    sphereColorInput,
+    lightColorInput,
+    ...lightPositionsInput,
+  ]);
 };
 
 /**

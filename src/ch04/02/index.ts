@@ -9,6 +9,7 @@ import {
   createVector3dSliders,
   initController,
   initGUI,
+  addChildrenToController,
 } from "../../lib/gui/index.js";
 import { calculateNormals } from "../../lib/math/3d.js";
 import { Matrix4 } from "../../lib/math/matrix.js";
@@ -157,7 +158,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createSelectorForm({
+  const { container: coordinateSystemInput } = createSelectorForm({
     label: "Coordinate System",
     value: coordinateSystem,
     options: Object.values(COORDINATE_SYSTEM),
@@ -165,7 +166,7 @@ const initControls = () => {
       coordinateSystem = v;
     },
   });
-  createVector3dSliders({
+  const rotationInputs = createVector3dSliders({
     labels: ["Rotation X", "Rotation Y", "Rotation Z"],
     value: modelRotation,
     min: -180,
@@ -174,7 +175,9 @@ const initControls = () => {
     onChange: (v) => {
       modelRotation = v;
     },
-  });
+  }).map(({ container }) => container);
+
+  addChildrenToController([coordinateSystemInput, ...rotationInputs]);
 };
 
 const init = async () => {

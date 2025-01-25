@@ -1,5 +1,7 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
+  createCollapsibleComponent,
   createDescriptionPanel,
   createSliderInputForm,
   createVector3dSliders,
@@ -226,7 +228,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createVector3dSliders({
+  const redLightInputs = createVector3dSliders({
     labels: ["Red Light X", "Red Light Y", "Red Light Z"],
     value: redLightPosition,
     min: -100,
@@ -246,8 +248,12 @@ const initControls = () => {
         "wall"
       );
     },
+  }).map(({ container }) => container);
+  const redLightsCollapsible = createCollapsibleComponent({
+    label: "Red Light",
+    children: redLightInputs,
   });
-  createVector3dSliders({
+  const greeLightInputs = createVector3dSliders({
     labels: ["Green Light X", "Green Light Y", "Green Light Z"],
     value: greenLightPosition,
     min: -100,
@@ -267,8 +273,12 @@ const initControls = () => {
         "wall"
       );
     },
+  }).map(({ container }) => container);
+  const greenLightsCollapsible = createCollapsibleComponent({
+    label: "Green Light",
+    children: greeLightInputs,
   });
-  createVector3dSliders({
+  const blueLightInputs = createVector3dSliders({
     labels: ["Blue Light X", "Blue Light Y", "Blue Light Z"],
     value: blueLightPosition,
     min: -100,
@@ -288,8 +298,12 @@ const initControls = () => {
         "wall"
       );
     },
+  }).map(({ container }) => container);
+  const blueLightsCollapsible = createCollapsibleComponent({
+    label: "Blue Light",
+    children: blueLightInputs,
   });
-  createVector3dSliders({
+  const whileLightInputs = createVector3dSliders({
     labels: ["White Light X", "White Light Y", "White Light Z"],
     value: whiteLightPosition,
     min: -100,
@@ -309,8 +323,12 @@ const initControls = () => {
         "wall"
       );
     },
+  }).map(({ container }) => container);
+  const whiteLightsCollapsible = createCollapsibleComponent({
+    label: "White Light",
+    children: whileLightInputs,
   });
-  createSliderInputForm({
+  const { container: lightCutoffInput } = createSliderInputForm({
     label: "Light Cutoff",
     value: lightCutOff,
     max: 1,
@@ -320,6 +338,13 @@ const initControls = () => {
       scene.updateUniform("uLightCutOff", v, "wall");
     },
   });
+  addChildrenToController([
+    redLightsCollapsible,
+    greenLightsCollapsible,
+    blueLightsCollapsible,
+    whiteLightsCollapsible,
+    lightCutoffInput,
+  ]);
 };
 
 const init = () => {

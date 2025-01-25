@@ -9,6 +9,7 @@ import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import { vertices, indices } from "../data/data.js";
 import {
+  addChildrenToController,
   createColorInputForm,
   createDescriptionPanel,
   createSliderInputForm,
@@ -174,7 +175,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createColorInputForm({
+  const sphereColorInput = createColorInputForm({
     label: "Sphere color",
     value: rgbToHex(denormalizeColor(sphereColor)),
     onInit: (v) => {
@@ -184,7 +185,7 @@ const initControls = () => {
       gl.uniform3fv(program.uMaterialColor, normalizeColor(hexToRgb(v)));
     },
   });
-  createColorInputForm({
+  const lightColorInput = createColorInputForm({
     label: "Light color",
     value: rgbToHex(denormalizeColor(lightColor)),
     onInit: (v) => {
@@ -194,7 +195,7 @@ const initControls = () => {
       gl.uniform3fv(program.uLightColor, normalizeColor(hexToRgb(v)));
     },
   });
-  createSliderInputForm({
+  const { container: translateXInput } = createSliderInputForm({
     label: "Translate X",
     value: lightDirection[0],
     min: -MAX_VALUE,
@@ -217,7 +218,7 @@ const initControls = () => {
       ]);
     },
   });
-  createSliderInputForm({
+  const { container: translateYInput } = createSliderInputForm({
     label: "Translate Y",
     value: lightDirection[1],
     min: -MAX_VALUE,
@@ -240,7 +241,7 @@ const initControls = () => {
       ]);
     },
   });
-  createSliderInputForm({
+  const { container: translateZInput } = createSliderInputForm({
     label: "Translate Z",
     value: lightDirection[2],
     min: -MAX_VALUE,
@@ -263,6 +264,13 @@ const initControls = () => {
       ]);
     },
   });
+  addChildrenToController([
+    sphereColorInput,
+    lightColorInput,
+    translateXInput,
+    translateYInput,
+    translateZInput,
+  ]);
 };
 
 /**

@@ -6,6 +6,7 @@ import {
   createCheckboxInputForm,
   createSliderInputForm,
   createSelectorForm,
+  addChildrenToController,
 } from "../../lib/gui/index.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
@@ -110,7 +111,7 @@ const getEnableDisable = (v: boolean) => (v ? "enable" : "disable");
 const initControls = () => {
   initController();
 
-  createCheckboxInputForm({
+  const { container: alphaBlendInput } = createCheckboxInputForm({
     label: "Alpha Blending",
     value: true,
     onInit: (v) => {
@@ -121,7 +122,7 @@ const initControls = () => {
       gl[getEnableDisable(v)](gl.BLEND);
     },
   });
-  createCheckboxInputForm({
+  const { container: faceCullingInput } = createCheckboxInputForm({
     label: "Face culling",
     value: true,
     onInit: (v) => {
@@ -131,7 +132,7 @@ const initControls = () => {
       gl[getEnableDisable(v)](gl.CULL_FACE);
     },
   });
-  createSelectorForm({
+  const { container: cullingModeInput } = createSelectorForm({
     label: "Culling Mode",
     value: CullingMode.FRONT,
     options: Object.values(CullingMode),
@@ -139,7 +140,7 @@ const initControls = () => {
       gl.cullFace(gl[v]);
     },
   });
-  createSliderInputForm({
+  const { container: alphaValueInput } = createSliderInputForm({
     label: "Alpha Value",
     value: alphaValue,
     min: 0,
@@ -149,6 +150,12 @@ const initControls = () => {
       scene.updateUniform("uAlpha", v, "cube");
     },
   });
+  addChildrenToController([
+    alphaBlendInput,
+    faceCullingInput,
+    cullingModeInput,
+    alphaValueInput,
+  ]);
 };
 
 const init = () => {

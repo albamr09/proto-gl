@@ -1,6 +1,8 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createButtonForm,
+  createCollapsibleComponent,
   createDescriptionPanel,
   createLowerLeftPanel,
   createMatrixElement,
@@ -141,14 +143,15 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  const cameraTypeSelector = createSelectorForm({
-    label: "Camera Type",
-    value: cameraType,
-    options: Object.values(CameraType),
-    onChange: (v) => {
-      camera.setType(v);
-    },
-  });
+  const { selectInput: cameraTypeSelector, container: cameraTypeInput } =
+    createSelectorForm({
+      label: "Camera Type",
+      value: cameraType,
+      options: Object.values(CameraType),
+      onChange: (v) => {
+        camera.setType(v);
+      },
+    });
   const dollySlider = createSliderInputForm({
     label: "Dolly",
     value: 0,
@@ -191,7 +194,7 @@ const initControls = () => {
       camera.setAzimuth(v[1]);
     },
   });
-  createButtonForm({
+  const resetButton = createButtonForm({
     label: "Reset",
     onClick: () => {
       camera.reset();
@@ -212,6 +215,21 @@ const initControls = () => {
       cameraTypeSelector.value = camera.type;
     },
   });
+  const translationCollapsible = createCollapsibleComponent({
+    label: "Translation",
+    children: translateSliders.map(({ container }) => container),
+  });
+  const rotationCollapsible = createCollapsibleComponent({
+    label: "Rotation",
+    children: rotateSliders.map(({ container }) => container),
+  });
+  addChildrenToController([
+    cameraTypeInput,
+    dollySlider.container,
+    translationCollapsible,
+    rotationCollapsible,
+    resetButton,
+  ]);
 };
 
 const init = () => {

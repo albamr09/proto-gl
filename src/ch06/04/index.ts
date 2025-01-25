@@ -1,5 +1,7 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
+  createCollapsibleComponent,
   createDescriptionPanel,
   createNumericInput,
   createSliderInputForm,
@@ -221,7 +223,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  createVector3dSliders({
+  const redLightInputs = createVector3dSliders({
     labels: ["Red Light X", "Red Light Y", "Red Light Z"],
     value: redLightPosition,
     min: -100,
@@ -236,40 +238,8 @@ const initControls = () => {
         "wall"
       );
     },
-  });
-  createVector3dSliders({
-    labels: ["Green Light X", "Green Light Y", "Green Light Z"],
-    value: greenLightPosition,
-    min: -100,
-    max: 100,
-    step: 1,
-    onChange(v) {
-      greenLightPosition = v;
-      scene.updateUniform("uTranslate", v, "green-light");
-      scene.updateUniform(
-        "uLightPositions",
-        [...redLightPosition, ...v, ...blueLightPosition],
-        "wall"
-      );
-    },
-  });
-  createVector3dSliders({
-    labels: ["Blue Light X", "Blue Light Y", "Blue Light Z"],
-    value: blueLightPosition,
-    min: -100,
-    max: 100,
-    step: 1,
-    onChange(v) {
-      blueLightPosition = v;
-      scene.updateUniform("uTranslate", v, "blue-light");
-      scene.updateUniform(
-        "uLightPositions",
-        [...redLightPosition, ...greenLightPosition, ...v],
-        "wall"
-      );
-    },
-  });
-  createVector3dSliders({
+  }).map(({ container }) => container);
+  const redLightDirectionInputs = createVector3dSliders({
     labels: [
       "Red Light Direction X",
       "Red Light Direction Y",
@@ -287,8 +257,28 @@ const initControls = () => {
         "wall"
       );
     },
+  }).map(({ container }) => container);
+  const redLightsCollapsible = createCollapsibleComponent({
+    label: "Red Light",
+    children: [...redLightInputs, ...redLightDirectionInputs],
   });
-  createVector3dSliders({
+  const greeLightInputs = createVector3dSliders({
+    labels: ["Green Light X", "Green Light Y", "Green Light Z"],
+    value: greenLightPosition,
+    min: -100,
+    max: 100,
+    step: 1,
+    onChange(v) {
+      greenLightPosition = v;
+      scene.updateUniform("uTranslate", v, "green-light");
+      scene.updateUniform(
+        "uLightPositions",
+        [...redLightPosition, ...v, ...blueLightPosition],
+        "wall"
+      );
+    },
+  }).map(({ container }) => container);
+  const greenLightDirectionInputs = createVector3dSliders({
     labels: [
       "Green Light Direction X",
       "Green Light Direction Y",
@@ -306,8 +296,28 @@ const initControls = () => {
         "wall"
       );
     },
+  }).map(({ container }) => container);
+  const greenLightsCollapsible = createCollapsibleComponent({
+    label: "Green Light",
+    children: [...greeLightInputs, ...greenLightDirectionInputs],
   });
-  createVector3dSliders({
+  const blueLightInputs = createVector3dSliders({
+    labels: ["Blue Light X", "Blue Light Y", "Blue Light Z"],
+    value: blueLightPosition,
+    min: -100,
+    max: 100,
+    step: 1,
+    onChange(v) {
+      blueLightPosition = v;
+      scene.updateUniform("uTranslate", v, "blue-light");
+      scene.updateUniform(
+        "uLightPositions",
+        [...redLightPosition, ...greenLightPosition, ...v],
+        "wall"
+      );
+    },
+  }).map(({ container }) => container);
+  const blueLightDirectionInputs = createVector3dSliders({
     labels: [
       "Blue Direction Light X",
       "Blue Light Direction Y",
@@ -326,8 +336,12 @@ const initControls = () => {
         "wall"
       );
     },
+  }).map(({ container }) => container);
+  const blueLightsCollapsible = createCollapsibleComponent({
+    label: "Blue Light",
+    children: [...blueLightInputs, ...blueLightDirectionInputs],
   });
-  createSliderInputForm({
+  const { container: lightCutoffInput } = createSliderInputForm({
     label: "Light Cutoff",
     value: lightCutOff,
     max: 1,
@@ -337,6 +351,13 @@ const initControls = () => {
       scene.updateUniform("uLightCutOff", v, "wall");
     },
   });
+
+  addChildrenToController([
+    redLightsCollapsible,
+    greenLightsCollapsible,
+    blueLightsCollapsible,
+    lightCutoffInput,
+  ]);
 };
 
 const init = () => {

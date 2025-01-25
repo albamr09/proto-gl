@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createDescriptionPanel,
   createSelectorForm,
   initController,
@@ -170,7 +171,7 @@ const render = () => {
 const initControls = () => {
   initController();
 
-  createSelectorForm({
+  const { container: cameraTypeInput } = createSelectorForm({
     label: "Camera Type",
     value: cameraType,
     options: Object.values(CameraType),
@@ -178,6 +179,7 @@ const initControls = () => {
       camera.setType(v);
     },
   });
+  addChildrenToController(cameraTypeInput);
 };
 
 const init = () => {

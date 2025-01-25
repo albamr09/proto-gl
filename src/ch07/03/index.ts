@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createCheckboxInputForm,
   createDescriptionPanel,
   createImageInputForm,
@@ -184,21 +185,21 @@ const loadTexture = (image: HTMLImageElement) => {
 
 const initControls = () => {
   initController();
-  createCheckboxInputForm({
+  const { container: useVertexColorsInput } = createCheckboxInputForm({
     label: "Use Vertex Colors",
     value: false,
     onChange: (v) => {
       scene.updateUniform("uUsePerVertexColoring", v, "cube");
     },
   });
-  createCheckboxInputForm({
+  const { container: useLambertInput } = createCheckboxInputForm({
     label: "Use Lambert Term",
     value: false,
     onChange: (v) => {
       scene.updateUniform("uUseLambert", v, "cube");
     },
   });
-  createSliderInputForm({
+  const { container: alphaValueInput } = createSliderInputForm({
     label: "Alpha value",
     value: 1,
     min: 0,
@@ -208,7 +209,7 @@ const initControls = () => {
       scene.updateUniform("uAlpha", v, "cube");
     },
   });
-  createImageInputForm({
+  const { container: textureImageInput } = createImageInputForm({
     label: "Texture Image",
     value: "/data/images/webgl.png",
     onInit: (v) => {
@@ -220,7 +221,7 @@ const initControls = () => {
       loadTexture(v);
     },
   });
-  createSelectorForm({
+  const { container: magnificationFilterInput } = createSelectorForm({
     label: "Magnification Filter",
     value: MagFilter.NEAREST,
     options: Object.values(MagFilter),
@@ -230,7 +231,7 @@ const initControls = () => {
       gl.bindTexture(gl.TEXTURE_2D, null);
     },
   });
-  createSelectorForm({
+  const { container: minificationFilterInput } = createSelectorForm({
     label: "Minification Filter",
     value: MinFilter.NEAREST,
     options: Object.values(MinFilter),
@@ -240,6 +241,14 @@ const initControls = () => {
       gl.bindTexture(gl.TEXTURE_2D, null);
     },
   });
+  addChildrenToController([
+    useVertexColorsInput,
+    useLambertInput,
+    alphaValueInput,
+    textureImageInput,
+    magnificationFilterInput,
+    minificationFilterInput,
+  ]);
 };
 
 const init = () => {

@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createDescriptionPanel,
   createLowerLeftPanel,
   createMatrixElement,
@@ -165,7 +166,7 @@ const init = async () => {
   render();
 
   initController();
-  createSelectorForm({
+  const { container: coordinateSystemInput } = createSelectorForm({
     label: "Coordinate System",
     value: coordinateSystem,
     options: Object.values(COORDINATE_SYSTEM),
@@ -173,7 +174,7 @@ const init = async () => {
       coordinateSystem = v;
     },
   });
-  createVector3dSliders({
+  const translationInputs = createVector3dSliders({
     labels: ["Translate X", "Translate Y", "Translate Z"],
     value: modelTranslation,
     min: -500,
@@ -185,7 +186,9 @@ const init = async () => {
     onChange(v) {
       modelTranslation = v;
     },
-  });
+  }).map(({ container }) => container);
+
+  addChildrenToController([coordinateSystemInput, ...translationInputs]);
 };
 
 window.onload = init;
