@@ -1,7 +1,9 @@
 import {
+  createCollapsibleComponent,
   createColorInputForm,
   createDescriptionPanel,
   createNumericInput,
+  getControllerContainer,
   initController,
   initGUI,
 } from "../../lib/gui/index.js";
@@ -191,7 +193,7 @@ const getSubArray = (originalArray: number[], start: number, size = 4) => {
 
 const initControls = () => {
   initController();
-  createColorInputForm({
+  const carColorInput = createColorInputForm({
     label: "Car color",
     value: "#ffffff",
     onChange: (v) => {
@@ -200,8 +202,9 @@ const initControls = () => {
         instance.updateUniform("uMaterialDiffuse", [...newColor, 1]);
       });
     },
-  });
-  createNumericInput({
+    addToContainer: false,
+  }) as HTMLDivElement;
+  const shininessInput = createNumericInput({
     label: "Specular Color",
     value: shininessValue,
     min: 0,
@@ -212,16 +215,35 @@ const initControls = () => {
         instance.updateUniform("uMaterialSpecular", [v, v, v, 1]);
       });
     },
+    addToContainer: false,
+  }) as HTMLDivElement;
+  const carCollapsible = createCollapsibleComponent({
+    label: "Car",
+    children: [carColorInput, shininessInput],
+    openByDefault: true,
   });
-  ["Far Left", "Far Right", "Near Left", "Near Right"].forEach(
-    (label, index) => {
-      createLightColorController(label, index);
-    }
-  );
+
+  getControllerContainer()?.appendChild(carCollapsible);
+
+  const lightCollapsibles = [
+    "Far Left",
+    "Far Right",
+    "Near Left",
+    "Near Right",
+  ].map((label, index) => {
+    return createLightColorController(label, index);
+  });
+
+  const lightCollapsible = createCollapsibleComponent({
+    label: "Lights",
+    children: lightCollapsibles,
+  });
+  getControllerContainer()?.appendChild(lightCollapsible);
+  getControllerContainer()?.appendChild(lightCollapsible);
 };
 
 const createLightColorController = (label: string, index: number) => {
-  createColorInputForm({
+  const diffuseInputForm = createColorInputForm({
     label: `${label} Diffuse Color`,
     value: rgbToHex(
       denormalizeColor(getSubArray(diffuseLightColors, index * 4))
@@ -229,8 +251,9 @@ const createLightColorController = (label: string, index: number) => {
     onChange: (v) => {
       updateLightColor(v, index, "uLightDiffuseColors");
     },
-  });
-  createColorInputForm({
+    addToContainer: false,
+  }) as HTMLDivElement;
+  const specularInputForm = createColorInputForm({
     label: `${label} Specular Color`,
     value: rgbToHex(
       denormalizeColor(getSubArray(specularLightColors, index * 4))
@@ -238,7 +261,14 @@ const createLightColorController = (label: string, index: number) => {
     onChange: (v) => {
       updateLightColor(v, index, "uLightSpecularColors");
     },
+    addToContainer: false,
+  }) as HTMLDivElement;
+
+  const collapsibleComponent = createCollapsibleComponent({
+    label: label,
+    children: [diffuseInputForm, specularInputForm],
   });
+  return collapsibleComponent;
 };
 
 const updateLightColor = (

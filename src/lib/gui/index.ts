@@ -10,37 +10,21 @@ export const initGUI = () => {
 export const initController = () => {
   const controlContainer = document.createElement("div");
 
-  // Set the id attribute for the div
-  controlContainer.setAttribute("id", "control-panel");
+  controlContainer.classList.add("right-panel");
 
-  // Create title bar
-  const titleBar = document.createElement("div");
-  titleBar.className = "title";
-  titleBar.innerHTML = "Control panel";
-  const caret = document.createElement("span");
-  caret.className = "caret";
-  titleBar.appendChild(caret);
-  caret.classList.add("open");
-  controlContainer.appendChild(titleBar);
-
-  // Create body bar
-  const controlBody = document.createElement("form");
-  controlBody.setAttribute("id", CONTROL_CONTAINER_ID);
+  const controllerContent = document.createElement("form");
+  controllerContent.setAttribute("id", CONTROL_CONTAINER_ID);
   // Avoid reload on submit
-  controlBody.addEventListener("submit", function (event) {
+  controllerContent.addEventListener("submit", function (event) {
     event.preventDefault();
   });
-  controlContainer.appendChild(controlBody);
 
-  titleBar.addEventListener("click", () => {
-    if (controlBody.style.display === "none") {
-      controlBody.style.display = "flex";
-      caret.classList.add("open");
-    } else {
-      controlBody.style.display = "none";
-      caret.classList.remove("open");
-    }
+  const controllerCollapsible = createCollapsibleComponent({
+    label: "Controls",
+    children: controllerContent,
+    openByDefault: true,
   });
+  controlContainer.appendChild(controllerCollapsible);
 
   // Append the container to the body of the document
   document.body.appendChild(controlContainer);
@@ -54,6 +38,7 @@ export const createNumericInput = ({
   step,
   onInit = () => {},
   onChange,
+  addToContainer = true,
 }: {
   label: string;
   value: number;
@@ -62,6 +47,7 @@ export const createNumericInput = ({
   step: number;
   onInit?: (v: number) => void;
   onChange: (v: number) => void;
+  addToContainer?: boolean;
 }) => {
   // Create a div container
   const formContainer = document.createElement("div");
@@ -105,8 +91,11 @@ export const createNumericInput = ({
   // Append the form to the container
   formContainer.appendChild(form);
 
-  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
-  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+  if (addToContainer) {
+    document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+  } else {
+    return formContainer;
+  }
 };
 
 export const createSelectorForm = <T>({
@@ -207,11 +196,13 @@ export const createColorInputForm = ({
   value,
   onInit = () => {},
   onChange,
+  addToContainer = true,
 }: {
   label: string;
   value: string;
   onInit?: (v: string) => void;
   onChange: (v: string) => void;
+  addToContainer?: boolean;
 }) => {
   // Create a div container
   const formContainer = document.createElement("div");
@@ -253,8 +244,11 @@ export const createColorInputForm = ({
   // Append the form to the container
   formContainer.appendChild(form);
 
-  // Append the container to the control container (change CONTROL_CONTAINER_ID to the actual ID)
-  document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+  if (addToContainer) {
+    document.getElementById(CONTROL_CONTAINER_ID)?.appendChild(formContainer);
+  } else {
+    return formContainer;
+  }
 };
 
 export const createImageInputForm = ({
@@ -510,45 +504,21 @@ export const createCheckboxInputForm = ({
 };
 
 export const createDescriptionPanel = (description: string) => {
+  const descriptionContent = document.createElement("div");
+  descriptionContent.innerHTML = description;
+  const collapsibleComponent = createCollapsibleComponent({
+    label: "Description",
+    children: descriptionContent,
+    openByDefault: true,
+  });
+
   // Create panel container
   const panel = document.createElement("div");
-  panel.id = "collapsiblePanel";
-
-  // Create title bar
-  const titleBar = document.createElement("div");
-  titleBar.className = "title";
-  titleBar.innerHTML = "Description";
-
-  // Create caret icon
-  const caret = document.createElement("span");
-  caret.className = "caret";
-  titleBar.appendChild(caret);
-
-  // Create content area
-  const content = document.createElement("div");
-  content.className = "content";
-  content.innerHTML = description;
-  // Make dialog open by default
-  content.style.display = "block";
-  caret.classList.add("open");
-
-  // Append title bar and content to panel
-  panel.appendChild(titleBar);
-  panel.appendChild(content);
+  panel.classList.add("left-panel");
+  panel.appendChild(collapsibleComponent);
 
   // Append panel to body
   document.body.appendChild(panel);
-
-  // Add event listener for collapse/expand functionality
-  titleBar.addEventListener("click", () => {
-    if (content.style.display === "none" || content.style.display === "") {
-      content.style.display = "block";
-      caret.classList.add("open");
-    } else {
-      content.style.display = "none";
-      caret.classList.remove("open");
-    }
-  });
 };
 
 export const createMatrixElement = (containerId: string, dimension: number) => {
@@ -603,4 +573,75 @@ export const updatePanelTitle = (id: string, title: string) => {
   const titleElement = panelElement.getElementsByClassName("title")[0];
   if (!titleElement) return;
   titleElement.innerHTML = title;
+};
+
+export const createCollapsibleComponent = ({
+  label,
+  children,
+  openByDefault = false,
+}: {
+  label: string;
+  children: HTMLElement | HTMLElement[]; // Accept single or multiple children
+  openByDefault?: boolean;
+}) => {
+  // Create a div for the collapsible container
+  const collapsibleContainer = document.createElement("div");
+  collapsibleContainer.classList.add("collapsible-container");
+
+  // Create a button for toggling the collapse
+  const toggleButton = document.createElement("button");
+  toggleButton.classList.add("collapsible-toggle");
+  toggleButton.textContent = label;
+
+  const openCollapsible = () => {
+    collapsibleContent.style.display = "flex";
+    caret.classList.add("open");
+  };
+
+  const closeCollapsible = () => {
+    collapsibleContent.style.display = "none";
+    caret.classList.remove("open");
+  };
+
+  // Toggle button
+  const caret = document.createElement("span");
+  caret.className = "caret";
+  toggleButton.appendChild(caret);
+
+  // Create a div to hold the collapsible content (children)
+  const collapsibleContent = document.createElement("div");
+  collapsibleContent.classList.add("collapsible-content");
+
+  // Append the children to the collapsible content
+  if (Array.isArray(children)) {
+    children.forEach((child) => collapsibleContent.appendChild(child));
+  } else {
+    collapsibleContent.appendChild(children);
+  }
+
+  if (openByDefault) {
+    openCollapsible();
+  } else {
+    closeCollapsible();
+  }
+
+  // Toggle function to show/hide the content
+  toggleButton.addEventListener("click", () => {
+    const isCollapsed = collapsibleContent.style.display === "none";
+    if (isCollapsed) {
+      openCollapsible();
+    } else {
+      closeCollapsible();
+    }
+  });
+
+  // Append the button and collapsible content to the container
+  collapsibleContainer.appendChild(toggleButton);
+  collapsibleContainer.appendChild(collapsibleContent);
+
+  return collapsibleContainer;
+};
+
+export const getControllerContainer = () => {
+  return document.getElementById(CONTROL_CONTAINER_ID);
 };

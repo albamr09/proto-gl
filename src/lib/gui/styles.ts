@@ -6,7 +6,7 @@ html, body {
   overflow: hidden; 
 }
 
-#control-panel {
+.right-panel {
   position: fixed;
   top: 10px;
   right: 10px;
@@ -30,8 +30,7 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: start;
-  gap: 10px;
-  padding: 10px;
+  gap: 5px;
   margin: 0;
 }
 
@@ -63,7 +62,7 @@ html, body {
   width: 50px;
 }
 
-#collapsiblePanel {
+.left-panel {
   position: fixed;
   top: 10px;
   left: 10px;
@@ -73,11 +72,6 @@ html, body {
   background-color: #fff;
   z-index: 1000;
   font-size: 14px;
-}
-
-#collapsiblePanel .content {
-  padding: 10px;
-  display: none; /* Hidden by default */
 }
 
 .caret {
@@ -132,6 +126,24 @@ button {
 
 button:hover {
   background: #e9e9e9;
+}
+
+.collapsible-container {
+  width: 100%;
+}
+
+.collapsible-content {
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.collapsible-toggle {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 `;
 
