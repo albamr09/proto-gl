@@ -258,7 +258,7 @@ const initControls = () => {
       );
     },
   }).map(({ container }) => container);
-  const redLightsCollapsible = createCollapsibleComponent({
+  const { container: redLightsCollapsible } = createCollapsibleComponent({
     label: "Red Light",
     children: [...redLightInputs, ...redLightDirectionInputs],
   });
@@ -297,7 +297,7 @@ const initControls = () => {
       );
     },
   }).map(({ container }) => container);
-  const greenLightsCollapsible = createCollapsibleComponent({
+  const { container: greenLightsCollapsible } = createCollapsibleComponent({
     label: "Green Light",
     children: [...greeLightInputs, ...greenLightDirectionInputs],
   });
@@ -337,7 +337,7 @@ const initControls = () => {
       );
     },
   }).map(({ container }) => container);
-  const blueLightsCollapsible = createCollapsibleComponent({
+  const { container: blueLightsCollapsible } = createCollapsibleComponent({
     label: "Blue Light",
     children: [...blueLightInputs, ...blueLightDirectionInputs],
   });

@@ -194,7 +194,7 @@ const initControls = () => {
       camera.setAzimuth(v[1]);
     },
   });
-  const resetButton = createButtonForm({
+  const { container: resetButton } = createButtonForm({
     label: "Reset",
     onClick: () => {
       camera.reset();
@@ -215,11 +215,11 @@ const initControls = () => {
       cameraTypeSelector.value = camera.type;
     },
   });
-  const translationCollapsible = createCollapsibleComponent({
+  const { container: translationCollapsible } = createCollapsibleComponent({
     label: "Translation",
     children: translateSliders.map(({ container }) => container),
   });
-  const rotationCollapsible = createCollapsibleComponent({
+  const { container: rotationCollapsible } = createCollapsibleComponent({
     label: "Rotation",
     children: rotateSliders.map(({ container }) => container),
   });

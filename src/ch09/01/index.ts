@@ -193,7 +193,7 @@ const getSubArray = (originalArray: number[], start: number, size = 4) => {
 
 const initControls = () => {
   initController();
-  const carColorInput = createColorInputForm({
+  const { container: carColorInput } = createColorInputForm({
     label: "Car color",
     value: "#ffffff",
     onChange: (v) => {
@@ -203,7 +203,7 @@ const initControls = () => {
       });
     },
   });
-  const shininessInput = createNumericInput({
+  const { container: shininessInput } = createNumericInput({
     label: "Specular Color",
     value: shininessValue,
     min: 0,
@@ -215,7 +215,7 @@ const initControls = () => {
       });
     },
   });
-  const carCollapsible = createCollapsibleComponent({
+  const { container: carCollapsible } = createCollapsibleComponent({
     label: "Car",
     children: [carColorInput, shininessInput],
     openByDefault: true,
@@ -230,7 +230,7 @@ const initControls = () => {
     return createLightColorController(label, index);
   });
 
-  const lightCollapsible = createCollapsibleComponent({
+  const { container: lightCollapsible } = createCollapsibleComponent({
     label: "Lights",
     children: lightCollapsibles,
   });
@@ -239,7 +239,7 @@ const initControls = () => {
 };
 
 const createLightColorController = (label: string, index: number) => {
-  const diffuseInputForm = createColorInputForm({
+  const { container: diffuseInputForm } = createColorInputForm({
     label: `${label} Diffuse Color`,
     value: rgbToHex(
       denormalizeColor(getSubArray(diffuseLightColors, index * 4))
@@ -248,7 +248,7 @@ const createLightColorController = (label: string, index: number) => {
       updateLightColor(v, index, "uLightDiffuseColors");
     },
   });
-  const specularInputForm = createColorInputForm({
+  const { container: specularInputForm } = createColorInputForm({
     label: `${label} Specular Color`,
     value: rgbToHex(
       denormalizeColor(getSubArray(specularLightColors, index * 4))
@@ -258,7 +258,7 @@ const createLightColorController = (label: string, index: number) => {
     },
   });
 
-  const collapsibleComponent = createCollapsibleComponent({
+  const { container: collapsibleComponent } = createCollapsibleComponent({
     label: label,
     children: [diffuseInputForm, specularInputForm],
   });

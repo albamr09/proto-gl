@@ -19,7 +19,7 @@ export const initController = () => {
     event.preventDefault();
   });
 
-  const controllerCollapsible = createCollapsibleComponent({
+  const { container: controllerCollapsible } = createCollapsibleComponent({
     label: "Controls",
     children: controllerContent,
     openByDefault: true,
@@ -89,7 +89,7 @@ export const createNumericInput = ({
   // Append the form to the container
   formContainer.appendChild(form);
 
-  return formContainer;
+  return { container: formContainer };
 };
 
 export const createSelectorForm = <T>({
@@ -167,7 +167,7 @@ export const createButtonForm = ({
 
   formContainer.appendChild(form);
 
-  return formContainer;
+  return { container: formContainer };
 };
 
 export const createColorInputForm = ({
@@ -212,7 +212,7 @@ export const createColorInputForm = ({
   form.appendChild(colorInput);
 
   formContainer.appendChild(form);
-  return formContainer;
+  return { container: formContainer };
 };
 
 export const createImageInputForm = ({
@@ -435,7 +435,7 @@ export const createCheckboxInputForm = ({
 export const createDescriptionPanel = (description: string) => {
   const descriptionContent = document.createElement("div");
   descriptionContent.innerHTML = description;
-  const collapsibleComponent = createCollapsibleComponent({
+  const { container: collapsibleComponent } = createCollapsibleComponent({
     label: "Description",
     children: descriptionContent,
     openByDefault: true,
@@ -562,7 +562,7 @@ export const createCollapsibleComponent = ({
   collapsibleContainer.appendChild(toggleButton);
   collapsibleContainer.appendChild(collapsibleContent);
 
-  return collapsibleContainer;
+  return { container: collapsibleContainer };
 };
 
 export const addChildrenToController = (

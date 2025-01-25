@@ -200,7 +200,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  const materialAmbientInput = createColorInputForm({
+  const { container: materialAmbientInput } = createColorInputForm({
     label: "Material Ambient Color",
     value: rgbToHex(denormalizeColor(materialAmbientColor)),
     onInit: (v) => {
@@ -216,7 +216,7 @@ const initControls = () => {
       ]);
     },
   });
-  const materialDiffuseInput = createColorInputForm({
+  const { container: materialDiffuseInput } = createColorInputForm({
     label: "Material Diffuse Color",
     value: rgbToHex(denormalizeColor(materialDiffuseColor)),
     onInit: (v) => {
@@ -232,7 +232,7 @@ const initControls = () => {
       ]);
     },
   });
-  const materialSpecularInput = createColorInputForm({
+  const { container: materialSpecularInput } = createColorInputForm({
     label: "Material Specular Color",
     value: rgbToHex(denormalizeColor(materialSpecularColor)),
     onInit: (v) => {
@@ -248,7 +248,7 @@ const initControls = () => {
       ]);
     },
   });
-  const materialCollapsible = createCollapsibleComponent({
+  const { container: materialCollapsible } = createCollapsibleComponent({
     label: "Material",
     children: [
       materialAmbientInput,
@@ -256,7 +256,7 @@ const initControls = () => {
       materialSpecularInput,
     ],
   });
-  const lightAmbientInput = createColorInputForm({
+  const { container: lightAmbientInput } = createColorInputForm({
     label: "Light Ambient Color",
     value: rgbToHex(denormalizeColor(lightAmbientColor)),
     onInit: (v) => {
@@ -272,7 +272,7 @@ const initControls = () => {
       ]);
     },
   });
-  const lightDiffuseInput = createColorInputForm({
+  const { container: lightDiffuseInput } = createColorInputForm({
     label: "Light Diffuse Color",
     value: rgbToHex(denormalizeColor(lightDiffuseColor)),
     onInit: (v) => {
@@ -288,7 +288,7 @@ const initControls = () => {
       ]);
     },
   });
-  const lightSpecularInput = createColorInputForm({
+  const { container: lightSpecularInput } = createColorInputForm({
     label: "Light Specular Color",
     value: rgbToHex(denormalizeColor(lightSpecularColor)),
     onInit: (v) => {
@@ -318,7 +318,7 @@ const initControls = () => {
     },
   }).map(({ container }) => container);
 
-  const lightCollapsible = createCollapsibleComponent({
+  const { container: lightCollapsible } = createCollapsibleComponent({
     label: "Lights",
     children: [
       lightAmbientInput,

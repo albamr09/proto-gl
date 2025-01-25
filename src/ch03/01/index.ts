@@ -175,7 +175,7 @@ const render = () => {
 
 const initControls = () => {
   initController();
-  const sphereColorInput = createColorInputForm({
+  const { container: sphereColorInput } = createColorInputForm({
     label: "Sphere color",
     value: rgbToHex(denormalizeColor(sphereColor)),
     onInit: (v) => {
@@ -185,7 +185,7 @@ const initControls = () => {
       gl.uniform3fv(program.uMaterialColor, normalizeColor(hexToRgb(v)));
     },
   });
-  const lightColorInput = createColorInputForm({
+  const { container: lightColorInput } = createColorInputForm({
     label: "Light color",
     value: rgbToHex(denormalizeColor(lightColor)),
     onInit: (v) => {

@@ -260,7 +260,7 @@ const initControls = () => {
       scene.updateUniform("uUseLambert", v);
     },
   });
-  const sphereColorInput = createColorInputForm({
+  const { container: sphereColorInput } = createColorInputForm({
     label: "Sphere Color",
     value: rgbToHex(denormalizeColor(sphereColor ?? [0, 0, 0])),
     onChange: (v) => {
@@ -284,7 +284,7 @@ const initControls = () => {
       scene.updateUniform("uMaterialDiffuse", [...sphereColor, v], "sphere");
     },
   });
-  const coneColorInput = createColorInputForm({
+  const { container: coneColorInput } = createColorInputForm({
     label: "Cone Color",
     value: rgbToHex(denormalizeColor(coneColor ?? [0, 0, 0])),
     onChange: (v) => {
@@ -341,7 +341,7 @@ const initControls = () => {
       gl.blendFunc(gl[sourceFunction], gl[v]);
     },
   });
-  const blendColorInput = createColorInputForm({
+  const { container: blendColorInput } = createColorInputForm({
     label: "Blend color",
     value: rgbToHex(denormalizeColor(blendColor)),
     onInit: (v) => {
@@ -382,7 +382,7 @@ const initControls = () => {
       }
     },
   });
-  const blendCollapsible = createCollapsibleComponent({
+  const { container: blendCollapsible } = createCollapsibleComponent({
     label: "Blend",
     children: [
       enableBlendInput,
@@ -392,7 +392,7 @@ const initControls = () => {
       blendColorInput,
     ],
   });
-  const depthCollapsible = createCollapsibleComponent({
+  const { container: depthCollapsible } = createCollapsibleComponent({
     label: "Depth",
     children: [enableDepthTestInput, alphaValueInput, enableFaceCullingInput],
   });

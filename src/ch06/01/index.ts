@@ -221,7 +221,7 @@ const initControls = () => {
       scene.setConfigurationValue("visible", !v, "cube-simple");
     },
   });
-  const alphaInput = createNumericInput({
+  const { container: alphaInput } = createNumericInput({
     label: "Alpha Value",
     value: alphaValue,
     min: 0,

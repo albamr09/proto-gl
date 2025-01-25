@@ -234,7 +234,7 @@ const initControls = () => {
       scene.updateUniform("uRedLightPosition", v, "wall");
     },
   }).map(({ container }) => container);
-  const redLightsCollapsible = createCollapsibleComponent({
+  const { container: redLightsCollapsible } = createCollapsibleComponent({
     label: "Red Light",
     children: redLightInputs,
   });
@@ -249,7 +249,7 @@ const initControls = () => {
       scene.updateUniform("uGreenLightPosition", v, "wall");
     },
   }).map(({ container }) => container);
-  const greenLightsCollapsible = createCollapsibleComponent({
+  const { container: greenLightsCollapsible } = createCollapsibleComponent({
     label: "Green Light",
     children: greeLightInputs,
   });
@@ -264,11 +264,11 @@ const initControls = () => {
       scene.updateUniform("uBlueLightPosition", v, "wall");
     },
   }).map(({ container }) => container);
-  const blueLightsCollapsible = createCollapsibleComponent({
+  const { container: blueLightsCollapsible } = createCollapsibleComponent({
     label: "Blue Light",
     children: blueLightInputs,
   });
-  const lightCutoffInput = createNumericInput({
+  const { container: lightCutoffInput } = createNumericInput({
     label: "Light Cutoff",
     value: lightCutOff,
     max: 100,

@@ -186,11 +186,11 @@ const initControls = () => {
       modelRotation = v;
     },
   }).map(({ container }) => container);
-  const rotationCollapsible = createCollapsibleComponent({
+  const { container: rotationCollapsible } = createCollapsibleComponent({
     label: "Rotation",
     children: rotationInputs,
   });
-  const translationCollapsible = createCollapsibleComponent({
+  const { container: translationCollapsible } = createCollapsibleComponent({
     label: "Translation",
     children: translationInputs,
   });

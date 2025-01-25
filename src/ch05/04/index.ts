@@ -278,7 +278,7 @@ const initControls = () => {
     },
   });
 
-  const interpolationStepsInput = createNumericInput({
+  const { container: interpolationStepsInput } = createNumericInput({
     label: "Interpolation Steps",
     value: interpolationSteps,
     min: 0,

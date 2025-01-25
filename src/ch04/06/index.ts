@@ -280,7 +280,7 @@ const initControls = () => {
         controller.setFollowMouse(v);
       },
     });
-  const resetButton = createButtonForm({
+  const { container: resetButton } = createButtonForm({
     label: "Reset",
     onClick: () => {
       camera.reset();
@@ -304,7 +304,7 @@ const initControls = () => {
     },
   });
 
-  const cameraCollapsible = createCollapsibleComponent({
+  const { container: cameraCollapsible } = createCollapsibleComponent({
     label: "Camera",
     children: [
       cameraTypeInput,
@@ -314,11 +314,11 @@ const initControls = () => {
     ],
     openByDefault: true,
   });
-  const translationCollapsible = createCollapsibleComponent({
+  const { container: translationCollapsible } = createCollapsibleComponent({
     label: "Translation",
     children: translateSelectors.map(({ container }) => container),
   });
-  const rotationCollapsible = createCollapsibleComponent({
+  const { container: rotationCollapsible } = createCollapsibleComponent({
     label: "Rotation",
     children: rotateSelectors.map(({ container }) => container),
   });

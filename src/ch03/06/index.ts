@@ -258,7 +258,7 @@ const initLights = () => {
 
 const initGUIControl = () => {
   initController();
-  const spehereColorInput = createColorInputForm({
+  const { container: spehereColorInput } = createColorInputForm({
     label: "Sphere color",
     value: rgbToHex(
       denormalizeColor(
@@ -271,7 +271,7 @@ const initGUIControl = () => {
       obj.diffuse = [...normalizeColor(hexToRgb(v)), 1.0];
     },
   });
-  const coneColorInput = createColorInputForm({
+  const { container: coneColorInput } = createColorInputForm({
     label: "Cone color",
     value: rgbToHex(
       denormalizeColor(
@@ -284,7 +284,7 @@ const initGUIControl = () => {
       obj.diffuse = [...normalizeColor(hexToRgb(v)), 1.0];
     },
   });
-  const shininessInput = createNumericInput({
+  const { container: shininessInput } = createNumericInput({
     label: "Shininess",
     value: shininess,
     min: 0,
@@ -326,7 +326,7 @@ const initGUIControl = () => {
     },
   }).map(({ container }) => container);
 
-  const lightsCollapsible = createCollapsibleComponent({
+  const { container: lightsCollapsible } = createCollapsibleComponent({
     label: "Lights",
     children: lightPositionInputs,
     openByDefault: true,

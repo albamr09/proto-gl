@@ -198,7 +198,7 @@ const initControls = () => {
       scene.updateUniform("uUsePerVertexColoring", v);
     },
   });
-  const alphaValueInput = createNumericInput({
+  const { container: alphaValueInput } = createNumericInput({
     label: "Alpha Value",
     value: alphaValue,
     min: 0,

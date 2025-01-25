@@ -257,7 +257,7 @@ const initControls = () => {
       });
     },
   });
-  const textureCollapsible = createCollapsibleComponent({
+  const { container: textureCollapsible } = createCollapsibleComponent({
     label: "Texture Options",
     children: [
       textureImageInput,
