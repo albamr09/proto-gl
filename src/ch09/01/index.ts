@@ -251,25 +251,10 @@ const initControls = () => {
     value: carModels[0].name,
     options: carModels.map((car) => car.name),
     onChange: (selectedCarModel) => {
-      const selectedModelProperties = carModels.find(
-        (carModel) => carModel.name == selectedCarModel
-      );
-      if (!selectedModelProperties) return;
-      scene.getInstances().forEach((instance) => {
-        const id = instance.getId();
-        if (!id || id.includes("Floor")) return;
-        scene.remove(id);
-      });
-      const { path, size, paintAlias } = selectedModelProperties;
-      loadModel(path, size, paintAlias);
+      loadCarModel(selectedCarModel);
     },
     onInit: (selectedCarModel) => {
-      const selectedModelProperties = carModels.find(
-        (carModel) => carModel.name == selectedCarModel
-      );
-      if (!selectedModelProperties) return;
-      const { path, size, paintAlias } = selectedModelProperties;
-      loadModel(path, size, paintAlias);
+      loadCarModel(selectedCarModel);
     },
   });
   const { container: carCollapsible } = createCollapsibleComponent({
@@ -294,6 +279,20 @@ const initControls = () => {
   });
 
   addChildrenToController([carCollapsible, lightCollapsible]);
+};
+
+const loadCarModel = (carModelName: string) => {
+  const selectedModelProperties = carModels.find(
+    (carModel) => carModel.name == carModelName
+  );
+  if (!selectedModelProperties) return;
+  scene.getInstances().forEach((instance) => {
+    const id = instance.getId();
+    if (!id || id.includes("Floor")) return;
+    scene.remove(id);
+  });
+  const { path, size, paintAlias } = selectedModelProperties;
+  loadModel(path, size, paintAlias);
 };
 
 const createLightColorController = (label: string, index: number) => {
