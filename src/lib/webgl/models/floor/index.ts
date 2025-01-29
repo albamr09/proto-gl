@@ -19,6 +19,7 @@ class Floor extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
   }) {
     const { vertices, indices } = Floor.build(dimension, lines);
     super({
+      id: "Floor",
       gl,
       vertexShaderSource,
       fragmentShaderSource,

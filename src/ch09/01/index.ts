@@ -4,6 +4,7 @@ import {
   createColorInputForm,
   createDescriptionPanel,
   createNumericInput,
+  createSelectorForm,
   initController,
   initGUI,
 } from "../../lib/gui/index.js";
@@ -38,7 +39,34 @@ let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let shininessValue = 0.5;
-const paintAlias = "BMW";
+
+const carModels = [
+  {
+    paintAlias: "BMW",
+    name: "BMW-i8",
+    path: "/data/models/bmw-i8/",
+    size: 25,
+  },
+  {
+    paintAlias: "Lack",
+    name: "Audi-r8",
+    path: "/data/models/audi-r8",
+    size: 150,
+  },
+  {
+    paintAlias: "pintura_carro",
+    name: "Ford Mustang",
+    path: "/data/models/ford-mustang",
+    size: 103,
+  },
+  {
+    paintAlias: "Yellow",
+    name: "Lamborghini Gallardo",
+    path: "/data/models/lamborghini-gallardo",
+    size: 66,
+  },
+];
+let paintAlias: string;
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
@@ -79,9 +107,8 @@ const generateLightColors = () => {
 const diffuseLightColors = generateLightColors();
 const specularLightColors = generateLightColors();
 
-const initData = () => {
-  scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
-
+const loadModel = (modelPath: string, size: number, painAlias: string) => {
+  paintAlias = painAlias;
   const lightPositions = {
     farLeft: [-1000, 1000, -1000],
     farRight: [1000, 1000, -1000],
@@ -89,8 +116,8 @@ const initData = () => {
     nearRight: [1000, 1000, 1000],
   };
 
-  for (let i = 1; i < 25; i++) {
-    loadData(`/data/models/bmw-i8/part${i}.json`).then((data) => {
+  for (let i = 1; i < size; i++) {
+    loadData(`${modelPath}/part${i}.json`).then((data) => {
       const {
         alias: id,
         vertices,
@@ -177,6 +204,10 @@ const initData = () => {
   }
 };
 
+const initData = () => {
+  scene.add(new Floor({ gl, dimension: 82, lines: 2 }));
+};
+
 const updateInstancesWithPaintAttribute = (
   cb: (instance: Instance<any, any>) => void
 ) => {
@@ -215,9 +246,35 @@ const initControls = () => {
       });
     },
   });
+  const { container: carSelector } = createSelectorForm({
+    label: "Car Model",
+    value: carModels[0].name,
+    options: carModels.map((car) => car.name),
+    onChange: (selectedCarModel) => {
+      const selectedModelProperties = carModels.find(
+        (carModel) => carModel.name == selectedCarModel
+      );
+      if (!selectedModelProperties) return;
+      scene.getInstances().forEach((instance) => {
+        const id = instance.getId();
+        if (!id || id.includes("Floor")) return;
+        scene.remove(id);
+      });
+      const { path, size, paintAlias } = selectedModelProperties;
+      loadModel(path, size, paintAlias);
+    },
+    onInit: (selectedCarModel) => {
+      const selectedModelProperties = carModels.find(
+        (carModel) => carModel.name == selectedCarModel
+      );
+      if (!selectedModelProperties) return;
+      const { path, size, paintAlias } = selectedModelProperties;
+      loadModel(path, size, paintAlias);
+    },
+  });
   const { container: carCollapsible } = createCollapsibleComponent({
     label: "Car",
-    children: [carColorInput, shininessInput],
+    children: [carSelector, carColorInput, shininessInput],
     openByDefault: true,
   });
 
@@ -233,6 +290,7 @@ const initControls = () => {
   const { container: lightCollapsible } = createCollapsibleComponent({
     label: "Lights",
     children: lightCollapsibles,
+    openByDefault: true,
   });
 
   addChildrenToController([carCollapsible, lightCollapsible]);
