@@ -66,3 +66,8 @@ export type InstanceTransformationProperties = {
   translationVector?: Vector;
   rotationVector?: Vector;
 };
+
+export type CanvasProperties = {
+  height: number;
+  width: number;
+};

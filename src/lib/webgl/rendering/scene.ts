@@ -11,10 +11,12 @@ import {
   InstanceClickPayload,
   InstanceDragPayload,
   InstanceDragEndPayload,
+  CanvasProperties,
 } from "./types.js";
 
 class Scene extends EventTarget {
   private gl: WebGL2RenderingContext;
+  private canvasProperties!: CanvasProperties;
   private objects: Map<string, Instance<any, any>>;
   private renderOrder: string[];
   private modelViewMatrix: Matrix4;
@@ -24,7 +26,8 @@ class Scene extends EventTarget {
 
   constructor(
     gl: WebGL2RenderingContext,
-    editorConfiguration?: { allow?: boolean; showGuides?: boolean }
+    editorConfiguration?: { allow?: boolean; showGuides?: boolean },
+    canvas?: HTMLCanvasElement
   ) {
     super();
     this.gl = gl;
@@ -39,7 +42,25 @@ class Scene extends EventTarget {
         showGuides: !!editorConfiguration?.showGuides,
       });
     }
+    canvas && this.updateCanvasProperties(canvas);
     this.setUp();
+  }
+
+  private updateCanvasProperties(canvas: HTMLCanvasElement) {
+    const update = () => {
+      this.canvasProperties = {
+        height: canvas.height,
+        width: canvas.width,
+      };
+    };
+    update();
+
+    window.onresize = () => {
+      update();
+    };
+    canvas.onresize = () => {
+      update();
+    };
   }
 
   // Default setup, defining depth testing
