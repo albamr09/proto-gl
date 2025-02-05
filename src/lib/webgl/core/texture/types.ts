@@ -1,6 +1,7 @@
 export interface TextureParameters {
   index: number;
   source?: string;
+  texture?: WebGLTexture;
   data?: HTMLImageElement;
   faces?: { [Key in CubeMapTargets]: string };
   configuration?: TextureConfiguration;

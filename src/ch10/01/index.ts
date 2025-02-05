@@ -1,9 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import {
-  addChildrenToController,
-  createCheckboxInputForm,
   createDescriptionPanel,
-  createNumericInput,
   initController,
   initGUI,
 } from "../../lib/gui/index.js";
@@ -25,15 +22,17 @@ import Scene from "../../lib/webgl/rendering/scene.js";
 import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
+import PostProcess from "../../lib/webgl/rendering/postprocess/index.js";
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
-let texture: WebGLTexture | null;
+let post: PostProcess;
 
 const initProgram = () => {
-  scene = new Scene(gl, {}, canvas);
+  scene = new Scene({ gl, canvas });
+  post = new PostProcess({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -114,31 +113,25 @@ const initData = () => {
           ...lightUniforms,
         },
         indices,
+        textures: [
+          {
+            index: 0,
+            source: "/data/images/webgl.png",
+            target: gl.TEXTURE_2D,
+          },
+        ],
       })
     );
   });
-  // Texture
-  texture = gl.createTexture();
-  const image = new Image();
-  image.src = "/data/images/webgl.png";
-  image.onload = () => {
-    // Load texture
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.bindTexture(gl.TEXTURE_2D, null);
-  };
 };
 
 const draw = () => {
-  scene.render(() => {
-    const uniform = scene.getUniform("cube", "uSampler");
-    if (!uniform) return;
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.uniform1i(uniform.getLocation()!, 0);
-  });
+  post.bindFramebuffer();
+  scene.render();
+  post.unbindFramebuffer();
+
+  // Re-render scene from framebuffer with post process effect
+  post.draw();
 };
 
 const render = () => {

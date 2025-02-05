@@ -1,11 +1,7 @@
 import CubeMapTexture from "./cubemap-texture.js";
 import Texture2D from "./texture-2d.js";
 import Texture from "./texture.js";
-import {
-  CubeMapTargets,
-  TextureConfiguration,
-  TextureTargets,
-} from "./types.js";
+import { TextureDefinition } from "./types.js";
 
 class TextureFactory {
   static create({
@@ -13,21 +9,23 @@ class TextureFactory {
     index,
     target,
     source,
+    texture,
     data,
     faces,
     configuration,
   }: {
     gl: WebGL2RenderingContext;
-    index: number;
-    target: TextureTargets;
-    source?: string;
-    faces?: Record<CubeMapTargets, string>;
-    data?: HTMLImageElement;
-    configuration?: TextureConfiguration;
-  }): Texture {
+  } & TextureDefinition): Texture {
     switch (target) {
       case WebGL2RenderingContext.TEXTURE_2D:
-        return new Texture2D({ gl, index, source, data, configuration });
+        return new Texture2D({
+          gl,
+          index,
+          source,
+          data,
+          texture,
+          configuration,
+        });
       case WebGL2RenderingContext.TEXTURE_CUBE_MAP:
         return new CubeMapTexture({ gl, index, faces, configuration });
       default:

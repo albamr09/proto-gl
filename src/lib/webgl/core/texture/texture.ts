@@ -109,6 +109,10 @@ abstract class Texture {
     }
   }
 
+  protected setTexture(texture: WebGLTexture) {
+    this.glTexture = texture;
+  }
+
   public activate() {}
   public updateImage({}: {
     source?: string;

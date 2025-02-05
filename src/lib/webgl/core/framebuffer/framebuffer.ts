@@ -1,15 +1,21 @@
-import Scene from "../../rendering/scene";
-
 class Framebuffer {
   private gl: WebGL2RenderingContext;
   private renderBuffer?: WebGLRenderbuffer | null;
   private texture?: WebGLTexture | null;
   private frameBuffer?: WebGLFramebuffer | null;
 
-  constructor(scene: Scene, canvas: HTMLCanvasElement) {
-    this.gl = scene.getContext();
+  constructor({
+    gl,
+    canvas,
+    asFilter = false,
+  }: {
+    gl: WebGL2RenderingContext;
+    canvas: HTMLCanvasElement;
+    asFilter?: boolean;
+  }) {
+    this.gl = gl;
     this.createRenderBuffer(canvas);
-    this.createTexture(canvas);
+    this.createTexture(canvas, asFilter);
     this.createFrameBuffer();
   }
 
@@ -26,7 +32,7 @@ class Framebuffer {
     );
   }
 
-  private createTexture(canvas: HTMLCanvasElement) {
+  private createTexture(canvas: HTMLCanvasElement, asFilter: boolean) {
     const { height, width } = canvas;
 
     this.texture = this.gl.createTexture();
@@ -42,6 +48,39 @@ class Framebuffer {
       this.gl.UNSIGNED_BYTE,
       null
     );
+    if (asFilter) {
+      this.gl.texParameteri(
+        this.gl.TEXTURE_2D,
+        this.gl.TEXTURE_MAG_FILTER,
+        this.gl.NEAREST
+      );
+      this.gl.texParameteri(
+        this.gl.TEXTURE_2D,
+        this.gl.TEXTURE_MIN_FILTER,
+        this.gl.NEAREST
+      );
+      this.gl.texParameteri(
+        this.gl.TEXTURE_2D,
+        this.gl.TEXTURE_WRAP_S,
+        this.gl.CLAMP_TO_EDGE
+      );
+      this.gl.texParameteri(
+        this.gl.TEXTURE_2D,
+        this.gl.TEXTURE_WRAP_T,
+        this.gl.CLAMP_TO_EDGE
+      );
+      this.gl.texImage2D(
+        this.gl.TEXTURE_2D,
+        0,
+        this.gl.RGBA,
+        width,
+        height,
+        0,
+        this.gl.RGBA,
+        this.gl.UNSIGNED_BYTE,
+        null
+      );
+    }
   }
 
   private createFrameBuffer() {
@@ -86,6 +125,39 @@ class Framebuffer {
 
   public unBind() {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+  }
+
+  public getTexture() {
+    return this.texture;
+  }
+
+  public resize({ width, height }: { width: number; height: number }) {
+    if (!this.texture || !this.renderBuffer) {
+      throw Error("No texture or render buffer was created");
+    }
+
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D,
+      0,
+      this.gl.RGBA,
+      width,
+      height,
+      0,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      null
+    );
+    this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, this.renderBuffer);
+    this.gl.renderbufferStorage(
+      this.gl.RENDERBUFFER,
+      this.gl.DEPTH_COMPONENT16,
+      width,
+      height
+    );
+
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, null);
   }
 }
 
