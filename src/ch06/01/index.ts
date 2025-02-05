@@ -36,7 +36,7 @@ let useLambert = true,
   alphaValue = 1.0;
 
 const initProgram = () => {
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,

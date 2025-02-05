@@ -45,7 +45,11 @@ let pickingController: PickingController;
 let program: Program<typeof attributes, typeof uniforms>;
 
 const initProgram = () => {
-  scene = new Scene(gl, { allow: true, showGuides: true });
+  scene = new Scene({
+    gl,
+    canvas,
+    editorConfiguration: { allow: true, showGuides: true },
+  });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,

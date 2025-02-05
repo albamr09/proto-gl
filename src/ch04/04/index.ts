@@ -42,6 +42,7 @@ const uniforms = [
 ] as const;
 
 let gl: WebGL2RenderingContext;
+let canvas: HTMLCanvasElement;
 let program: Program<typeof attributes, typeof uniforms>;
 let scene: Scene;
 let modelViewMatrix = Matrix4.identity();
@@ -64,7 +65,7 @@ const initProgram = () => {
     attributes,
     uniforms
   );
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(cameraType);
   camera.setInitialPosition(new Vector(modelTranslation));
 };
@@ -241,7 +242,7 @@ const init = () => {
   createLowerLeftPanel("Camera Matrix");
   createMatrixElement("lower-left-panel", 4);
 
-  const canvas = configureCanvas();
+  canvas = configureCanvas();
   autoResizeCanvas(canvas);
 
   gl = getGLContext();

@@ -41,7 +41,7 @@ const attributes = ["aPosition", "aNormal", "aColor"] as const;
 const uniforms = ["uLightAmbient", "uLightDiffuse", "uAlpha"] as const;
 
 const initProgram = () => {
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,

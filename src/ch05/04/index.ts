@@ -117,7 +117,7 @@ const computeInterpolatedPositions = (method: INTERPOLATION, steps: number) => {
 };
 
 const initProgram = () => {
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,

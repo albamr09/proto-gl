@@ -52,7 +52,11 @@ let program: Program<typeof attributes, typeof uniforms>;
 let showOffscreenBuffer = false;
 
 const initProgram = () => {
-  scene = new Scene(gl, { allow: true, showGuides: false });
+  scene = new Scene({
+    gl,
+    canvas,
+    editorConfiguration: { allow: true, showGuides: false },
+  });
   const camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -199,7 +203,7 @@ const initData = () => {
 };
 
 const render = () => {
-  scene.render(() => {}, true, showOffscreenBuffer);
+  scene.render({ offscreen: showOffscreenBuffer });
   requestAnimationFrame(render);
 };
 

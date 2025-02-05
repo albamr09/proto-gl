@@ -33,7 +33,7 @@ class PickingController extends EventTarget {
     this.lastY = 0;
     this.dragStarted = false;
     this.instanceLabels = new Set();
-    this.frameBuffer = new Framebuffer(scene, canvas);
+    this.frameBuffer = new Framebuffer(this.gl, canvas);
 
     this.scene.addEventListener("render", () => this.render());
     this.scene.addEventListener(
@@ -53,7 +53,7 @@ class PickingController extends EventTarget {
     const blendingEnabled = this.gl.getParameter(this.gl.BLEND);
     this.gl.disable(this.gl.BLEND);
     this.frameBuffer.bind();
-    this.scene.render(() => {}, true, true);
+    this.scene.render({ offscreen: true });
     this.frameBuffer.unBind();
     if (blendingEnabled) {
       this.gl.enable(this.gl.BLEND);

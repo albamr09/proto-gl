@@ -114,6 +114,7 @@ export const autoResizeCanvas = (canvas: HTMLCanvasElement) => {
   const expandFullScreen = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    canvas.dispatchEvent(new Event("resize"));
   };
 
   expandFullScreen();

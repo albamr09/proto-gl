@@ -33,7 +33,7 @@ let initialPosition = [-25, 0, 20] as [number, number, number],
 let interpolatedPositions: [number, number, number][] = [];
 
 const initProgram = () => {
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,

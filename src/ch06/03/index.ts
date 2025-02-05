@@ -61,7 +61,7 @@ const WallUniforms = [
 ] as const;
 
 const initScene = () => {
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,

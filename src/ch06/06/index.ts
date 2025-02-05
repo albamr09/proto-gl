@@ -81,7 +81,7 @@ let blendColor = [0, 0, 0];
 let renderingOrder = Order.SPHERE;
 
 const initProgram = () => {
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,

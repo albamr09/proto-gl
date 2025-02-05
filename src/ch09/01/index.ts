@@ -83,7 +83,7 @@ const uniforms = [
 ] as const;
 
 const initProgram = () => {
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   const camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,

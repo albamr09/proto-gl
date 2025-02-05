@@ -43,6 +43,7 @@ const uniforms = [
 ] as const;
 
 let gl: WebGL2RenderingContext;
+let canvas: HTMLCanvasElement;
 let program: Program<typeof attributes, typeof uniforms>;
 let scene: Scene;
 let modelViewMatrix: Matrix4, cameraMatrix: Matrix4, projectionMatrix: Matrix4;
@@ -60,7 +61,7 @@ const initProgram = () => {
     attributes,
     uniforms
   );
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
 };
 
 const initData = async () => {
@@ -154,7 +155,7 @@ const init = async () => {
   createLowerLeftPanel(coordinateSystem);
   createMatrixElement("lower-left-panel", 4);
 
-  const canvas = configureCanvas();
+  canvas = configureCanvas();
   autoResizeCanvas(canvas);
 
   gl = getGLContext();

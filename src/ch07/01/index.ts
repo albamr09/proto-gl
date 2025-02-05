@@ -36,7 +36,7 @@ let useLambert = true,
   alphaValue = 1.0;
 
 const initProgram = () => {
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -160,12 +160,14 @@ const initData = () => {
 };
 
 const draw = () => {
-  scene.render(() => {
-    const uniform = scene.getUniform("cube", "uSampler");
-    if (!uniform) return;
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.uniform1i(uniform.getLocation()!, 0);
+  scene.render({
+    cb: () => {
+      const uniform = scene.getUniform("cube", "uSampler");
+      if (!uniform) return;
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.uniform1i(uniform.getLocation()!, 0);
+    },
   });
 };
 

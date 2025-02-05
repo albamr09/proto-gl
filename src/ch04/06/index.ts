@@ -85,7 +85,7 @@ const initProgram = () => {
     attributes,
     uniforms
   );
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(cameraType, porjectionType, gl);
   controller = new Controller({
     camera,
@@ -155,14 +155,16 @@ const initLightUniforms = () => {
 };
 
 const draw = () => {
-  scene.render((o) => {
-    o.updateUniform(
-      "uProjectionMatrix",
-      camera.getProjectionTransform().toFloatArray(),
-      // Transpose matrix only if the projection
-      // was not manully transposed before
-      { transpose: !camera.isProjectionTransposed() }
-    );
+  scene.render({
+    cb: (o) => {
+      o.updateUniform(
+        "uProjectionMatrix",
+        camera.getProjectionTransform().toFloatArray(),
+        // Transpose matrix only if the projection
+        // was not manully transposed before
+        { transpose: !camera.isProjectionTransposed() }
+      );
+    },
   });
 };
 

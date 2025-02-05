@@ -40,7 +40,7 @@ let sphereZ = 0;
 let coneX = 0;
 
 const initProgram = () => {
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(cameraType, projectionType, gl, scene);
   camera.setPosition(initialPosition);
   camera.setInitialPosition(initialPosition);

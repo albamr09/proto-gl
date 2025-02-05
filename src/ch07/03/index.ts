@@ -66,7 +66,7 @@ enum MinFilter {
 }
 
 const initProgram = () => {
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -163,9 +163,11 @@ const initData = () => {
 };
 
 const draw = () => {
-  scene.render(() => {
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
+  scene.render({
+    cb: () => {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+    },
   });
 };
 

@@ -88,7 +88,7 @@ const initProgram = () => {
     attributes,
     uniforms
   );
-  scene = new Scene(gl);
+  scene = new Scene({ gl, canvas });
   camera = new Camera(cameraType, porjectionType, gl);
   controller = new Controller({
     camera,
@@ -158,7 +158,7 @@ const initLightUniforms = () => {
 
 const draw = () => {
   scene.clear(heightFactor, widthFactor);
-  scene.render(() => {}, false);
+  scene.render({ clear: false });
 };
 
 const updateTransformations = () => {
