@@ -7,15 +7,19 @@ class Framebuffer {
   constructor({
     gl,
     canvas,
-    asFilter = false,
+    texture,
   }: {
     gl: WebGL2RenderingContext;
     canvas: HTMLCanvasElement;
-    asFilter?: boolean;
+    texture?: WebGLTexture | null;
   }) {
     this.gl = gl;
     this.createRenderBuffer(canvas);
-    this.createTexture(canvas, asFilter);
+    if (texture) {
+      this.texture = texture;
+    } else {
+      this.createTexture(canvas);
+    }
     this.createFrameBuffer();
   }
 
@@ -30,9 +34,10 @@ class Framebuffer {
       width,
       height
     );
+    this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, null);
   }
 
-  private createTexture(canvas: HTMLCanvasElement, asFilter: boolean) {
+  private createTexture(canvas: HTMLCanvasElement) {
     const { height, width } = canvas;
 
     this.texture = this.gl.createTexture();
@@ -48,39 +53,7 @@ class Framebuffer {
       this.gl.UNSIGNED_BYTE,
       null
     );
-    if (asFilter) {
-      this.gl.texParameteri(
-        this.gl.TEXTURE_2D,
-        this.gl.TEXTURE_MAG_FILTER,
-        this.gl.NEAREST
-      );
-      this.gl.texParameteri(
-        this.gl.TEXTURE_2D,
-        this.gl.TEXTURE_MIN_FILTER,
-        this.gl.NEAREST
-      );
-      this.gl.texParameteri(
-        this.gl.TEXTURE_2D,
-        this.gl.TEXTURE_WRAP_S,
-        this.gl.CLAMP_TO_EDGE
-      );
-      this.gl.texParameteri(
-        this.gl.TEXTURE_2D,
-        this.gl.TEXTURE_WRAP_T,
-        this.gl.CLAMP_TO_EDGE
-      );
-      this.gl.texImage2D(
-        this.gl.TEXTURE_2D,
-        0,
-        this.gl.RGBA,
-        width,
-        height,
-        0,
-        this.gl.RGBA,
-        this.gl.UNSIGNED_BYTE,
-        null
-      );
-    }
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
   }
 
   private createFrameBuffer() {
@@ -92,6 +65,8 @@ class Framebuffer {
     this.frameBuffer = this.gl.createFramebuffer();
 
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
+    this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, this.renderBuffer);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
 
     // Texture
     this.gl.framebufferTexture2D(
@@ -109,7 +84,6 @@ class Framebuffer {
       this.renderBuffer
     );
 
-    // Clean up
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, null);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
@@ -125,10 +99,6 @@ class Framebuffer {
 
   public unBind() {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-  }
-
-  public getTexture() {
-    return this.texture;
   }
 
   public resize({ width, height }: { width: number; height: number }) {

@@ -21,14 +21,15 @@ abstract class Texture {
     image: TextureImage,
     target: TextureTargets | CubeMapTargets
   ) {
-    if (!image) {
-      console.warn("Texture image was not created");
-      return;
-    }
-    if (image.hasData()) {
+    if (this.canSetImageData(image)) {
       this.populateGLTexture(image, target);
       return;
     }
+
+    if (!image) {
+      throw Error("Cannot try to load null image on texture");
+    }
+
     image
       .loadImage()
       .then(() => {
@@ -60,18 +61,33 @@ abstract class Texture {
       console.error("Cannot load texture as it has not been created");
       return;
     }
+    if (!this.canSetImageData(image)) {
+      throw Error("Could not set image data");
+    }
     this.gl.bindTexture(this.target, this.glTexture);
-    this.populateWithImageData(image, target);
+    if (image) {
+      this.populateWithImageData(image, target);
+    } else {
+      this.populateEmpty(target);
+    }
     this.setGLParameters();
     this.gl.bindTexture(this.target, null);
   }
+
+  private canSetImageData(image?: TextureImage) {
+    return image?.hasData() || this.isTextureSizeConfigured();
+  }
+
+  protected isTextureSizeConfigured = () => {
+    return this.configuration?.width && this.configuration?.height;
+  };
 
   private populateWithImageData(
     image: TextureImage,
     target: TextureTargets | CubeMapTargets
   ) {
     if (!image?.hasData()) {
-      throw Error("Cannot bind texture without data");
+      throw Error("Cannot populate texture with empty image");
     }
     this.gl.texImage2D(
       Number(target),
@@ -80,6 +96,24 @@ abstract class Texture {
       this.gl.RGBA,
       this.gl.UNSIGNED_BYTE,
       image.getImage()!
+    );
+  }
+
+  private populateEmpty(target: TextureTargets | CubeMapTargets) {
+    if (!this.isTextureSizeConfigured()) {
+      throw Error("Cannot create empty texture without size");
+    }
+
+    this.gl.texImage2D(
+      Number(target),
+      0,
+      this.gl.RGBA,
+      this.configuration!.width!,
+      this.configuration!.height!,
+      0,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      null
     );
   }
 
@@ -126,6 +160,10 @@ abstract class Texture {
       return;
     }
     gl.deleteTexture(this.glTexture);
+  }
+
+  public getConfiguration() {
+    return { ...this.configuration };
   }
 }
 

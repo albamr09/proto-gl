@@ -17,6 +17,8 @@ export interface TextureConfiguration {
   minFilter?: GLint;
   wrapS?: GLint;
   wrapT?: GLint;
+  width?: number;
+  height?: number;
 }
 
 export type TextureTargets =

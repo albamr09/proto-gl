@@ -3,6 +3,7 @@ import vertexShaderSource from "./vs.glsl.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import Instance from "../instance.js";
 import { UniformKind } from "../../core/uniform/types.js";
+import Texture2D from "../../core/texture/texture-2d.js";
 
 const attributes = ["aPosition", "aTextureCoords"] as const;
 const uniforms = ["uSampler"] as const;
@@ -10,6 +11,7 @@ const uniforms = ["uSampler"] as const;
 class PostProcess {
   private frameBuffer: Framebuffer;
   private filterInstance?: Instance<typeof attributes, typeof uniforms>;
+  private texture: Texture2D;
 
   constructor({
     gl,
@@ -18,21 +20,33 @@ class PostProcess {
     gl: WebGL2RenderingContext;
     canvas: HTMLCanvasElement;
   }) {
-    this.frameBuffer = new Framebuffer({ gl, canvas, asFilter: true });
+    this.texture = new Texture2D({
+      gl,
+      index: 0,
+      configuration: {
+        magFilter: gl.NEAREST,
+        minFilter: gl.NEAREST,
+        wrapS: gl.CLAMP_TO_EDGE,
+        wrapT: gl.CLAMP_TO_EDGE,
+        width: canvas.width,
+        height: canvas.height,
+      },
+    });
+    this.frameBuffer = new Framebuffer({
+      gl,
+      canvas,
+      texture: this.texture.getTexture(),
+    });
+
     this.configureGeometry(gl);
 
-    canvas.addEventListener("resize", (e) => {
-      // TODO: Fix types
-      // @ts-ignore
-      const { width, height } = e.target;
+    canvas.addEventListener("resize", () => {
+      const { width, height } = canvas;
       this.frameBuffer.resize({ width, height });
     });
   }
 
   private configureGeometry(gl: WebGL2RenderingContext) {
-    const glTexture = this.frameBuffer.getTexture();
-    if (!glTexture) return;
-
     const vertices = [-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1];
     const textureCoords = [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1];
 
@@ -64,7 +78,8 @@ class PostProcess {
         {
           target: gl.TEXTURE_2D,
           index: 0,
-          texture: glTexture,
+          texture: this.texture.getTexture()!,
+          configuration: this.texture.getConfiguration(),
         },
       ],
       size: 6,

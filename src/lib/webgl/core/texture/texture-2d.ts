@@ -29,8 +29,8 @@ class Texture2D extends Texture {
     } else if (texture) {
       this.setTexture(texture);
     }
-    if (this.image) {
-      this.addImageDataToTexture(this.image, this.target);
+    if (this.image || this.isTextureSizeConfigured()) {
+      this.addImageDataToTexture(this.image!, this.target);
     }
   }
 
@@ -60,6 +60,10 @@ class Texture2D extends Texture {
     }
     this.gl.activeTexture(this.gl.TEXTURE0 + this.index);
     this.gl.bindTexture(this.target, this.glTexture);
+  }
+
+  public getTexture() {
+    return this.glTexture;
   }
 }
 
