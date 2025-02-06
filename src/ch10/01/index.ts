@@ -28,11 +28,12 @@ let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
-let post: PostProcess;
+let postProcessor: PostProcess;
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
-  post = new PostProcess({ gl, canvas });
+  // TODO: this should be inside the scene, as a list of filters
+  postProcessor = new PostProcess({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -126,12 +127,12 @@ const initData = () => {
 };
 
 const draw = () => {
-  post.bindFramebuffer();
+  postProcessor.bind();
   scene.render();
-  post.unbindFramebuffer();
+  postProcessor.unBind();
 
   // Re-render scene from framebuffer with post process effect
-  post.draw();
+  postProcessor.draw();
 };
 
 const render = () => {

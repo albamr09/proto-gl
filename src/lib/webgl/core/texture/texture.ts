@@ -13,7 +13,7 @@ abstract class Texture {
     this.createTexture();
   }
 
-  private createTexture(): void {
+  private createTexture() {
     this.glTexture = this.gl.createTexture();
   }
 

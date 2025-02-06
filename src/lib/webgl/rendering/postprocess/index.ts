@@ -1,16 +1,11 @@
 import Framebuffer from "../../core/framebuffer/framebuffer.js";
-import vertexShaderSource from "./vs.glsl.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import Instance from "../instance.js";
-import { UniformKind } from "../../core/uniform/types.js";
 import Texture2D from "../../core/texture/texture-2d.js";
-
-const attributes = ["aPosition", "aTextureCoords"] as const;
-const uniforms = ["uSampler"] as const;
+import GrayScaleFilter from "./filters/grayscale/index.js";
+import Filter from "./filters/index.js";
 
 class PostProcess {
   private frameBuffer: Framebuffer;
-  private filterInstance?: Instance<typeof attributes, typeof uniforms>;
+  private filter: Filter;
   private texture: Texture2D;
 
   constructor({
@@ -38,7 +33,7 @@ class PostProcess {
       texture: this.texture.getTexture(),
     });
 
-    this.configureGeometry(gl);
+    this.filter = new GrayScaleFilter(gl, this.texture);
 
     canvas.addEventListener("resize", () => {
       const { width, height } = canvas;
@@ -46,48 +41,8 @@ class PostProcess {
     });
   }
 
-  private configureGeometry(gl: WebGL2RenderingContext) {
-    const vertices = [-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1];
-    const textureCoords = [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1];
-
-    // TODO: add id
-    this.filterInstance = new Instance({
-      id: "filter",
-      gl,
-      vertexShaderSource,
-      fragmentShaderSource,
-      attributes: {
-        aPosition: {
-          data: vertices,
-          size: 2,
-          type: gl.FLOAT,
-        },
-        aTextureCoords: {
-          data: textureCoords,
-          size: 2,
-          type: gl.FLOAT,
-        },
-      },
-      uniforms: {
-        uSampler: {
-          data: 0,
-          type: UniformKind.SCALAR_INT,
-        },
-      },
-      textures: [
-        {
-          target: gl.TEXTURE_2D,
-          index: 0,
-          texture: this.texture.getTexture()!,
-          configuration: this.texture.getConfiguration(),
-        },
-      ],
-      size: 6,
-    });
-  }
-
   draw() {
-    this.filterInstance?.render({});
+    this.filter?.render();
   }
 
   bindFramebuffer() {
