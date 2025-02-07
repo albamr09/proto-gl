@@ -24,23 +24,16 @@ import Scene from "../../lib/webgl/rendering/scene.js";
 import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
-import PostProcess from "../../lib/webgl/rendering/postprocess/index.js";
 import { FilterTypes } from "../../lib/webgl/rendering/postprocess/types.js";
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
-let postProcessor: PostProcess;
+let selectedFilter: FilterTypes = "grayscale";
 
 const initProgram = () => {
-  scene = new Scene({ gl, canvas });
-  // TODO: this should be inside the scene, as a list of filters
-  postProcessor = new PostProcess({
-    gl,
-    canvas,
-    type: "grayscale",
-  });
+  scene = new Scene({ gl, canvas, filters: ["grayscale"] });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -134,10 +127,7 @@ const initData = () => {
 };
 
 const draw = () => {
-  postProcessor.bind();
   scene.render();
-  postProcessor.unBind();
-  postProcessor.draw();
 };
 
 const render = () => {
@@ -150,14 +140,12 @@ const initControls = () => {
 
   const { container: filterSelector } = createSelectorForm({
     label: "Filter",
-    value: "grayscale",
+    value: selectedFilter,
     options: ["grayscale", "invert"],
     onChange: (v) => {
-      postProcessor = new PostProcess({
-        gl,
-        canvas,
-        type: v as FilterTypes,
-      });
+      scene.removeFilter(selectedFilter);
+      selectedFilter = v as FilterTypes;
+      scene.addFilter(selectedFilter);
     },
   });
 

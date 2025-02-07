@@ -4,7 +4,12 @@ import vertexShaderSource from "./vs.glsl.js";
 
 class InvertFilter extends Filter {
   constructor() {
-    super({ id: "invet-filter", vertexShaderSource, fragmentShaderSource });
+    super({
+      id: "invet-filter",
+      type: "invert",
+      vertexShaderSource,
+      fragmentShaderSource,
+    });
   }
 }
 

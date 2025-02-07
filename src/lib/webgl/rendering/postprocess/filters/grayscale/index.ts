@@ -4,7 +4,12 @@ import vertexShaderSource from "./vs.glsl.js";
 
 class GrayScaleFilter extends Filter {
   constructor() {
-    super({ id: "grayscale-filter", vertexShaderSource, fragmentShaderSource });
+    super({
+      id: "grayscale-filter",
+      type: "grayscale",
+      vertexShaderSource,
+      fragmentShaderSource,
+    });
   }
 }
 

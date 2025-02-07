@@ -75,6 +75,16 @@ class PostProcess {
   public unBind() {
     this.frameBuffer.unBind();
   }
+
+  public hasFilter(filter: Filter | FilterTypes) {
+    if (!this.filter) return false;
+
+    if (filter instanceof Filter) {
+      return this.filter.getId() == filter.getId();
+    }
+
+    return this.filter.getType() == filter;
+  }
 }
 
 export default PostProcess;

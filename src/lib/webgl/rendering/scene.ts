@@ -5,66 +5,74 @@ import { TextureParameters } from "../core/texture/types.js";
 import { UniformConfig } from "../core/uniform/types.js";
 import EditorController from "./editor/controller.js";
 import Instance from "./instance";
+import Filter from "./postprocess/filters/index.js";
+import PostProcess from "./postprocess/index.js";
+import { FilterTypes } from "./postprocess/types.js";
 import {
   SceneEventTypes,
   InstanceConfiguration,
   InstanceClickPayload,
   InstanceDragPayload,
   InstanceDragEndPayload,
-  CanvasProperties,
+  SceneRenderOptions,
 } from "./types.js";
 
 class Scene extends EventTarget {
   private gl: WebGL2RenderingContext;
-  private canvasProperties!: CanvasProperties;
+  private canvas: HTMLCanvasElement;
   private objects: Map<string, Instance<any, any>>;
   private renderOrder: string[];
   private modelViewMatrix: Matrix4;
   private normalMatrix: Matrix4;
   private projectionMatrix: Matrix4;
   private editorController?: EditorController;
+  private postProcessors?: PostProcess[];
 
-  constructor(
-    gl: WebGL2RenderingContext,
-    editorConfiguration?: { allow?: boolean; showGuides?: boolean },
-    canvas?: HTMLCanvasElement
-  ) {
+  constructor({
+    gl,
+    canvas,
+    editorConfiguration,
+    filters,
+  }: {
+    gl: WebGL2RenderingContext;
+    canvas: HTMLCanvasElement;
+    editorConfiguration?: { allow?: boolean; showGuides?: boolean };
+    filters?: (Filter | FilterTypes)[];
+  }) {
     super();
     this.gl = gl;
+    this.canvas = canvas;
     this.modelViewMatrix = Matrix4.identity();
     this.normalMatrix = Matrix4.identity();
     this.projectionMatrix = Matrix4.identity();
     this.objects = new Map();
     this.renderOrder = [];
+    this.postProcessors = filters?.map((filter) => {
+      return this.createPostProcess(gl, canvas, filter);
+    });
     if (editorConfiguration?.allow) {
       this.editorController = new EditorController({
         gl,
         showGuides: !!editorConfiguration?.showGuides,
       });
     }
-    canvas && this.updateCanvasProperties(canvas);
-    this.setUp();
+    this.setGLProperties();
   }
 
-  private updateCanvasProperties(canvas: HTMLCanvasElement) {
-    const update = () => {
-      this.canvasProperties = {
-        height: canvas.height,
-        width: canvas.width,
-      };
-    };
-    update();
-
-    window.onresize = () => {
-      update();
-    };
-    canvas.onresize = () => {
-      update();
-    };
+  private createPostProcess(
+    gl: WebGL2RenderingContext,
+    canvas: HTMLCanvasElement,
+    filter: Filter | FilterTypes
+  ) {
+    if (filter instanceof Filter) {
+      return new PostProcess({ gl, canvas, filter });
+    } else {
+      return new PostProcess({ gl, canvas, type: filter });
+    }
   }
 
   // Default setup, defining depth testing
-  private setUp() {
+  private setGLProperties() {
     this.gl.clearColor(0.9, 0.9, 0.9, 1);
     this.gl.clearDepth(1);
     this.gl.enable(this.gl.DEPTH_TEST);
@@ -288,12 +296,48 @@ class Scene extends EventTarget {
     this.projectionMatrix = projectionMatrix.copy() as Matrix4;
   }
 
-  // TODO: this should be dict
-  render(
-    cb: (o: Instance<any, any>) => void = () => {},
+  public render({
+    cb = () => {},
     clear = true,
-    offscreen = false
-  ) {
+    offscreen = false,
+  }: SceneRenderOptions = {}) {
+    this.applyPostProcessors({
+      idx: 0,
+      renderFunction: () => {
+        this._render({ cb, clear, offscreen });
+      },
+    });
+  }
+
+  private applyPostProcessors = ({
+    idx,
+    renderFunction,
+  }: {
+    idx: number;
+    renderFunction: () => void;
+  }) => {
+    const shouldApplyPostProcessor = !!this.postProcessors?.[idx];
+    if (!shouldApplyPostProcessor) {
+      renderFunction();
+      return;
+    }
+
+    this.postProcessors![idx].bind();
+    renderFunction();
+    this.postProcessors![idx].unBind();
+    this.applyPostProcessors({
+      idx: idx + 1,
+      renderFunction: () => {
+        this.postProcessors![idx].draw();
+      },
+    });
+  };
+
+  private _render({
+    cb = () => {},
+    clear = true,
+    offscreen = false,
+  }: SceneRenderOptions = {}) {
     clear && this.clear();
     this.traverse((o) => {
       o.updateTransformationMatrices({
@@ -322,7 +366,7 @@ class Scene extends EventTarget {
   /**
    * Setups scene to render
    */
-  clear(heightFactor = 1, widthFactor = 1) {
+  public clear(heightFactor = 1, widthFactor = 1) {
     // Define the viewport geometry, this is used internally to map NDC coordinates
     // to the final drawing space
     this.gl.viewport(
@@ -396,6 +440,24 @@ class Scene extends EventTarget {
 
   public getEditorInstances() {
     return this.editorController?.getInstances();
+  }
+
+  public addFilter(filter: Filter | FilterTypes) {
+    const isUnique = !this.postProcessors?.some((processor) =>
+      processor.hasFilter(filter)
+    );
+
+    if (isUnique) {
+      this.postProcessors?.push(
+        this.createPostProcess(this.gl, this.canvas, filter)
+      );
+    }
+  }
+
+  public removeFilter(filter: Filter | FilterTypes) {
+    this.postProcessors = this.postProcessors?.filter(
+      (postProcessor) => !postProcessor.hasFilter(filter)
+    );
   }
 }
 

@@ -1,23 +1,28 @@
 import Texture2D from "../../../core/texture/texture-2d";
 import { UniformKind } from "../../../core/uniform/types.js";
 import Instance from "../../instance.js";
+import { FilterTypes } from "../types";
 
 abstract class Filter {
   private id: string;
+  private type?: FilterTypes;
   private vertexShaderSource: string;
   private fragmentShaderSource: string;
   protected instance?: Instance<any, any>;
 
   constructor({
     id,
+    type,
     vertexShaderSource,
     fragmentShaderSource,
   }: {
     id: string;
+    type?: FilterTypes;
     vertexShaderSource: string;
     fragmentShaderSource: string;
   }) {
     this.id = id;
+    this.type = type;
     this.vertexShaderSource = vertexShaderSource;
     this.fragmentShaderSource = fragmentShaderSource;
   }
@@ -78,6 +83,14 @@ abstract class Filter {
 
   public render() {
     return this.instance?.render({});
+  }
+
+  public getType() {
+    return this.type;
+  }
+
+  public getId() {
+    return this.id;
   }
 }
 

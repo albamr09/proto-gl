@@ -67,7 +67,8 @@ export type InstanceTransformationProperties = {
   rotationVector?: Vector;
 };
 
-export type CanvasProperties = {
-  height: number;
-  width: number;
+export type SceneRenderOptions = {
+  cb?: (o: Instance<any, any>) => void;
+  clear?: boolean;
+  offscreen?: boolean;
 };
