@@ -1,19 +1,24 @@
 import Framebuffer from "../../core/framebuffer/framebuffer.js";
 import Texture2D from "../../core/texture/texture-2d.js";
-import GrayScaleFilter from "./filters/grayscale/index.js";
+import FilterFactory from "./factory.js";
 import Filter from "./filters/index.js";
+import { FilterTypes } from "./types.js";
 
 class PostProcess {
   private frameBuffer: Framebuffer;
-  private filter: Filter;
+  private filter?: Filter;
   private texture: Texture2D;
 
   constructor({
     gl,
     canvas,
+    filter,
+    type,
   }: {
     gl: WebGL2RenderingContext;
     canvas: HTMLCanvasElement;
+    filter?: Filter;
+    type?: FilterTypes;
   }) {
     this.texture = new Texture2D({
       gl,
@@ -33,7 +38,7 @@ class PostProcess {
       texture: this.texture.getTexture(),
     });
 
-    this.filter = new GrayScaleFilter(gl, this.texture);
+    this.createFilter(gl, type, filter);
 
     canvas.addEventListener("resize", () => {
       const { width, height } = canvas;
@@ -41,15 +46,33 @@ class PostProcess {
     });
   }
 
-  draw() {
+  private createFilter(
+    gl: WebGL2RenderingContext,
+    type?: FilterTypes,
+    filter?: Filter
+  ) {
+    if (filter) {
+      this.filter = filter.build(gl, this.texture);
+    } else if (type) {
+      this.filter = FilterFactory.create({
+        gl,
+        texture: this.texture,
+        type,
+      });
+    } else {
+      throw Error("Cannot create post process for undefined type and filter");
+    }
+  }
+
+  public draw() {
     this.filter?.render();
   }
 
-  bindFramebuffer() {
+  public bind() {
     this.frameBuffer.bind();
   }
 
-  unbindFramebuffer() {
+  public unBind() {
     this.frameBuffer.unBind();
   }
 }

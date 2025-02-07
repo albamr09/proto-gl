@@ -1,6 +1,8 @@
 import { loadData } from "../../lib/files.js";
 import {
+  addChildrenToController,
   createDescriptionPanel,
+  createSelectorForm,
   initController,
   initGUI,
 } from "../../lib/gui/index.js";
@@ -23,6 +25,7 @@ import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 import PostProcess from "../../lib/webgl/rendering/postprocess/index.js";
+import { FilterTypes } from "../../lib/webgl/rendering/postprocess/types.js";
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
@@ -33,7 +36,11 @@ let postProcessor: PostProcess;
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
   // TODO: this should be inside the scene, as a list of filters
-  postProcessor = new PostProcess({ gl, canvas });
+  postProcessor = new PostProcess({
+    gl,
+    canvas,
+    type: "grayscale",
+  });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -130,8 +137,6 @@ const draw = () => {
   postProcessor.bind();
   scene.render();
   postProcessor.unBind();
-
-  // Re-render scene from framebuffer with post process effect
   postProcessor.draw();
 };
 
@@ -142,6 +147,21 @@ const render = () => {
 
 const initControls = () => {
   initController();
+
+  const { container: filterSelector } = createSelectorForm({
+    label: "Filter",
+    value: "grayscale",
+    options: ["grayscale", "invert"],
+    onChange: (v) => {
+      postProcessor = new PostProcess({
+        gl,
+        canvas,
+        type: v as FilterTypes,
+      });
+    },
+  });
+
+  addChildrenToController([filterSelector]);
 };
 
 const init = () => {
