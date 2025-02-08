@@ -17,7 +17,7 @@ void main(void) {
   vec4 frameColor = texture(uSampler, vTextureCoords);
   vec4 grain = texture(
     uNoiseSampler,
-    vTextureCoords * 2.0 + uTime * scrollSpeed * uInverseTextureSize
+    fract(vTextureCoords * 2.0 + uTime * scrollSpeed * uInverseTextureSize)
   );
   fragColor = frameColor - (grain * grainIntensity);
 }

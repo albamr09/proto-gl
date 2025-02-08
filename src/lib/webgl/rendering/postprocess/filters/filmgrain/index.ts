@@ -8,6 +8,8 @@ import vertexShaderSource from "./vs.glsl.js";
 const attributes = [] as const;
 const uniforms = ["uInverseTextureSize", "uTimer"] as const;
 
+// TODO: fix attribute and uniform types
+
 class FilmgrainFilter extends Filter<typeof attributes, typeof uniforms> {
   private canvas: HTMLCanvasElement;
   private startTime: number;
