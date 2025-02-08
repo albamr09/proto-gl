@@ -1,8 +1,5 @@
 import { Attributes, ProgramType, Uniforms } from "./types.js";
-import {
-  TRANSFORM_UNIFORM_NAMES,
-  TransformUniformKeys,
-} from "./uniform/types.js";
+import { TRANSFORM_UNIFORM_NAMES } from "./uniform/types.js";
 
 class Program<
   A extends readonly string[] = [],
@@ -10,9 +7,8 @@ class Program<
 > {
   private gl: WebGL2RenderingContext;
   private _program: WebGLProgram | null;
-  // TODO: make private
-  public attributes: Attributes<A>;
-  public uniforms: Uniforms<U, WebGLUniformLocation>;
+  private attributes: Attributes<A>;
+  private uniforms: Uniforms<U, WebGLUniformLocation>;
 
   /**
    * Creates a program that is made up of a vertex shader and a fragment shader
@@ -36,38 +32,6 @@ class Program<
 
     this.attributes = this._loadAttributes(attributes);
     this.uniforms = this._loadUniforms(uniforms);
-  }
-
-  /**
-   * Tells WebGL to use this program to render
-   */
-  use() {
-    this.gl.useProgram(this._program);
-  }
-
-  getProgram() {
-    return this._program;
-  }
-
-  /**
-   * Updates WebGL configuration
-   */
-  setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
-    fn(this.gl);
-  }
-
-  /**
-   * Returns the location of the attribute
-   */
-  getAttribute(attributeName: A[number]) {
-    return this.attributes[attributeName];
-  }
-
-  /**
-   * Returns the location of the attribute
-   */
-  getUniform(uniformName: TransformUniformKeys[number] & U[number]) {
-    return this.uniforms[uniformName];
   }
 
   /**
@@ -174,6 +138,22 @@ class Program<
 
   public getUniformLocation(uniform: U[number]) {
     return this.uniforms[uniform];
+  }
+
+  public use() {
+    this.gl.useProgram(this._program);
+  }
+
+  public getProgram() {
+    return this._program;
+  }
+
+  public setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
+    fn(this.gl);
+  }
+
+  public getAttribute(attributeName: A[number]) {
+    return this.attributes[attributeName];
   }
 }
 

@@ -111,9 +111,15 @@ const initData = async () => {
 
 const initLightUniforms = () => {
   program.use();
-  gl.uniform3fv(program.uniforms.uLightPosition, [0, 120, 120]);
-  gl.uniform4fv(program.uniforms.uLightAmbient, [1.0, 1.0, 1.0, 1.0]);
-  gl.uniform4fv(program.uniforms.uLightDiffuse, [1.0, 1.0, 1.0, 1.0]);
+  gl.uniform3fv(program.getUniformLocation("uLightPosition"), [0, 120, 120]);
+  gl.uniform4fv(
+    program.getUniformLocation("uLightAmbient"),
+    [1.0, 1.0, 1.0, 1.0]
+  );
+  gl.uniform4fv(
+    program.getUniformLocation("uLightDiffuse"),
+    [1.0, 1.0, 1.0, 1.0]
+  );
 };
 
 const updateTransforms = () => {

@@ -41,6 +41,9 @@ type DataObject = {
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
+  "uModelViewMatrix",
+  "uProjectionMatrix",
+  "uNormalMatrix",
   "uMaterialAmbientColor",
   "uMaterialDiffuseColor",
   "uMaterialSpecularColor",
@@ -84,9 +87,9 @@ const initBuffer = (data: DataObject) => {
   const verticesBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(program.attributes.aPosition);
+  gl.enableVertexAttribArray(program.getAttribute("aPosition"));
   gl.vertexAttribPointer(
-    program.attributes.aPosition,
+    program.getAttribute("aPosition"),
     3,
     gl.FLOAT,
     false,
@@ -99,8 +102,15 @@ const initBuffer = (data: DataObject) => {
   const normalsBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(program.attributes.aNormal);
-  gl.vertexAttribPointer(program.attributes.aNormal, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(program.getAttribute("aNormal"));
+  gl.vertexAttribPointer(
+    program.getAttribute("aNormal"),
+    3,
+    gl.FLOAT,
+    false,
+    0,
+    0
+  );
 
   // Indices
   const indicesBuffer = gl.createBuffer();
@@ -140,26 +150,35 @@ const synchWorld = () => {
   );
 
   gl.uniformMatrix4fv(
-    program.uniforms.uModelViewMatrix,
+    program.getUniformLocation("uModelViewMatrix"),
     false,
     modelViewMatrix.toFloatArray()
   );
   gl.uniformMatrix4fv(
-    program.uniforms.uNormalMatrix,
+    program.getUniformLocation("uNormalMatrix"),
     false,
     normalMatrix.toFloatArray()
   );
   gl.uniformMatrix4fv(
-    program.uniforms.uProjectionMatrix,
+    program.getUniformLocation("uProjectionMatrix"),
     false,
     projectionMatrix.toFloatArray()
   );
 };
 
 const setUniforms = (object: DataObject) => {
-  gl.uniform4fv(program.uniforms.uMaterialDiffuseColor, [...object.Kd, 1.0]);
-  gl.uniform4fv(program.uniforms.uMaterialAmbientColor, [...object.Ka, 1.0]);
-  gl.uniform4fv(program.uniforms.uMaterialSpecularColor, [...object.Ks, 1.0]);
+  gl.uniform4fv(program.getUniformLocation("uMaterialDiffuseColor"), [
+    ...object.Kd,
+    1.0,
+  ]);
+  gl.uniform4fv(program.getUniformLocation("uMaterialAmbientColor"), [
+    ...object.Ka,
+    1.0,
+  ]);
+  gl.uniform4fv(program.getUniformLocation("uMaterialSpecularColor"), [
+    ...object.Ks,
+    1.0,
+  ]);
 };
 
 const draw = () => {
@@ -200,14 +219,14 @@ const initControls = () => {
     value: rgbToHex(denormalizeColor(lightDiffuseColor)),
     onInit: (v) => {
       lightDiffuseColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uniforms.uLightDiffuseColor, [
+      gl.uniform4fv(program.getUniformLocation("uLightDiffuseColor"), [
         ...lightDiffuseColor,
         1.0,
       ]);
     },
     onChange: (v) => {
       lightDiffuseColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uniforms.uLightDiffuseColor, [
+      gl.uniform4fv(program.getUniformLocation("uLightDiffuseColor"), [
         ...lightDiffuseColor,
         1.0,
       ]);
@@ -218,14 +237,14 @@ const initControls = () => {
     value: rgbToHex(denormalizeColor(lightSpecularColor)),
     onInit: (v) => {
       lightSpecularColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uniforms.uLightSpecularColor, [
+      gl.uniform4fv(program.getUniformLocation("uLightSpecularColor"), [
         ...lightSpecularColor,
         1.0,
       ]);
     },
     onChange: (v) => {
       lightSpecularColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uniforms.uLightSpecularColor, [
+      gl.uniform4fv(program.getUniformLocation("uLightSpecularColor"), [
         ...lightSpecularColor,
         1.0,
       ]);
@@ -236,14 +255,14 @@ const initControls = () => {
     value: rgbToHex(denormalizeColor(lightAmbientColor)),
     onInit: (v) => {
       lightAmbientColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uniforms.uLightAmbientColor, [
+      gl.uniform4fv(program.getUniformLocation("uLightAmbientColor"), [
         ...lightAmbientColor,
         1.0,
       ]);
     },
     onChange: (v) => {
       lightAmbientColor = normalizeColor(hexToRgb(v));
-      gl.uniform4fv(program.uniforms.uLightAmbientColor, [
+      gl.uniform4fv(program.getUniformLocation("uLightAmbientColor"), [
         ...lightAmbientColor,
         1.0,
       ]);
@@ -256,10 +275,10 @@ const initControls = () => {
     max: 100,
     step: 1,
     onInit: (v) => {
-      gl.uniform1f(program.uniforms.uShininess, v);
+      gl.uniform1f(program.getUniformLocation("uShininess"), v);
     },
     onChange: (v) => {
-      gl.uniform1f(program.uniforms.uShininess, v);
+      gl.uniform1f(program.getUniformLocation("uShininess"), v);
     },
   });
   const carPositionInputs = createVector3dSliders({
@@ -282,10 +301,10 @@ const initControls = () => {
     max: 500,
     step: 1,
     onInit: (v) => {
-      gl.uniform3fv(program.uniforms.uLightPosition, v);
+      gl.uniform3fv(program.getUniformLocation("uLightPosition"), v);
     },
     onChange: (v) => {
-      gl.uniform3fv(program.uniforms.uLightPosition, v);
+      gl.uniform3fv(program.getUniformLocation("uLightPosition"), v);
     },
   }).map(({ container }) => container);
 

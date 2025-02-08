@@ -149,9 +149,15 @@ const initData = () => {
 
 const initLightUniforms = () => {
   program.use();
-  gl.uniform4fv(program.uniforms.uLightAmbient, [0.1, 0.1, 0.1, 1]);
-  gl.uniform3fv(program.uniforms.uLightPosition, [0, 0, 2120]);
-  gl.uniform4fv(program.uniforms.uLightDiffuse, [0.7, 0.7, 0.7, 1]);
+  gl.uniform4fv(
+    program.getUniformLocation("uLightAmbient"),
+    [0.1, 0.1, 0.1, 1]
+  );
+  gl.uniform3fv(program.getUniformLocation("uLightPosition"), [0, 0, 2120]);
+  gl.uniform4fv(
+    program.getUniformLocation("uLightDiffuse"),
+    [0.7, 0.7, 0.7, 1]
+  );
 };
 
 const draw = () => {
