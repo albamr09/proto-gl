@@ -1,4 +1,6 @@
 import { Vector } from "../../math/vector.js";
+import Program from "../core/program.js";
+import { TextureDefinition } from "../core/texture/types.js";
 import {
   UniformConfig,
   UniformDataMapping,
@@ -24,6 +26,32 @@ export interface InstanceConfiguration {
   pickable?: boolean;
   visible?: boolean;
   renderingMode?: GLenum;
+}
+
+export interface InstanceProps<
+  A extends readonly string[],
+  U extends readonly string[]
+> {
+  gl: WebGL2RenderingContext;
+  program?: Program<A, U>;
+  id?: string;
+  vertexShaderSource?: string;
+  fragmentShaderSource?: string;
+  attributes?: {
+    [P in A[number]]?: AttributeConfig;
+  };
+  indices?: number[];
+  uniforms?: {
+    [P in U[number]]?: UniformDefinition;
+  };
+  size?: number;
+  configuration?: InstanceConfiguration;
+  // TODO: textures should have uniforms attached to it, instead of having to redefine them
+  textures?: TextureDefinition[];
+  transformationProperties?: InstanceTransformationProperties;
+  onClick?: (o: InstanceClickPayload<A, U>) => void;
+  onDrag?: ({ instance, dx, dy }: InstanceDragPayload<A, U>) => void;
+  onDragFinish?: (o: InstanceDragEndPayload<A, U>) => void;
 }
 
 export type InstanceDragPayload<

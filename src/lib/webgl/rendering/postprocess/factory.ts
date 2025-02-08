@@ -25,11 +25,11 @@ class FilterFactory {
       case "invert":
         return new InvertFilter().build(gl, texture);
       case "wavy":
-        return new WavyFilter().build(gl, texture);
+        return new WavyFilter().build(gl, texture) as Filter;
       case "blur":
-        return new BlurFilter(canvas).build(gl, texture);
+        return new BlurFilter(canvas).build(gl, texture) as Filter;
       case "filmgrain":
-        return new FilmgrainFilter(canvas).build(gl, texture);
+        return new FilmgrainFilter(canvas).build(gl, texture) as Filter;
       default:
         throw new Error(`Unsupported filter: ${type}`);
     }

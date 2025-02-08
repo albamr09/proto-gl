@@ -1,14 +1,11 @@
 import Texture2D from "../../../../core/texture/texture-2d.js";
 import { UniformKind } from "../../../../core/uniform/types.js";
-import Instance from "../../../instance.js";
 import Filter from "../index.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 
 const attributes = [] as const;
-const uniforms = ["uInverseTextureSize", "uTimer"] as const;
-
-// TODO: fix attribute and uniform types
+const uniforms = ["uInverseTextureSize", "uTime", "uNoiseSampler"] as const;
 
 class FilmgrainFilter extends Filter<typeof attributes, typeof uniforms> {
   private canvas: HTMLCanvasElement;
@@ -27,7 +24,7 @@ class FilmgrainFilter extends Filter<typeof attributes, typeof uniforms> {
   }
 
   public override build(gl: WebGL2RenderingContext, texture: Texture2D) {
-    this.instance = new Instance({
+    super.createInstance({
       id: super.getId(),
       gl,
       vertexShaderSource: this.vertexShaderSource,

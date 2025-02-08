@@ -1,6 +1,5 @@
 import Texture2D from "../../../../core/texture/texture-2d.js";
 import { UniformKind } from "../../../../core/uniform/types.js";
-import Instance from "../../../instance.js";
 import Filter from "../index.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
@@ -23,7 +22,7 @@ class WavyFilter extends Filter<typeof attributes, typeof uniforms> {
   }
 
   public override build(gl: WebGL2RenderingContext, texture: Texture2D) {
-    this.instance = new Instance({
+    this.createInstance({
       id: super.getId(),
       gl,
       vertexShaderSource: this.vertexShaderSource,

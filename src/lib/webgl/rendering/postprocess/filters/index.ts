@@ -1,6 +1,7 @@
 import Texture2D from "../../../core/texture/texture-2d";
 import { UniformKind } from "../../../core/uniform/types.js";
 import Instance from "../../instance.js";
+import { InstanceProps } from "../../types";
 import { FilterTypes } from "../types";
 
 const attributes = ["aPosition", "aTextureCoords"] as const;
@@ -14,7 +15,10 @@ abstract class Filter<
   private type?: FilterTypes;
   protected vertexShaderSource: string;
   protected fragmentShaderSource: string;
-  protected instance?: Instance<A & typeof attributes, U & typeof uniforms>;
+  protected instance?: Instance<
+    [...A, ...typeof attributes],
+    [...U, ...typeof uniforms]
+  >;
 
   constructor({
     id,
@@ -33,16 +37,30 @@ abstract class Filter<
     this.fragmentShaderSource = fragmentShaderSource;
   }
 
-  protected getVertices() {
+  private getVertices() {
     return [-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1];
   }
 
-  protected getTextureCoords() {
+  private getTextureCoords() {
     return [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1];
   }
 
+  protected createInstance(
+    props: InstanceProps<
+      [...A, ...typeof attributes],
+      [...U, ...typeof uniforms]
+    >
+  ) {
+    this.instance = new Instance<
+      [...A, ...typeof attributes],
+      [...U, ...typeof uniforms]
+    >({
+      ...props,
+    });
+  }
+
   public build(gl: WebGL2RenderingContext, texture: Texture2D) {
-    this.instance = new Instance<A & typeof attributes, U & typeof uniforms>({
+    this.createInstance({
       id: this.id,
       gl,
       vertexShaderSource: this.vertexShaderSource,
