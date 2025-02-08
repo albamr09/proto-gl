@@ -56,9 +56,6 @@ class Instance<
   public onDrag?: ({ instance, dx, dy }: InstanceDragPayload<A, U>) => void;
   public onDragFinish?: (o: InstanceDragEndPayload<A, U>) => void;
 
-  /**
-   * Creates an object with its own program
-   */
   constructor({
     id,
     gl,
@@ -152,10 +149,6 @@ class Instance<
     this.textures?.set(texture.index, newTexture);
   }
 
-  /**
-   * Set the data for a given attribute and associates the attribute
-   * with the instances VAO
-   */
   public setAttributeData(
     attributeName: A[number],
     attribute: AttributeConfig,
@@ -168,7 +161,6 @@ class Instance<
       return;
     }
 
-    // Bind the VAO
     if (bind) {
       this.gl.bindVertexArray(this.vao);
     }
@@ -197,9 +189,6 @@ class Instance<
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
   }
 
-  /**
-   * Initializes all attributes and indices. It also enables the attributes.
-   */
   private loadAttributes({
     attributes,
     indices,
@@ -214,12 +203,10 @@ class Instance<
     this.vao = this.gl.createVertexArray();
     this.gl.bindVertexArray(this.vao);
 
-    // Attributes
     for (const attribute of Object.keys(attributes)) {
       this.setAttributeData(attribute, attributes[attribute as A[number]]!);
     }
 
-    // Indices
     if (indices) {
       this.ibo = this.gl.createBuffer();
       this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo);
@@ -230,14 +217,12 @@ class Instance<
       );
       this.size = indices.length;
     } else {
-      // If we do not have indices, then we use the size supplied by the user
       if (!size) {
         throw Error("No indices or size for the data were provided");
       }
       this.size = size;
     }
 
-    // Clean
     this.gl.bindVertexArray(null);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
@@ -304,14 +289,11 @@ class Instance<
     value: UniformDataMapping[UniformKind],
     metadata?: UniformConfig
   ) {
-    // It if exists update
     const uniform = this.uniforms?.[uniformName];
-    if (uniform !== undefined && uniform !== null) {
-      // Update data
-      uniform.setData(value);
-      // Update metadata
-      metadata && uniform.setMetadata(metadata);
-    }
+    if (!uniform) return;
+
+    uniform.setData(value);
+    metadata && uniform.setMetadata(metadata);
   }
 
   public getUniform(uniformName: U[number] | TransformUniformKeys[number]) {
@@ -362,23 +344,18 @@ class Instance<
     if (shouldChangeDepthTest) {
       this.gl[depthTest ? "enable" : "disable"](this.gl.DEPTH_TEST);
     }
-    // Use this program instance
     this.program.use();
-    // Bind vertices and indices
     this.gl.bindVertexArray(this.vao);
     if (this.ibo) {
       this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo);
     }
 
-    // Textures
     this.textures?.forEach((texture) => {
       texture.activate();
     });
 
-    // Callback
     cb(this, this.gl);
 
-    // Populate uniforms
     for (const uniform of Object.values(
       this?.uniforms ?? {}
     ) as ConcreteUniforms[]) {
@@ -386,7 +363,6 @@ class Instance<
       uniform.bind(this.gl);
     }
 
-    // If we have IBO defined draw using index information
     if (this.ibo) {
       this.gl.drawElements(
         this.configuration.renderingMode!,
@@ -395,11 +371,9 @@ class Instance<
         0
       );
     } else {
-      // Else draw using vertex order directly
       this.gl.drawArrays(this.configuration.renderingMode!, 0, this.size);
     }
 
-    // Unbind
     this.gl.bindVertexArray(null);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
 
