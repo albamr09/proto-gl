@@ -1,6 +1,7 @@
 import { loadData } from "../../lib/files.js";
 import {
   addChildrenToController,
+  createButtonForm,
   createDescriptionPanel,
   createSelectorForm,
   initController,
@@ -34,7 +35,7 @@ let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
-let selectedFilter: ExtendedFilterTypes = "normal";
+let selectedFilters: ExtendedFilterTypes[] = [];
 let normalFilter: NormalFilter;
 
 const initProgram = () => {
@@ -141,25 +142,44 @@ const render = () => {
 const initControls = () => {
   initController();
 
+  const { container: addButton } = createButtonForm({
+    label: "Add filter",
+    onClick: () => {
+      const filterSelector = createFilterSelector();
+      addChildrenToController([filterSelector]);
+    },
+  });
+
+  addChildrenToController([addButton]);
+};
+
+const createFilterSelector = () => {
+  const idx = selectedFilters.length;
+  selectedFilters.push("normal");
+  let currentFilter = selectedFilters[idx];
+
   const { container: filterSelector } = createSelectorForm({
     label: "Filter",
-    value: selectedFilter,
+    value: currentFilter,
     options: ["normal", "grayscale", "invert", "wavy", "blur", "filmgrain"],
     onChange: (v) => {
-      updateFilter((filter) => {
+      updateFilter(currentFilter, (filter) => {
         scene.removeFilter(filter);
       });
-      selectedFilter = v as ExtendedFilterTypes;
-      updateFilter((filter) => {
+      currentFilter = v as ExtendedFilterTypes;
+      updateFilter(currentFilter, (filter) => {
         scene.addFilter(filter);
       });
     },
   });
 
-  addChildrenToController([filterSelector]);
+  return filterSelector;
 };
 
-const updateFilter = (action: (filter: Filter | FilterTypes) => void) => {
+const updateFilter = (
+  selectedFilter: ExtendedFilterTypes,
+  action: (filter: Filter | FilterTypes) => void
+) => {
   if (selectedFilter == "normal") {
     action(normalFilter);
   } else {

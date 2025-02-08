@@ -442,12 +442,12 @@ class Scene extends EventTarget {
     return this.editorController?.getInstances();
   }
 
-  public addFilter(filter: Filter | FilterTypes) {
+  public addFilter(filter: Filter | FilterTypes, enforceUnique = false) {
     const isUnique = !this.postProcessors?.some((processor) =>
       processor.hasFilter(filter)
     );
 
-    if (isUnique) {
+    if (isUnique || !enforceUnique) {
       this.postProcessors?.push(
         this.createPostProcess(this.gl, this.canvas, filter)
       );
@@ -455,9 +455,13 @@ class Scene extends EventTarget {
   }
 
   public removeFilter(filter: Filter | FilterTypes) {
-    this.postProcessors = this.postProcessors?.filter(
-      (postProcessor) => !postProcessor.hasFilter(filter)
+    const index = this.postProcessors?.findIndex((postProcessor) =>
+      postProcessor.hasFilter(filter)
     );
+
+    if (index !== undefined && index !== -1) {
+      this.postProcessors?.splice(index, 1);
+    }
   }
 }
 
