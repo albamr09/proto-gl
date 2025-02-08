@@ -70,14 +70,6 @@ const initData = () => {
         },
       },
       uniforms: {
-        uSampler: {
-          data: 0,
-          type: UniformKind.SCALAR_INT,
-        },
-        uCubeSampler: {
-          data: 1,
-          type: UniformKind.SCALAR_INT,
-        },
         uMaterialDiffuse: {
           data: diffuse,
           type: UniformKind.VECTOR_FLOAT,
@@ -86,12 +78,14 @@ const initData = () => {
       textures: [
         {
           index: 0,
+          uniform: "uSampler",
           target: gl.TEXTURE_2D,
           source: "/data/images/webgl.png",
           configuration: { generateMipmap: true },
         },
         {
           index: 1,
+          uniform: "uCubeSampler",
           target: gl.TEXTURE_CUBE_MAP,
           faces: {
             [gl.TEXTURE_CUBE_MAP_POSITIVE_X]:

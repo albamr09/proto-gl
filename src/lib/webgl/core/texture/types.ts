@@ -9,6 +9,7 @@ export interface TextureParameters {
 
 export interface TextureDefinition extends TextureParameters {
   target: TextureTargets;
+  uniform?: string;
 }
 
 export interface TextureConfiguration {

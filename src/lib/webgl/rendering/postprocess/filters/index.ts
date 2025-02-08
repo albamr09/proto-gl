@@ -66,7 +66,6 @@ abstract class Filter<
       vertexShaderSource: this.vertexShaderSource,
       fragmentShaderSource: this.fragmentShaderSource,
       attributes: this.getCommonAttributes(gl),
-      uniforms: this.getCommonUniforms(),
       textures: this.getCommonTextures(gl, texture),
       ...this.getCommonProperties(),
     });
@@ -84,15 +83,6 @@ abstract class Filter<
         data: this.getTextureCoords(),
         size: 2,
         type: gl.FLOAT,
-      },
-    };
-  };
-
-  protected getCommonUniforms = () => {
-    return {
-      uSampler: {
-        data: 0,
-        type: UniformKind.SCALAR_INT,
       },
     };
   };

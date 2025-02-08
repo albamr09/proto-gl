@@ -29,7 +29,6 @@ class WavyFilter extends Filter<typeof attributes, typeof uniforms> {
       fragmentShaderSource: this.fragmentShaderSource,
       attributes: this.getCommonAttributes(gl),
       uniforms: {
-        ...this.getCommonUniforms(),
         uTime: {
           data: this.getCurrentTime(),
           type: UniformKind.SCALAR_FLOAT,

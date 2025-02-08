@@ -31,7 +31,6 @@ class FilmgrainFilter extends Filter<typeof attributes, typeof uniforms> {
       fragmentShaderSource: this.fragmentShaderSource,
       attributes: this.getCommonAttributes(gl),
       uniforms: {
-        ...this.getCommonUniforms(),
         uInverseTextureSize: {
           data: this.getInverseTextureSize(),
           type: UniformKind.VECTOR_FLOAT,
@@ -40,15 +39,12 @@ class FilmgrainFilter extends Filter<typeof attributes, typeof uniforms> {
           data: this.getCurrentTime(),
           type: UniformKind.SCALAR_FLOAT,
         },
-        uNoiseSampler: {
-          data: 1,
-          type: UniformKind.SCALAR_INT,
-        },
       },
       textures: [
         ...this.getCommonTextures(gl, texture),
         {
           index: 1,
+          uniform: "uNoiseSampler",
           source: "/data/images/noise.png",
           target: gl.TEXTURE_2D,
           configuration: {

@@ -113,16 +113,13 @@ const initData = () => {
             data: diffuse,
             type: UniformKind.VECTOR_FLOAT,
           },
-          uSampler: {
-            data: 0,
-            type: UniformKind.SCALAR_INT,
-          },
           ...lightUniforms,
         },
         indices,
         textures: [
           {
             index: 0,
+            uniform: "uSampler",
             source: "/data/images/webgl.png",
             target: gl.TEXTURE_2D,
           },

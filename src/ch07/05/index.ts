@@ -130,14 +130,6 @@ const initData = async () => {
           data: 1,
           type: UniformKind.SCALAR_FLOAT,
         },
-        uTextureSampler: {
-          data: 0,
-          type: UniformKind.SCALAR_INT,
-        },
-        uLightTextureSampler: {
-          data: 1,
-          type: UniformKind.SCALAR_INT,
-        },
         uUseMultiply: {
           data: 1,
           type: UniformKind.SCALAR_INT,
@@ -147,11 +139,13 @@ const initData = async () => {
       textures: [
         {
           index: 0,
+          uniform: "uTextureSampler",
           source: "/data/images/webgl-marble.png",
           target: gl.TEXTURE_2D,
         },
         {
           index: 1,
+          uniform: "uLightTextureSampler",
           source: "/data/images/light.png",
           target: gl.TEXTURE_2D,
         },

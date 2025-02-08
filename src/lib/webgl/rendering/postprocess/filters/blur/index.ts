@@ -29,7 +29,6 @@ class BlurFilter extends Filter<typeof attributes, typeof uniforms> {
       fragmentShaderSource: this.fragmentShaderSource,
       attributes: this.getCommonAttributes(gl),
       uniforms: {
-        ...this.getCommonUniforms(),
         uInverseTextureSize: {
           data: this.getInverseTextureSize(),
           type: UniformKind.VECTOR_FLOAT,

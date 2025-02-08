@@ -10,6 +10,7 @@ class Program<
 > {
   private gl: WebGL2RenderingContext;
   private _program: WebGLProgram | null;
+  // TODO: make private
   public attributes: Attributes<A>;
   public uniforms: Uniforms<U, WebGLUniformLocation>;
 
@@ -169,6 +170,10 @@ class Program<
     }
 
     return shader;
+  }
+
+  public getUniformLocation(uniform: U[number]) {
+    return this.uniforms[uniform];
   }
 }
 

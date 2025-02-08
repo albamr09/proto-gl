@@ -88,8 +88,8 @@ class Instance<
         gl,
         vertexShaderSource,
         fragmentShaderSource,
-        Object.keys(attributes ?? {}) as readonly string[] as A,
-        Object.keys(uniforms ?? {}) as readonly string[] as U
+        this.getAttributeNames({ attributes }),
+        this.getUniformNames({ uniforms, textures })
       );
     } else {
       throw Error("Could not create the instance");
@@ -101,8 +101,8 @@ class Instance<
       ...configuration,
     };
 
-    this.setupAttributes({ attributes: attributes ?? {}, indices, size });
-    this.setupUniforms({ uniforms });
+    this.loadAttributes({ attributes: attributes ?? {}, indices, size });
+    this.loadUniforms({ uniforms, textures });
 
     if (textures) {
       this.textures = new Map();
@@ -114,6 +114,27 @@ class Instance<
     this.onDrag = onDrag;
     this.onDragFinish = onDragFinish;
   }
+
+  private getAttributeNames = ({
+    attributes,
+  }: {
+    attributes?: InstanceProps<A, U>["attributes"];
+  }) => {
+    return Object.keys(attributes ?? {}) as readonly string[] as A;
+  };
+
+  private getUniformNames = ({
+    uniforms,
+    textures,
+  }: {
+    uniforms?: InstanceProps<A, U>["uniforms"];
+    textures?: InstanceProps<A, U>["textures"];
+  }) => {
+    return [
+      ...Object.keys(uniforms ?? {}),
+      ...(textures?.map((texture) => texture?.uniform).filter(Boolean) ?? []),
+    ] as readonly string[] as U;
+  };
 
   public setId(id: string) {
     this.id = id;
@@ -179,7 +200,7 @@ class Instance<
   /**
    * Initializes all attributes and indices. It also enables the attributes.
    */
-  private setupAttributes({
+  private loadAttributes({
     attributes,
     indices,
     size,
@@ -224,12 +245,12 @@ class Instance<
     this.attributes = { ...attributes };
   }
 
-  private setupUniforms({
+  private loadUniforms({
     uniforms,
+    textures,
   }: {
-    uniforms?: {
-      [P in U[number]]?: UniformDefinition;
-    };
+    uniforms?: InstanceProps<A, U>["uniforms"];
+    textures?: InstanceProps<A, U>["textures"];
   }) {
     // Uniforms
     const mergedUniforms = {
@@ -241,19 +262,39 @@ class Instance<
         | U[number]
         | TransformUniformKeys[number]
       )[]
-    ).reduce((dict, k) => {
-      const uniform = mergedUniforms[k] as UniformDefinition;
-      const location = this.program.uniforms[k];
+    ).reduce((dict, uniformName) => {
+      const uniform = mergedUniforms[uniformName] as UniformDefinition;
+      const location = this.program.getUniformLocation(uniformName);
       if (uniform == null || uniform == undefined || !location) return dict;
-      dict[k] = UniformFactory.createUniform(
-        k,
+      dict[uniformName] = UniformFactory.createUniform(
+        uniformName,
         uniform.type,
         uniform.data,
         location,
         uniform?.size,
         uniform?.transpose
       );
+      return dict;
+    }, {} as Uniforms<U, ConcreteUniforms>);
 
+    this.uniforms = {
+      ...this.uniforms,
+      ...this.generateTextureUniforms(textures),
+    };
+  }
+
+  private generateTextureUniforms(textures: InstanceProps<A, U>["textures"]) {
+    return textures?.reduce((dict, texture) => {
+      if (!texture?.uniform) return dict;
+      const uniformName = texture?.uniform as U[number];
+      const location = this.program.getUniformLocation(uniformName);
+      if (!location) return dict;
+      dict[uniformName] = UniformFactory.createUniform(
+        texture.uniform,
+        UniformKind.SCALAR_INT,
+        texture.index,
+        location
+      );
       return dict;
     }, {} as Uniforms<U, ConcreteUniforms>);
   }
