@@ -38,7 +38,7 @@ class PostProcess {
       texture: this.texture.getTexture(),
     });
 
-    this.createFilter(gl, type, filter);
+    this.createFilter(gl, canvas, type, filter);
 
     canvas.addEventListener("resize", () => {
       const { width, height } = canvas;
@@ -48,6 +48,7 @@ class PostProcess {
 
   private createFilter(
     gl: WebGL2RenderingContext,
+    canvas: HTMLCanvasElement,
     type?: FilterTypes,
     filter?: Filter
   ) {
@@ -58,13 +59,14 @@ class PostProcess {
         gl,
         texture: this.texture,
         type,
+        canvas,
       });
     } else {
       throw Error("Cannot create post process for undefined type and filter");
     }
   }
 
-  public draw() {
+  public render() {
     this.filter?.render();
   }
 

@@ -148,6 +148,7 @@ abstract class Texture {
   }
 
   public activate() {}
+
   public updateImage({}: {
     source?: string;
     data?: HTMLImageElement;

@@ -24,7 +24,7 @@ void main(void) {
   vec3 L = normalize(-uLightPosition);
   vec4 color;
 
-  float lambertTerm = max(dot(-L, N), 0.2);
+  float lambertTerm = max(dot(-L, N), 0.33);
   vec4 Ia = uLightAmbient * uMaterialAmbient;
   vec4 Id = uLightDiffuse * uMaterialDiffuse * lambertTerm;
   color = vec4(vec3(Ia + Id), 1.0);

@@ -328,7 +328,7 @@ class Scene extends EventTarget {
     this.applyPostProcessors({
       idx: idx + 1,
       renderFunction: () => {
-        this.postProcessors![idx].draw();
+        this.postProcessors![idx].render();
       },
     });
   };

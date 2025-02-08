@@ -25,15 +25,21 @@ import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 import { FilterTypes } from "../../lib/webgl/rendering/postprocess/types.js";
+import NormalFilter from "./normalFilter/index.js";
+import Filter from "../../lib/webgl/rendering/postprocess/filters/index.js";
+
+type ExtendedFilterTypes = FilterTypes | "normal";
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
-let selectedFilter: FilterTypes = "grayscale";
+let selectedFilter: ExtendedFilterTypes = "normal";
+let normalFilter: NormalFilter;
 
 const initProgram = () => {
-  scene = new Scene({ gl, canvas, filters: ["grayscale"] });
+  normalFilter = new NormalFilter();
+  scene = new Scene({ gl, canvas, filters: [normalFilter] });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -43,7 +49,7 @@ const initProgram = () => {
   new Controller({ camera, canvas });
   camera.setAzimuth(-45);
   camera.setElevation(-30);
-  camera.setPosition(new Vector([0, 0, 3]));
+  camera.setPosition(new Vector([0, 0, 10]));
 
   // Configure alpha blending
   gl.enable(gl.BLEND);
@@ -141,15 +147,27 @@ const initControls = () => {
   const { container: filterSelector } = createSelectorForm({
     label: "Filter",
     value: selectedFilter,
-    options: ["grayscale", "invert"],
+    options: ["normal", "grayscale", "invert", "wavy", "blur", "filmgrain"],
     onChange: (v) => {
-      scene.removeFilter(selectedFilter);
-      selectedFilter = v as FilterTypes;
-      scene.addFilter(selectedFilter);
+      updateFilter((filter) => {
+        scene.removeFilter(filter);
+      });
+      selectedFilter = v as ExtendedFilterTypes;
+      updateFilter((filter) => {
+        scene.addFilter(filter);
+      });
     },
   });
 
   addChildrenToController([filterSelector]);
+};
+
+const updateFilter = (action: (filter: Filter | FilterTypes) => void) => {
+  if (selectedFilter == "normal") {
+    action(normalFilter);
+  } else {
+    action(selectedFilter);
+  }
 };
 
 const init = () => {

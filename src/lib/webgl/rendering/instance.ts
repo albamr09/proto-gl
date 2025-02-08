@@ -89,6 +89,7 @@ class Instance<
     };
     size?: number;
     configuration?: InstanceConfiguration;
+    // TODO: textures should have uniforms attached to it, instead of having to redefine them
     textures?: TextureDefinition[];
     transformationProperties?: InstanceTransformationProperties;
     onClick?: (o: InstanceClickPayload<A, U>) => void;

@@ -3,12 +3,18 @@ import { UniformKind } from "../../../core/uniform/types.js";
 import Instance from "../../instance.js";
 import { FilterTypes } from "../types";
 
-abstract class Filter {
+const attributes = ["aPosition", "aTextureCoords"] as const;
+const uniforms = ["uSampler"] as const;
+
+abstract class Filter<
+  A extends readonly string[] = [],
+  U extends readonly string[] = []
+> {
   private id: string;
   private type?: FilterTypes;
-  private vertexShaderSource: string;
-  private fragmentShaderSource: string;
-  protected instance?: Instance<any, any>;
+  protected vertexShaderSource: string;
+  protected fragmentShaderSource: string;
+  protected instance?: Instance<A & typeof attributes, U & typeof uniforms>;
 
   constructor({
     id,
@@ -36,52 +42,67 @@ abstract class Filter {
   }
 
   public build(gl: WebGL2RenderingContext, texture: Texture2D) {
-    this.instance = new Instance({
+    this.instance = new Instance<A & typeof attributes, U & typeof uniforms>({
       id: this.id,
       gl,
       vertexShaderSource: this.vertexShaderSource,
       fragmentShaderSource: this.fragmentShaderSource,
-      ...this.getCommonProperties(gl, texture),
+      attributes: this.getCommonAttributes(gl),
+      uniforms: this.getCommonUniforms(),
+      textures: this.getCommonTextures(gl, texture),
+      ...this.getCommonProperties(),
     });
     return this;
   }
 
-  protected getCommonProperties = (
+  protected getCommonAttributes = (gl: WebGL2RenderingContext) => {
+    return {
+      aPosition: {
+        data: this.getVertices(),
+        size: 2,
+        type: gl.FLOAT,
+      },
+      aTextureCoords: {
+        data: this.getTextureCoords(),
+        size: 2,
+        type: gl.FLOAT,
+      },
+    };
+  };
+
+  protected getCommonUniforms = () => {
+    return {
+      uSampler: {
+        data: 0,
+        type: UniformKind.SCALAR_INT,
+      },
+    };
+  };
+
+  protected getCommonTextures = (
     gl: WebGL2RenderingContext,
     texture: Texture2D
   ) => {
+    return [
+      {
+        target: gl.TEXTURE_2D,
+        index: 0,
+        texture: texture.getTexture()!,
+        configuration: texture.getConfiguration(),
+      },
+    ];
+  };
+
+  protected getCommonProperties = () => {
     return {
-      attributes: {
-        aPosition: {
-          data: this.getVertices(),
-          size: 2,
-          type: gl.FLOAT,
-        },
-        aTextureCoords: {
-          data: this.getTextureCoords(),
-          size: 2,
-          type: gl.FLOAT,
-        },
-      },
-      uniforms: {
-        uSampler: {
-          data: 0,
-          type: UniformKind.SCALAR_INT,
-        },
-      },
-      textures: [
-        {
-          target: gl.TEXTURE_2D,
-          index: 0,
-          texture: texture.getTexture()!,
-          configuration: texture.getConfiguration(),
-        },
-      ],
       size: 6,
     };
   };
 
+  protected updateUniforms() {}
+
   public render() {
+    this.updateUniforms();
     return this.instance?.render({});
   }
 
