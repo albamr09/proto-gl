@@ -77,7 +77,6 @@ class Instance<
     this.id = id ?? uuidv4();
     this.gl = gl;
 
-    // Create program
     if (program) {
       this.program = program;
     } else if (vertexShaderSource && fragmentShaderSource) {
@@ -98,7 +97,7 @@ class Instance<
       ...configuration,
     };
 
-    this.loadAttributes({ attributes: attributes ?? {}, indices, size });
+    this.loadAttributes({ attributes, indices, size });
     this.loadUniforms({ uniforms, textures });
 
     if (textures) {
@@ -182,7 +181,6 @@ class Instance<
     );
     this.gl.enableVertexAttribArray(attributeLocation);
 
-    // Clean up
     if (bind) {
       this.gl.bindVertexArray(null);
     }
@@ -194,18 +192,16 @@ class Instance<
     indices,
     size,
   }: {
-    attributes: {
-      [P in A[number]]?: AttributeConfig;
-    };
-    indices?: number[];
-    size?: number;
+    attributes: InstanceProps<A, U>["attributes"];
+    indices?: InstanceProps<A, U>["indices"];
+    size?: InstanceProps<A, U>["size"];
   }) {
     this.vao = this.gl.createVertexArray();
     this.gl.bindVertexArray(this.vao);
 
-    for (const attribute of Object.keys(attributes)) {
-      this.setAttributeData(attribute, attributes[attribute as A[number]]!);
-    }
+    Object.entries(attributes ?? {}).forEach(([attribute, data]) => {
+      this.setAttributeData(attribute, data as AttributeConfig);
+    });
 
     if (indices) {
       this.ibo = this.gl.createBuffer();
@@ -237,7 +233,6 @@ class Instance<
     uniforms?: InstanceProps<A, U>["uniforms"];
     textures?: InstanceProps<A, U>["textures"];
   }) {
-    // Uniforms
     const mergedUniforms = {
       ...uniforms,
       ...TRANSFORM_UNIFORM_CONFIG_MAP,
