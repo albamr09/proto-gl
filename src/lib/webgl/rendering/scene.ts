@@ -454,7 +454,7 @@ class Scene extends EventTarget {
     }
   }
 
-  public removeFilter(filter: Filter | FilterTypes) {
+  public removeFirstFilter(filter: Filter | FilterTypes) {
     const index = this.postProcessors?.findIndex((postProcessor) =>
       postProcessor.hasFilter(filter)
     );
@@ -462,6 +462,12 @@ class Scene extends EventTarget {
     if (index !== undefined && index !== -1) {
       this.postProcessors?.splice(index, 1);
     }
+  }
+
+  public setFilters(filters: (Filter | FilterTypes)[]) {
+    this.postProcessors = filters.map((filter) => {
+      return this.createPostProcess(this.gl, this.canvas, filter);
+    });
   }
 }
 

@@ -27,7 +27,7 @@ import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
 import { FilterTypes } from "../../lib/webgl/rendering/postprocess/types.js";
 import NormalFilter from "./normalFilter/index.js";
-import Filter from "../../lib/webgl/rendering/postprocess/filters/index.js";
+import { Matrix4 } from "../../lib/math/matrix.js";
 
 type ExtendedFilterTypes = FilterTypes | "normal";
 
@@ -36,11 +36,9 @@ let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
 let selectedFilters: ExtendedFilterTypes[] = [];
-let normalFilter: NormalFilter;
 
 const initProgram = () => {
-  normalFilter = new NormalFilter();
-  scene = new Scene({ gl, canvas, filters: [normalFilter] });
+  scene = new Scene({ gl, canvas });
   camera = new Camera(
     CameraType.ORBITING,
     ProjectionType.PERSPECTIVE,
@@ -50,7 +48,7 @@ const initProgram = () => {
   new Controller({ camera, canvas });
   camera.setAzimuth(-45);
   camera.setElevation(-30);
-  camera.setPosition(new Vector([0, 0, 10]));
+  camera.setPosition(new Vector([0, 0, 25]));
 
   // Configure alpha blending
   gl.enable(gl.BLEND);
@@ -63,6 +61,7 @@ const initProgram = () => {
 const attributes = ["aPosition", "aNormal", "aTextureCoords"] as const;
 const uniforms = [
   "uMaterialDiffuse",
+  "uTransformation",
   "uLightPosition",
   "uLightAmbient",
   "uLightDiffuse",
@@ -114,6 +113,12 @@ const initData = () => {
             data: diffuse,
             type: UniformKind.VECTOR_FLOAT,
           },
+          uTransformation: {
+            data: Matrix4.identity()
+              .scale(new Vector([6, 6, 6]))
+              .toFloatArray(),
+            type: UniformKind.MATRIX,
+          },
           ...lightUniforms,
         },
         indices,
@@ -156,35 +161,33 @@ const initControls = () => {
 const createFilterSelector = () => {
   const idx = selectedFilters.length;
   selectedFilters.push("normal");
-  let currentFilter = selectedFilters[idx];
 
   const { container: filterSelector } = createSelectorForm({
     label: "Filter",
-    value: currentFilter,
-    options: ["normal", "grayscale", "invert", "wavy", "blur", "filmgrain"],
+    value: selectedFilters[idx],
+    options: [
+      "normal",
+      "grayscale",
+      "invert",
+      "wavy",
+      "blur",
+      "filmgrain",
+      "stretch",
+    ],
     onChange: (v) => {
-      updateFilter(currentFilter, (filter) => {
-        scene.removeFilter(filter);
+      // Remove previous
+      selectedFilters.splice(idx, 1);
+      // Add new
+      selectedFilters.splice(idx, 0, v as ExtendedFilterTypes);
+      const filtersToAdd = selectedFilters.map((filter) => {
+        if (filter == "normal") return new NormalFilter();
+        else return filter;
       });
-      currentFilter = v as ExtendedFilterTypes;
-      updateFilter(currentFilter, (filter) => {
-        scene.addFilter(filter);
-      });
+      scene.setFilters(filtersToAdd);
     },
   });
 
   return filterSelector;
-};
-
-const updateFilter = (
-  selectedFilter: ExtendedFilterTypes,
-  action: (filter: Filter | FilterTypes) => void
-) => {
-  if (selectedFilter == "normal") {
-    action(normalFilter);
-  } else {
-    action(selectedFilter);
-  }
 };
 
 const init = () => {

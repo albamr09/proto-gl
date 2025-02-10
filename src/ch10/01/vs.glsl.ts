@@ -3,6 +3,7 @@ const vertexShaderSource = `#version 300 es
 uniform mat4 uModelViewMatrix;
 uniform mat4 uNormalMatrix;
 uniform mat4 uProjectionMatrix;
+uniform mat4 uTransformation;
 
 uniform vec3 uLightPosition;
 uniform vec4 uLightAmbient;
@@ -19,7 +20,7 @@ out vec4 vColor;
 out vec2 vTextureCoords;
 
 void main(void) {
-  gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
+  gl_Position = uProjectionMatrix * uModelViewMatrix * uTransformation * vec4(aPosition, 1.0);
   vec3 N = vec3(uNormalMatrix * vec4(aNormal, 1.0));
   vec3 L = normalize(-uLightPosition);
   vec4 color;
