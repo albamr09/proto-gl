@@ -4,6 +4,7 @@ import FilmgrainFilter from "./filters/filmgrain/index.js";
 import GrayScaleFilter from "./filters/grayscale/index.js";
 import Filter from "./filters/index.js";
 import InvertFilter from "./filters/invert/index.js";
+import StretchFilter from "./filters/stretch/index.js";
 import WavyFilter from "./filters/wavy/index.js";
 import { FilterTypes } from "./types.js";
 
@@ -30,6 +31,8 @@ class FilterFactory {
         return new BlurFilter(canvas).build(gl, texture) as Filter;
       case "filmgrain":
         return new FilmgrainFilter(canvas).build(gl, texture) as Filter;
+      case "stretch":
+        return new StretchFilter().build(gl, texture) as Filter;
       default:
         throw new Error(`Unsupported filter: ${type}`);
     }

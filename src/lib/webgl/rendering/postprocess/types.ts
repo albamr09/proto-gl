@@ -3,4 +3,5 @@ export type FilterTypes =
   | "invert"
   | "wavy"
   | "blur"
-  | "filmgrain";
+  | "filmgrain"
+  | "stretch";
