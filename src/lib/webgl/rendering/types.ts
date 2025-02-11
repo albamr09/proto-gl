@@ -17,7 +17,18 @@ export type UniformDefinition<K extends UniformKind = UniformKind> =
 export type AttributeConfig = {
   data: number[];
   size: number;
-  type: GLenum; // Data type of each element (e.g., gl.FLOAT, gl.INT)
+  type:
+    | WebGL2RenderingContext["BYTE"]
+    | WebGL2RenderingContext["SHORT"]
+    | WebGL2RenderingContext["UNSIGNED_BYTE"]
+    | WebGL2RenderingContext["UNSIGNED_SHORT"]
+    | WebGL2RenderingContext["FLOAT"]
+    // Only for WebGL2
+    | WebGL2RenderingContext["HALF_FLOAT"]
+    | WebGL2RenderingContext["INT"]
+    | WebGL2RenderingContext["UNSIGNED_INT"]
+    | WebGL2RenderingContext["INT_2_10_10_10_REV"]
+    | WebGL2RenderingContext["UNSIGNED_INT_2_10_10_10_REV"];
   stride?: number; // Offset in bytes between consecutive attributes
   offset?: number; // Offset in bytes to the first element
 };
@@ -25,7 +36,14 @@ export type AttributeConfig = {
 export interface InstanceConfiguration {
   pickable?: boolean;
   visible?: boolean;
-  renderingMode?: GLenum;
+  renderingMode?:
+    | WebGL2RenderingContext["POINTS"]
+    | WebGL2RenderingContext["LINE_STRIP"]
+    | WebGL2RenderingContext["LINE_LOOP"]
+    | WebGL2RenderingContext["LINES"]
+    | WebGL2RenderingContext["TRIANGLE_STRIP"]
+    | WebGL2RenderingContext["TRIANGLE_FAN"]
+    | WebGL2RenderingContext["TRIANGLES"];
 }
 
 export interface InstanceProps<

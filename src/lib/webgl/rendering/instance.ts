@@ -30,9 +30,7 @@ import {
 const defaultConfiguration: InstanceConfiguration = {
   pickable: true,
   visible: true,
-  // TODO: this kinda sucks, we are setting a
-  // random number instead of the actual default
-  renderingMode: 0,
+  renderingMode: WebGL2RenderingContext["TRIANGLES"],
 };
 
 class Instance<

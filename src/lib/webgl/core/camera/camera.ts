@@ -32,6 +32,7 @@ class Camera {
   public transposeProjection: boolean;
   private scene?: Scene;
 
+  // TODO: this should be a dict, with default types
   constructor(
     type: CameraType,
     projection = ProjectionType.PERSPECTIVE,

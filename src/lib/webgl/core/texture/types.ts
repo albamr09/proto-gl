@@ -14,10 +14,24 @@ export interface TextureDefinition extends TextureParameters {
 
 export interface TextureConfiguration {
   generateMipmap?: boolean;
-  magFilter?: GLint;
-  minFilter?: GLint;
-  wrapS?: GLint;
-  wrapT?: GLint;
+  magFilter?:
+    | WebGL2RenderingContext["LINEAR"]
+    | WebGL2RenderingContext["NEAREST"];
+  minFilter?:
+    | WebGL2RenderingContext["LINEAR"]
+    | WebGL2RenderingContext["NEAREST"]
+    | WebGL2RenderingContext["NEAREST_MIPMAP_NEAREST"]
+    | WebGL2RenderingContext["LINEAR_MIPMAP_NEAREST"]
+    | WebGL2RenderingContext["NEAREST_MIPMAP_LINEAR"]
+    | WebGL2RenderingContext["LINEAR_MIPMAP_LINEAR"];
+  wrapS?:
+    | WebGL2RenderingContext["REPEAT"]
+    | WebGL2RenderingContext["CLAMP_TO_EDGE"]
+    | WebGL2RenderingContext["MIRRORED_REPEAT"];
+  wrapT?:
+    | WebGL2RenderingContext["REPEAT"]
+    | WebGL2RenderingContext["CLAMP_TO_EDGE"]
+    | WebGL2RenderingContext["MIRRORED_REPEAT"];
   width?: number;
   height?: number;
 }
