@@ -15,6 +15,7 @@ import {
   InstanceDragPayload,
   InstanceDragEndPayload,
   SceneRenderOptions,
+  AttributeConfig,
 } from "./types.js";
 
 class Scene extends EventTarget {
@@ -154,7 +155,7 @@ class Scene extends EventTarget {
   };
 
   // Renders an item first
-  renderFirst(id: string) {
+  public renderFirst(id: string) {
     const index = this.renderOrder.indexOf(id);
     if (index == -1) {
       console.error(`Object for id ${index} not found`);
@@ -170,7 +171,7 @@ class Scene extends EventTarget {
   }
 
   // Renders an item last
-  renderLast(id: string) {
+  public renderLast(id: string) {
     const index = this.renderOrder.indexOf(id);
     if (index == -1) {
       console.error(`Object for id ${index} not found`);
@@ -186,7 +187,7 @@ class Scene extends EventTarget {
   }
 
   // Pushes an item up the render priority
-  renderSooner(id: string) {
+  public renderSooner(id: string) {
     const index = this.renderOrder.indexOf(id);
     if (index == -1) {
       console.error(`Object for id ${index} not found`);
@@ -205,7 +206,7 @@ class Scene extends EventTarget {
   }
 
   // Pushes an item down the render priority
-  renderLater(id: string) {
+  public renderLater(id: string) {
     const index = this.renderOrder.indexOf(id);
     if (index == -1) {
       console.error(`Object for id ${index} not found`);
@@ -225,11 +226,11 @@ class Scene extends EventTarget {
   }
 
   // Prints the current render order by alias
-  printRenderOrder() {
+  public printRenderOrder() {
     console.log("Render Order:", this.renderOrder);
   }
 
-  setConfigurationValue<T>(
+  public setConfigurationValue<T>(
     key: keyof InstanceConfiguration,
     value: T,
     id?: string
@@ -244,24 +245,24 @@ class Scene extends EventTarget {
   }
 
   // Context
-  setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
+  public setGLParameters(fn: (gl: WebGL2RenderingContext) => void) {
     fn(this.gl);
     this.objects.forEach((o) => {
       o.setGLParameters(fn);
     });
   }
 
-  getContext() {
+  public getContext() {
     return this.gl;
   }
 
   // Uniforms
   // TODO: Get data should know the type
-  getUniform(id: string, uniformName: any) {
+  public getUniform(id: string, uniformName: any) {
     return this.objects.get(id)?.getUniform(uniformName);
   }
 
-  updateUniform(
+  public updateUniform(
     uniformName: string,
     // TODO: type
     value: any,
@@ -277,7 +278,33 @@ class Scene extends EventTarget {
     });
   }
 
-  updateTexture({ id, texture }: { id?: string; texture: TextureParameters }) {
+  public setAttributeData({
+    id,
+    name,
+    value,
+    bind = false,
+  }: {
+    id?: string;
+    name: string;
+    value: AttributeConfig;
+    bind?: boolean;
+  }) {
+    if (id) {
+      this.objects.get(id)?.setAttributeData(name, value, bind);
+      return;
+    }
+    this.objects.forEach((o) => {
+      o.setAttributeData(name, value, bind);
+    });
+  }
+
+  public updateTexture({
+    id,
+    texture,
+  }: {
+    id?: string;
+    texture: TextureParameters;
+  }) {
     if (id) {
       this.objects.get(id)?.updateTexture({ ...texture });
       return;
@@ -287,12 +314,12 @@ class Scene extends EventTarget {
     });
   }
 
-  updateModelViewMatrix(modelViewMatrix: Matrix4) {
+  public updateModelViewMatrix(modelViewMatrix: Matrix4) {
     this.modelViewMatrix = modelViewMatrix.copy() as Matrix4;
     this.normalMatrix = computeNormalMatrix(this.modelViewMatrix);
   }
 
-  updateProjectionMatrix(projectionMatrix: Matrix4) {
+  public updateProjectionMatrix(projectionMatrix: Matrix4) {
     this.projectionMatrix = projectionMatrix.copy() as Matrix4;
   }
 

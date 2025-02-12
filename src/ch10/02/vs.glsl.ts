@@ -11,9 +11,7 @@ out float vLifespan;
 
 void main(void) {
   gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition.xyz, 1.0);
-
   vLifespan = aPosition.w;
-
   gl_PointSize = uParticleSize * vLifespan;
 }
 `;

@@ -32,6 +32,7 @@ let particleSize = 14;
 
 const attributes = ["aPosition"] as const;
 const uniforms = ["uParticleSize"] as const;
+let particles: Particles;
 
 type Particle = {
   position: number[];
@@ -42,9 +43,11 @@ type Particle = {
 
 class Particles {
   private particles: Particle[];
+  private lastUpdateTime!: number;
 
   constructor(size: number) {
     this.particles = this.createParticles(size);
+    this.updateLastUpdateTime();
   }
 
   private createParticles(size: number) {
@@ -52,23 +55,62 @@ class Particles {
   }
 
   private createParticle() {
+    const lifespan = Math.random() * particleLifeSpan;
     return {
-      position: [0, 0, 0],
+      position: [0, 0, 0, 0],
       velocity: [
         Math.random() * 20 - 10,
         Math.random() * 20,
         Math.random() * 20 - 10,
       ],
-      lifespan: Math.random() * particleLifeSpan,
-      remainingLife: Math.random() * particleLifeSpan,
+      lifespan,
+      remainingLife: lifespan,
     };
   }
 
   public getVertexPositions() {
-    return this.particles.flatMap((particle) => [
-      ...particle.position,
-      particle.lifespan,
-    ]);
+    return this.particles.flatMap((particle) => particle.position);
+  }
+
+  public update() {
+    const elapsedTime = this.getElapsedTime();
+    this.particles = this.particles.map((particle) => {
+      particle.remainingLife -= elapsedTime;
+
+      // Once the particle expires, reset it to the origin with a new velocity
+      if (particle.remainingLife <= 0) {
+        return this.createParticle();
+      }
+
+      return this.updateParticlePosition(particle, elapsedTime);
+    });
+    this.updateLastUpdateTime();
+  }
+
+  private getElapsedTime() {
+    return (Date.now() - this.lastUpdateTime) / 1000;
+  }
+
+  private updateParticlePosition = (
+    particle: Particle,
+    elapsedTime: number
+  ) => {
+    particle.position[0] += particle.velocity[0] * elapsedTime;
+    particle.position[1] += particle.velocity[1] * elapsedTime;
+    particle.position[2] += particle.velocity[2] * elapsedTime;
+    // Apply gravity to the velocity
+    particle.velocity[1] -= 9.8 * elapsedTime;
+    if (particle.position[1] < 0) {
+      // Allow particles to bounce off the floor
+      particle.velocity[1] *= -0.75;
+      particle.position[1] = 0;
+    }
+    particle.position[3] = particle.remainingLife / particle.lifespan;
+    return particle;
+  };
+
+  private updateLastUpdateTime() {
+    this.lastUpdateTime = Date.now();
   }
 }
 
@@ -85,6 +127,8 @@ const initProgram = () => {
   camera.setElevation(-40);
   camera.setAzimuth(-30);
 
+  gl.clearColor(0.1, 0.1, 0.1, 1.0);
+  gl.clearDepth(100);
   gl.enable(gl.BLEND);
   gl.disable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LESS);
@@ -92,7 +136,7 @@ const initProgram = () => {
 };
 
 const initData = () => {
-  const particles = new Particles(N_PARTICLES);
+  particles = new Particles(N_PARTICLES);
   const particlesInstance = new Instance<typeof attributes, typeof uniforms>({
     id: "particles",
     gl,
@@ -121,6 +165,11 @@ const initData = () => {
         source: "/data/images/spark.png",
         target: gl.TEXTURE_2D,
         uniform: "uSampler",
+        configuration: {
+          magFilter: gl.LINEAR,
+          minFilter: gl.LINEAR_MIPMAP_NEAREST,
+          generateMipmap: true,
+        },
       },
     ],
   });
@@ -128,6 +177,17 @@ const initData = () => {
 };
 
 const render = () => {
+  particles.update();
+  scene.setAttributeData({
+    id: "particles",
+    name: "aPosition",
+    value: {
+      data: particles.getVertexPositions(),
+      size: 4,
+      type: gl.FLOAT,
+    },
+    bind: true,
+  });
   scene.render();
   requestAnimationFrame(render);
 };

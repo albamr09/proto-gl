@@ -333,7 +333,10 @@ class Instance<
   }) {
     if (!this.configuration.visible) return;
     const hadDepthTest = this.gl.getParameter(this.gl.DEPTH_TEST);
-    const shouldChangeDepthTest = depthTest !== hadDepthTest;
+    const shouldChangeDepthTest =
+      depthTest !== null &&
+      depthTest == undefined &&
+      depthTest !== hadDepthTest;
     if (shouldChangeDepthTest) {
       this.gl[depthTest ? "enable" : "disable"](this.gl.DEPTH_TEST);
     }
