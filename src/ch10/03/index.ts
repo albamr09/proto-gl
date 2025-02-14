@@ -18,8 +18,6 @@ import {
 } from "../../lib/webgl/core/camera/types.js";
 import Controller from "../../lib/webgl/core/events/controller.js";
 import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
-import Axis from "../../lib/webgl/models/axis/index.js";
-import Floor from "../../lib/webgl/models/floor/index.js";
 import Instance from "../../lib/webgl/rendering/instance.js";
 import Scene from "../../lib/webgl/rendering/scene.js";
 import fragmentShaderSource from "./fs.glsl.js";
@@ -148,7 +146,8 @@ const initProgram = () => {
   );
   new Controller({ camera, canvas });
   camera.setPosition(new Vector([0, 0, 40]));
-  camera.setElevation(-10);
+  camera.setElevation(-40);
+  camera.setAzimuth(-30);
 
   gl.clearColor(0.1, 0.1, 0.1, 1.0);
   gl.clearDepth(100);
