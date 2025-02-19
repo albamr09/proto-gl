@@ -62,12 +62,7 @@ const WallUniforms = [
 
 const initScene = () => {
   scene = new Scene({ gl, canvas });
-  camera = new Camera(
-    CameraType.ORBITING,
-    ProjectionType.PERSPECTIVE,
-    gl,
-    scene
-  );
+  camera = new Camera({ gl, scene });
   camera.setPosition(new Vector([0, 5, 30]));
   camera.setAzimuth(0);
   camera.setElevation(-3);

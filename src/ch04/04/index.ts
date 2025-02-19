@@ -66,7 +66,7 @@ const initProgram = () => {
     uniforms
   );
   scene = new Scene({ gl, canvas });
-  camera = new Camera(cameraType);
+  camera = new Camera({ type: cameraType });
   camera.setInitialPosition(new Vector(modelTranslation));
 };
 

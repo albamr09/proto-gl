@@ -39,12 +39,7 @@ let selectedFilters: ExtendedFilterTypes[] = [];
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
-  camera = new Camera(
-    CameraType.ORBITING,
-    ProjectionType.PERSPECTIVE,
-    gl,
-    scene
-  );
+  camera = new Camera({ gl, scene });
   new Controller({ camera, canvas });
   camera.setAzimuth(-45);
   camera.setElevation(-30);

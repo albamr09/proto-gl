@@ -32,13 +32,17 @@ class Camera {
   public transposeProjection: boolean;
   private scene?: Scene;
 
-  // TODO: this should be a dict, with default types
-  constructor(
-    type: CameraType,
+  constructor({
+    type = CameraType.ORBITING,
     projection = ProjectionType.PERSPECTIVE,
-    gl?: WebGL2RenderingContext,
-    scene?: Scene
-  ) {
+    gl,
+    scene,
+  }: {
+    type?: CameraType;
+    projection?: ProjectionType;
+    gl?: WebGL2RenderingContext;
+    scene?: Scene;
+  }) {
     this.scene = scene;
     this.type = type;
     this.projection = projection;

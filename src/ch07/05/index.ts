@@ -49,12 +49,7 @@ let camera: Camera;
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
-  camera = new Camera(
-    CameraType.ORBITING,
-    ProjectionType.PERSPECTIVE,
-    gl,
-    scene
-  );
+  camera = new Camera({ gl, scene });
   new Controller({ camera, canvas });
 
   // Camera

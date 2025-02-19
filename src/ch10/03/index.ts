@@ -138,12 +138,7 @@ class Particles {
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
-  const camera = new Camera(
-    CameraType.ORBITING,
-    ProjectionType.PERSPECTIVE,
-    gl,
-    scene
-  );
+  const camera = new Camera({ gl, scene });
   new Controller({ camera, canvas });
   camera.setPosition(new Vector([0, 0, 40]));
   camera.setElevation(-40);

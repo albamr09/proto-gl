@@ -84,12 +84,7 @@ const uniforms = [
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
-  const camera = new Camera(
-    CameraType.ORBITING,
-    ProjectionType.PERSPECTIVE,
-    gl,
-    scene
-  );
+  const camera = new Camera({ gl, scene });
   new Controller({ camera, canvas });
   camera.setPosition(new Vector([0, 0.5, 5]));
   camera.setAzimuth(-25);

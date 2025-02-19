@@ -82,12 +82,7 @@ let renderingOrder = Order.SPHERE;
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
-  camera = new Camera(
-    CameraType.ORBITING,
-    ProjectionType.PERSPECTIVE,
-    gl,
-    scene
-  );
+  camera = new Camera({ gl, scene });
   new Controller({ camera, canvas });
   camera.setPosition(new Vector([0, 5, 35]));
   camera.setAzimuth(-25);

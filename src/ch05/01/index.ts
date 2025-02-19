@@ -41,7 +41,12 @@ let coneX = 0;
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
-  camera = new Camera(cameraType, projectionType, gl, scene);
+  camera = new Camera({
+    type: cameraType,
+    projection: projectionType,
+    gl,
+    scene,
+  });
   camera.setPosition(initialPosition);
   camera.setInitialPosition(initialPosition);
   controller = new Controller({ camera, canvas });

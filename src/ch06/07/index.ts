@@ -42,12 +42,7 @@ const uniforms = ["uLightAmbient", "uLightDiffuse", "uAlpha"] as const;
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
-  camera = new Camera(
-    CameraType.ORBITING,
-    ProjectionType.PERSPECTIVE,
-    gl,
-    scene
-  );
+  camera = new Camera({ gl, scene });
   camera.setPosition(new Vector([0, 0, 4]));
   camera.setAzimuth(-50);
   camera.setElevation(-30);

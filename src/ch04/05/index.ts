@@ -82,7 +82,7 @@ const initProgram = () => {
     uniforms
   );
   scene = new Scene({ gl, canvas });
-  camera = new Camera(cameraType);
+  camera = new Camera({ type: cameraType });
   controller = new Controller({
     camera,
     canvas,

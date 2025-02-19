@@ -86,7 +86,7 @@ const initProgram = () => {
     uniforms
   );
   scene = new Scene({ gl, canvas });
-  camera = new Camera(cameraType, porjectionType, gl);
+  camera = new Camera({ type: cameraType, projection: porjectionType, gl });
   controller = new Controller({
     camera,
     canvas,

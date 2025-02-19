@@ -85,12 +85,10 @@ class BouncingBall {
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
-  camera = new Camera(
-    CameraType.ORBITING,
-    ProjectionType.PERSPECTIVE,
+  camera = new Camera({
     gl,
-    scene
-  );
+    scene,
+  });
   new Controller({ camera, canvas });
 };
 

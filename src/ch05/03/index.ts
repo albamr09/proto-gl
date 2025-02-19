@@ -34,12 +34,7 @@ let interpolatedPositions: [number, number, number][] = [];
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
-  camera = new Camera(
-    CameraType.ORBITING,
-    ProjectionType.PERSPECTIVE,
-    gl,
-    scene
-  );
+  camera = new Camera({ gl, scene });
   camera.setPosition(new Vector([0, 2, 80]));
   camera.setElevation(-20);
   new Controller({ camera, canvas });

@@ -50,12 +50,7 @@ const initProgram = () => {
     canvas,
     editorConfiguration: { allow: true, showGuides: true },
   });
-  camera = new Camera(
-    CameraType.ORBITING,
-    ProjectionType.PERSPECTIVE,
-    gl,
-    scene
-  );
+  camera = new Camera({ gl, scene });
   pickingController = new PickingController(scene, canvas);
   new Controller({ camera, canvas, pickingController });
   camera.setPosition(new Vector([0, 0, 40]));
