@@ -2,16 +2,38 @@ const fragmentShaderSource = `#version 300 es
 
 precision mediump float;
 
+const float SHININESS = 8.0;
+
 uniform sampler2D uSampler;
 uniform sampler2D uNormalSampler;
 
+uniform vec4 uLightDiffuse;
+uniform vec4 uLightAmbient;
+uniform vec4 uMaterialAmbient;
+
 in vec2 vTextureCoords;
+in vec3 vTangentLightRay;
+in vec3 vTangentEyeRay;
 
 out vec4 fragColor;
 
 void main(void) {
+
+  // Ambient color
+  vec4 Ia = uLightAmbient * uMaterialAmbient;
+
+  // Diffuse color
   vec4 textureColor = texture(uSampler, vTextureCoords);
-  fragColor = vec4(textureColor.rgb, 1.0);
+  vec3 N = normalize(2.0 * (texture(uNormalSampler, vTextureCoords).rgb - 0.5));
+  vec3 L = normalize(vTangentLightRay);
+  float lambertTerm = dot(N, -L);
+  vec4 Id = textureColor * uLightDiffuse * lambertTerm;
+
+  // Specular color
+  vec3 R = reflect(-L, N);
+  float Is = pow(clamp(dot(R, vTangentEyeRay), 0.0, 1.0), SHININESS);
+
+  fragColor = Ia + Id + Is;
 }
 `;
 

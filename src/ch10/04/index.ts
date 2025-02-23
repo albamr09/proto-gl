@@ -1,5 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
+import { calculateNormals } from "../../lib/math/3d.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
   autoResizeCanvas,
@@ -19,8 +20,20 @@ let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
 
-const attributes = ["aPosition", "aTextureCoords"] as const;
-const uniforms = ["uSampler", "uNormalSampler"] as const;
+const attributes = [
+  "aPosition",
+  "aTextureCoords",
+  "aNormal",
+  "aTangent",
+] as const;
+const uniforms = [
+  "uSampler",
+  "uNormalSampler",
+  "uLightPosition",
+  "uLightAmbient",
+  "uLightDiffuse",
+  "uMaterialAmbient",
+] as const;
 
 const initProgram = () => {
   scene = new Scene({ gl, canvas });
@@ -52,6 +65,34 @@ const initData = () => {
           data: textureCoords,
           size: 2,
           type: gl.FLOAT,
+        },
+        aNormal: {
+          data: calculateNormals(vertices, indices, 3),
+          size: 3,
+          type: gl.FLOAT,
+        },
+        aTangent: {
+          data: textureCoords,
+          size: 3,
+          type: gl.FLOAT,
+        },
+      },
+      uniforms: {
+        uLightAmbient: {
+          data: [1, 1, 1, 1],
+          type: UniformKind.VECTOR_FLOAT,
+        },
+        uLightDiffuse: {
+          data: [1, 1, 1, 1],
+          type: UniformKind.VECTOR_FLOAT,
+        },
+        uLightPosition: {
+          data: [0, 5, 20],
+          type: UniformKind.VECTOR_FLOAT,
+        },
+        uMaterialAmbient: {
+          data: [0.2, 0.2, 0.2, 1],
+          type: UniformKind.VECTOR_FLOAT,
         },
       },
       textures: [
