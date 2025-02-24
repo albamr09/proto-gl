@@ -122,7 +122,7 @@ class Particles {
     particle.position[0] +=
       Math.sin(particle.frequency[0] * absoluteTime) * particle.amplitude[0];
     particle.position[2] +=
-      Math.sin(particle.frequency[1] * absoluteTime) * particle.amplitude[1];
+      Math.cos(particle.frequency[1] * absoluteTime) * particle.amplitude[1];
     particle.position[1] += particle.velocity * elapsedTime;
 
     // Apply gravity to the velocity
@@ -235,7 +235,7 @@ const initControls = () => {
     label: "Particle Life Span",
     value: particleLifeSpan,
     min: 1,
-    max: 10,
+    max: 20,
     step: 1,
     onChange: (v) => {
       particleLifeSpan = v;
