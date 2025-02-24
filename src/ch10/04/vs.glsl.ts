@@ -11,8 +11,6 @@ in vec2 aTextureCoords;
 in vec3 aNormal;
 in vec3 aTangent;
 
-uniform sampler2D uNormalSampler;
-
 out vec2 vTextureCoords;
 out vec3 vTangentLightRay;
 out vec3 vTangentEyeRay;

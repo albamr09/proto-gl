@@ -17,6 +17,11 @@ in vec3 vTangentEyeRay;
 
 out vec4 fragColor;
 
+// Transforms the normal stored inside the texture from a range of [0, 1] to a range of [-1, 1]
+vec3 transformNormal() {
+  return 2.0 * (texture(uNormalSampler, vTextureCoords).rgb - 0.5);
+}
+
 void main(void) {
 
   // Ambient color
@@ -24,7 +29,7 @@ void main(void) {
 
   // Diffuse color
   vec4 textureColor = texture(uSampler, vTextureCoords);
-  vec3 N = normalize(2.0 * (texture(uNormalSampler, vTextureCoords).rgb - 0.5));
+  vec3 N = normalize(transformNormal());
   vec3 L = normalize(vTangentLightRay);
   float lambertTerm = dot(N, -L);
   vec4 Id = textureColor * uLightDiffuse * lambertTerm;

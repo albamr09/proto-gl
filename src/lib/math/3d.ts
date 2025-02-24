@@ -81,6 +81,12 @@ export const calculateNormals = (
   return normals.map((n) => n.normalize().toArray()).flat();
 };
 
+const computeTangents = (
+  vertices: number[],
+  indices: number[],
+  textureCoordinates: number[]
+) => {};
+
 /*
  * Obtain transformation matrix to apply to normal vectors given the model view matrix.
  * Reference: https://paroj.github.io/gltut/Illumination/Tut09%20Normal%20Transformation.html
