@@ -81,6 +81,10 @@ export const calculateNormals = (
   return normals.flatMap((n) => n.normalize().toArray());
 };
 
+// Computes tangents for each vertex
+//
+// Reference: https://web.archive.org/web/20110708081637/http://www.terathon.com/code/tangent.html
+// Reference: https://gamedev.stackexchange.com/questions/68612/how-to-compute-tangent-and-bitangent-vectors
 export const computeTangents = (
   vertices: number[],
   uvs: number[],
