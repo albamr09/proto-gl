@@ -78,14 +78,65 @@ export const calculateNormals = (
   }
 
   // Normalize vectors
-  return normals.map((n) => n.normalize().toArray()).flat();
+  return normals.flatMap((n) => n.normalize().toArray());
 };
 
-const computeTangents = (
+export const computeTangents = (
   vertices: number[],
-  indices: number[],
-  textureCoordinates: number[]
-) => {};
+  uvs: number[],
+  indices: number[]
+) => {
+  let tangents = new Array(vertices.length / 3)
+    .fill(0)
+    .map(() => new Vector([0, 0, 0]));
+
+  function getVector(arr: number[], index: number, stride = 3) {
+    const baseIndex = index * stride;
+    const vectorElements = Array.from({ length: stride }).reduce(
+      (vector: number[], _, i) => {
+        vector.push(arr[baseIndex + i]);
+        return vector;
+      },
+      []
+    );
+    return new Vector(vectorElements);
+  }
+
+  for (let i = 0; i < indices.length; i += 3) {
+    let i0 = indices[i];
+    let i1 = indices[i + 1];
+    let i2 = indices[i + 2];
+
+    let v0 = getVector(vertices, i0);
+    let v1 = getVector(vertices, i1);
+    let v2 = getVector(vertices, i2);
+
+    let uv0 = getVector(uvs, i0, 2);
+    let uv1 = getVector(uvs, i1, 2);
+    let uv2 = getVector(uvs, i2, 2);
+
+    let edge1 = v1.sum(v0.negate());
+    let edge2 = v2.sum(v0.negate());
+
+    let deltaUV1 = uv1.sum(uv0.negate());
+    let deltaUV2 = uv2.sum(uv0.negate());
+
+    let f =
+      1.0 / (deltaUV1.at(0) * deltaUV2.at(1) - deltaUV2.at(0) * deltaUV1.at(1));
+
+    let tangent = new Vector([
+      f * (deltaUV2.at(1) * edge1.at(0) - deltaUV1.at(1) * edge2.at(0)),
+      f * (deltaUV2.at(1) * edge1.at(1) - deltaUV1.at(1) * edge2.at(1)),
+      f * (deltaUV2.at(1) * edge1.at(2) - deltaUV1.at(1) * edge2.at(2)),
+    ]);
+
+    tangents[i0] = tangent.sum(tangents[i0]);
+    tangents[i1] = tangent.sum(tangents[i1]);
+    tangents[i2] = tangent.sum(tangents[i2]);
+  }
+
+  return tangents.flatMap((tangent) => tangent.normalize().toArray());
+};
 
 /*
  * Obtain transformation matrix to apply to normal vectors given the model view matrix.

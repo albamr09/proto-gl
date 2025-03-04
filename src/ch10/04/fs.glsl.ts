@@ -10,6 +10,7 @@ uniform sampler2D uNormalSampler;
 uniform vec4 uLightDiffuse;
 uniform vec4 uLightAmbient;
 uniform vec4 uMaterialAmbient;
+uniform vec4 uMaterialDiffuse;
 
 in vec2 vTextureCoords;
 in vec3 vTangentLightRay;
@@ -32,10 +33,10 @@ void main(void) {
   vec3 N = normalize(transformNormal());
   vec3 L = normalize(vTangentLightRay);
   float lambertTerm = dot(N, -L);
-  vec4 Id = textureColor * uLightDiffuse * lambertTerm;
+  vec4 Id = uMaterialDiffuse * textureColor * uLightDiffuse * lambertTerm;
 
   // Specular color
-  vec3 R = reflect(-L, N);
+  vec3 R = reflect(L, N);
   float Is = pow(clamp(dot(R, vTangentEyeRay), 0.0, 1.0), SHININESS);
 
   fragColor = Ia + Id + Is;

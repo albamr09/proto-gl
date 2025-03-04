@@ -1,6 +1,6 @@
 import { loadData } from "../../lib/files.js";
 import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
-import { calculateNormals } from "../../lib/math/3d.js";
+import { calculateNormals, computeTangents } from "../../lib/math/3d.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
   autoResizeCanvas,
@@ -33,6 +33,7 @@ const uniforms = [
   "uLightAmbient",
   "uLightDiffuse",
   "uMaterialAmbient",
+  "uMaterialDiffuse",
 ] as const;
 
 const initProgram = () => {
@@ -47,7 +48,7 @@ const initProgram = () => {
 
 const initData = () => {
   loadData("/data/models/geometries/cube-texture.json").then((data) => {
-    const { indices, vertices, textureCoords } = data;
+    const { indices, vertices, textureCoords, diffuse } = data;
 
     const instance = new Instance<typeof attributes, typeof uniforms>({
       id: "cube",
@@ -72,7 +73,7 @@ const initData = () => {
           type: gl.FLOAT,
         },
         aTangent: {
-          data: textureCoords,
+          data: computeTangents(vertices, textureCoords, indices),
           size: 3,
           type: gl.FLOAT,
         },
@@ -92,6 +93,10 @@ const initData = () => {
         },
         uMaterialAmbient: {
           data: [0.2, 0.2, 0.2, 1],
+          type: UniformKind.VECTOR_FLOAT,
+        },
+        uMaterialDiffuse: {
+          data: diffuse,
           type: UniformKind.VECTOR_FLOAT,
         },
       },
