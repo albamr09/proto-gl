@@ -24,7 +24,7 @@ const computeTriangleNormal = (A: Vector, B: Vector, C: Vector) => {
 };
 
 /**
- * Reference: https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/03.html#Lights-Normals
+ * Reference: https://albamr09.github.io/cs/rtgw/03/#normals
  *
  * The normals of a complex surface (made up from several triangles) is computed as follow:
  *
@@ -38,7 +38,7 @@ const computeTriangleNormal = (A: Vector, B: Vector, C: Vector) => {
 export const calculateNormals = (
   vertices: number[],
   indices: number[],
-  size: GLint
+  size: GLint,
 ) => {
   const numVertices = vertices.length / size;
   let normals = Array.from(Array(numVertices)).map(() => new Vector([0, 0, 0]));
@@ -83,12 +83,11 @@ export const calculateNormals = (
 
 // Computes tangents for each vertex
 //
-// Reference: https://web.archive.org/web/20110708081637/http://www.terathon.com/code/tangent.html
-// Reference: https://gamedev.stackexchange.com/questions/68612/how-to-compute-tangent-and-bitangent-vectors
+// Reference: https://albamr09.github.io/cs/rtgw/10/#compute-tangents
 export const computeTangents = (
   vertices: number[],
   uvs: number[],
-  indices: number[]
+  indices: number[],
 ) => {
   let tangents = new Array(vertices.length / 3)
     .fill(0)
@@ -101,7 +100,7 @@ export const computeTangents = (
         vector.push(arr[baseIndex + i]);
         return vector;
       },
-      []
+      [],
     );
     return new Vector(vectorElements);
   }
@@ -170,7 +169,7 @@ const unFlattenVertices = (vertices: number[]) => {
  * */
 export const transformVertices = (
   vertices: number[],
-  transformationMatrix: Matrix4
+  transformationMatrix: Matrix4,
 ) => {
   return unFlattenVertices(vertices)
     .map((vertex) => {

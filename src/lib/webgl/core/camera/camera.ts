@@ -237,7 +237,7 @@ class Camera {
     // As you know the position of the camera
     // is obtained by moving the objects on the
     // world on the opposite direction
-    // Ref: https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04.html#Camera-Vertex%20Transformations-The%20Model,%20View%20and%20Projection%20matrices-The%20View%20Matrix
+    // Ref: https://albamr09.github.io/cs/rtgw/04/02_model_view/
     const negatedPosition = this.position.negate();
 
     if (this.isTracking()) {
@@ -248,7 +248,7 @@ class Camera {
       // where the camera is. This makes the illusion we are
       // "moving the camera"
       this.modelViewMatrix = this.modelViewMatrix.rotateVecDeg(
-        new Vector([this.elevation, this.azimuth, 0])
+        new Vector([this.elevation, this.azimuth, 0]),
       );
       this.modelViewMatrix = this.modelViewMatrix.translate(negatedPosition);
     } else {
@@ -262,7 +262,7 @@ class Camera {
       // i know sorry this does not make much sense)
       this.modelViewMatrix = this.modelViewMatrix.translate(negatedPosition);
       this.modelViewMatrix = this.modelViewMatrix.rotateVecDeg(
-        this.getRotation()
+        this.getRotation(),
       );
     }
 
@@ -281,7 +281,7 @@ class Camera {
         this.aspectRatio,
         this.near,
         this.far,
-        this.isProjectionTransposed()
+        this.isProjectionTransposed(),
       );
     } else if (this.projection == ProjectionType.ORTHOGRAPHIC) {
       this.projectionMatrix = Matrix4.ortho(
@@ -291,7 +291,7 @@ class Camera {
         this.height / this.fov,
         -this.far,
         this.far,
-        this.isProjectionTransposed()
+        this.isProjectionTransposed(),
       );
     }
     this.scene?.updateProjectionMatrix(this.projectionMatrix);

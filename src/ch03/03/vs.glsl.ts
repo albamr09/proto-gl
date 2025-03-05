@@ -51,7 +51,7 @@ void main(void) {
     // Reflected light direction on the surface (given by its normal vector)
     vec3 R = reflect(L, N);
     // Note that we only retrieve positive values for the dot product
-    // https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/03.html#Lights-Goraud%20Shading%20in%20Practice-With%20Phong%20Reflection%20Model-Vertex%20Shader-Light%20Reflection
+    // https://albamr09.github.io/cs/rtgw/03/#light-reflection
     float specular = pow(max(dot(R, E), 0.0), uShininnessFactor);
     Is = uLightSpecularColor * uMaterialSpecularColor * specular;
   }

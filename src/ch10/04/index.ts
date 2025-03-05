@@ -41,7 +41,7 @@ const initProgram = () => {
   camera = new Camera({ gl, scene });
   new Controller({ camera, canvas });
 
-  camera.setPosition(new Vector([0, 0, 2]));
+  camera.setPosition(new Vector([0, 0, 3.5]));
   camera.setAzimuth(40);
   camera.setElevation(-30);
 };

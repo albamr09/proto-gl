@@ -102,7 +102,7 @@ export class Matrix {
       .filter(
         (_, rowIdx) =>
           // Filters out row with idx = i
-          rowIdx != i
+          rowIdx != i,
       )
       .map((row) => {
         // Filters out columns with idx = j
@@ -333,7 +333,7 @@ export class Matrix4 extends Matrix {
   /**
    * Create a perspective projection matrix using a field-of-view and an aspect ratio.
    *
-   * Reference: https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04/02_01_perspective.html
+   * Reference: https://albamr09.github.io/cs/rtgw/04/02_model_view/02_01_perspective/
    *
    * @param fovy      Number The angle between the upper and lower sides of the viewing frustum.
    * @param aspect    Number The aspect ratio of the viewing window. (width/height).
@@ -346,7 +346,7 @@ export class Matrix4 extends Matrix {
     aspect: number,
     near: number,
     far: number,
-    transpose = true
+    transpose = true,
   ) {
     const rad = Angle.toRadians(fovy);
     const t = Math.tan(rad / 2) * near;
@@ -362,7 +362,7 @@ export class Matrix4 extends Matrix {
     ]);
 
     if (transpose) {
-      // See https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04/01_transformations.html#Transformations-Transposing Transformation or Projection Matrices
+      // See https://albamr09.github.io/cs/rtgw/04/01_transformations/#transposing-transformation-or-projection-matrices
       // to know why we would have to transpose this matrix
       return m.transpose() as Matrix4;
     } else {
@@ -373,7 +373,7 @@ export class Matrix4 extends Matrix {
   /**
    * Generates a orthogonal projection matrix with the given bounds.
    *
-   * Reference: https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04/02_02_orthographic.html
+   * Reference: https://albamr09.github.io/cs/rtgw/04/02_model_view/02_02_orthographic/
    *
    * @param l         Left bound of the frustum
    * @param r         Right bound of the frustum
@@ -390,7 +390,7 @@ export class Matrix4 extends Matrix {
     t: number,
     n: number,
     f: number,
-    transpose = true
+    transpose = true,
   ) {
     const m = new Matrix4([
       [2 / (r - l), 0, 0, -(r + l) / (r - l)],
@@ -400,7 +400,7 @@ export class Matrix4 extends Matrix {
     ]);
 
     if (transpose) {
-      // See https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04/01_transformations.html#Transformations-Transposing Transformation or Projection Matrices
+      // See https://albamr09.github.io/cs/rtgw/04/01_transformations/#transposing-transformation-or-projection-matrices
       // to know why we would have to transpose this matrix
       return m.transpose() as Matrix4;
     } else {
@@ -416,7 +416,7 @@ export class Matrix4 extends Matrix {
    * Obtains the right vector (orientation on the X axis)
    * This vector is basically the first column on the transformation matrix
    *
-   * See https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04.html#Camera-The%20Model-View%20Matrix-Spatial%20Encoding%20of%20the%20World
+   * See https://albamr09.github.io/cs/rtgw/04/02_model_view/#spatial-encoding-of-the-world
    */
   rightVector() {
     return new Vector(this.col(0).elements.slice(0, 3));
@@ -426,7 +426,7 @@ export class Matrix4 extends Matrix {
    * Obtains the up vector (orientation on the Y axis) which is stored as the
    * second column on the transformation matrix.
    *
-   * See https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04.html#Camera-The%20Model-View%20Matrix-Spatial%20Encoding%20of%20the%20World
+   * See https://albamr09.github.io/cs/rtgw/04/02_model_view/#spatial-encoding-of-the-world
    */
   upVector() {
     return new Vector(this.col(1).elements.slice(0, 3));
@@ -436,7 +436,7 @@ export class Matrix4 extends Matrix {
    * Obtains the right vector (orientation on the Z axis) stored as the
    * third column on the transformation matrix.
    *
-   * See https://albamr09.github.io/src/Notes/ComputerScience/CG/RTGW/04.html#Camera-The%20Model-View%20Matrix-Spatial%20Encoding%20of%20the%20World
+   * See https://albamr09.github.io/cs/rtgw/04/02_model_view/#spatial-encoding-of-the-world
    */
   normalVector() {
     return new Vector(this.col(2).elements.slice(0, 3));
