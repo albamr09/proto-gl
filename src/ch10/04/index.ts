@@ -1,5 +1,11 @@
 import { loadData } from "../../lib/files.js";
-import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
+import {
+  addChildrenToController,
+  createDescriptionPanel,
+  createNumericInput,
+  initController,
+  initGUI,
+} from "../../lib/gui/index.js";
 import { calculateNormals, computeTangents } from "../../lib/math/3d.js";
 import { Vector } from "../../lib/math/vector.js";
 import {
@@ -19,6 +25,7 @@ let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
 let scene: Scene;
 let camera: Camera;
+const SHININESS = 8;
 
 const attributes = [
   "aPosition",
@@ -34,6 +41,7 @@ const uniforms = [
   "uLightDiffuse",
   "uMaterialAmbient",
   "uMaterialDiffuse",
+  "uShininess",
 ] as const;
 
 const initProgram = () => {
@@ -41,7 +49,7 @@ const initProgram = () => {
   camera = new Camera({ gl, scene });
   new Controller({ camera, canvas });
 
-  camera.setPosition(new Vector([0, 0, 3.5]));
+  camera.setPosition(new Vector([0, 0, 2.8]));
   camera.setAzimuth(40);
   camera.setElevation(-30);
 };
@@ -99,6 +107,10 @@ const initData = () => {
           data: diffuse,
           type: UniformKind.VECTOR_FLOAT,
         },
+        uShininess: {
+          data: SHININESS,
+          type: UniformKind.SCALAR_FLOAT,
+        },
       },
       textures: [
         {
@@ -125,6 +137,22 @@ const render = () => {
   requestAnimationFrame(render);
 };
 
+const initControls = () => {
+  initController();
+  const { container: shininessContainer } = createNumericInput({
+    label: "Shininess",
+    value: SHININESS,
+    min: 0,
+    max: 10000,
+    step: 1,
+    onChange: (value) => {
+      scene.updateUniform("uShininess", value);
+    },
+  });
+
+  addChildrenToController([shininessContainer]);
+};
+
 const init = () => {
   initGUI();
   createDescriptionPanel("On this example we show how to use normal maps");
@@ -136,7 +164,7 @@ const init = () => {
   initProgram();
   initData();
   render();
-  // Controls
+  initControls();
 };
 
 window.onload = init;
