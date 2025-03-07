@@ -1,5 +1,4 @@
 import Texture2D from "../../../core/texture/texture-2d";
-import { UniformKind } from "../../../core/uniform/types.js";
 import Instance from "../../instance.js";
 import { InstanceProps } from "../../types";
 import { FilterTypes } from "../types";

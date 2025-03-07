@@ -1,23 +1,23 @@
-import Texture2D from "../../../../core/texture/texture-2d.js";
-import { UniformKind } from "../../../../core/uniform/types.js";
-import Filter from "../index.js";
 import fragmentShaderSource from "./fs.glsl.js";
 import vertexShaderSource from "./vs.glsl.js";
+import Texture2D from "../../lib/webgl/core/texture/texture-2d";
+import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
+import Filter from "../../lib/webgl/rendering/postprocess/filters/index.js";
 
 const attributes = [] as const;
-const uniforms = ["uTime"] as const;
+const uniforms = ["uTime", "uInverseTextureSize"] as const;
 
-class WavyFilter extends Filter<typeof attributes, typeof uniforms> {
+class RayTrace extends Filter<typeof attributes, typeof uniforms> {
+  private canvas: HTMLCanvasElement;
   private startTime: number;
 
-  constructor() {
+  constructor(canvas: HTMLCanvasElement) {
     super({
-      id: "wavy-filter",
-      type: "wavy",
+      id: "ray-trace-filter",
       vertexShaderSource,
       fragmentShaderSource,
     });
-
+    this.canvas = canvas;
     this.startTime = Date.now();
   }
 
@@ -29,6 +29,10 @@ class WavyFilter extends Filter<typeof attributes, typeof uniforms> {
       fragmentShaderSource: this.fragmentShaderSource,
       attributes: this.getCommonAttributes(gl),
       uniforms: {
+        uInverseTextureSize: {
+          data: this.getInverseTextureSize(),
+          type: UniformKind.VECTOR_FLOAT,
+        },
         uTime: {
           data: this.getCurrentTime(),
           type: UniformKind.SCALAR_FLOAT,
@@ -42,6 +46,15 @@ class WavyFilter extends Filter<typeof attributes, typeof uniforms> {
 
   protected override updateUniforms() {
     this.instance?.updateUniform("uTime", this.getCurrentTime());
+    this.instance?.updateUniform(
+      "uInverseTextureSize",
+      this.getInverseTextureSize()
+    );
+  }
+
+  private getInverseTextureSize() {
+    const { width, height } = this.canvas;
+    return [1 / width, 1 / height];
   }
 
   private getCurrentTime() {
@@ -49,4 +62,4 @@ class WavyFilter extends Filter<typeof attributes, typeof uniforms> {
   }
 }
 
-export default WavyFilter;
+export default RayTrace;
