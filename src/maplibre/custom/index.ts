@@ -8,7 +8,6 @@ import { Vector } from "../../lib/math/vector.js";
 
 const attributes = ["aPos"] as const;
 const uniforms = ["uRotation"] as const;
-let rotation = 0;
 
 interface CustomLayerInterface {
   id: string;
@@ -16,7 +15,7 @@ interface CustomLayerInterface {
   program?: Program<typeof attributes, typeof uniforms>;
   instance?: Instance<typeof attributes, typeof uniforms>;
   onAdd: (map: any, gl: WebGL2RenderingContext) => void;
-  render: (gl: WebGL2RenderingContext, matrix: Float32Array) => void;
+  render: (gl: WebGL2RenderingContext, args: any) => void;
 }
 
 let layer: CustomLayerInterface;
@@ -76,7 +75,7 @@ const initData = (
 
 const initLayer = () => {
   layer = {
-    id: "highlight",
+    id: "triangle",
     type: "custom",
     onAdd(map: any, gl: WebGL2RenderingContext) {
       try {
@@ -92,7 +91,8 @@ const initLayer = () => {
         console.log(e);
       }
     },
-    render(_gl: WebGL2RenderingContext, matrix: Float32Array) {
+    render(_gl: WebGL2RenderingContext, args: any) {
+      const matrix = args.defaultProjectionData.mainMatrix;
       const vertices = transformVertices(
         [
           [25.004, 60.239],
