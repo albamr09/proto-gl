@@ -16,6 +16,6 @@
     "build": "tsc-esm",
     "clean": "rm -rf dist",
     "dev": "tsc-esm --watch",
-    "test": "tsc-esm -p tsconfig.test.json && cd .test_build && node tests/main.js && cd .. && rm -rf .test_build"
+    "test": "tsc-esm -p tsconfig.test.json && cd tests/build && node tests/main.js && cd .. && rm -rf build"
   }
 }
