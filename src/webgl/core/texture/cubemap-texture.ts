@@ -1,4 +1,4 @@
-import { objectEntries } from "../../../utils/types.js";
+import { objectEntries } from "../../../utils/generics.js";
 import TextureImage from "./image.js";
 import Texture from "./texture.js";
 import { CubeMapTargets, TextureConfiguration } from "./types.js";

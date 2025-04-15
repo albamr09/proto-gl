@@ -1,0 +1,11 @@
+{
+  "name": "my-lib-example",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "webgl": "file:../"
+  },
+  "scripts": {
+    "start": "ts-node index.ts"
+  }
+}

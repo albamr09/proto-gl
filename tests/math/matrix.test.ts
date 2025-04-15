@@ -1,6 +1,6 @@
-import { Matrix4 } from "../../../src/lib/math/matrix.js";
-import { Vector } from "../../../src/lib/math/vector.js";
-import { describe, expect, it } from "../../test.js";
+import { Matrix4 } from "../../src/math/matrix.js";
+import { Vector } from "../../src/math/vector.js";
+import { describe, expect, it } from "../test.js";
 
 describe("Matrix4", () => {
   it("should create an identity matrix", () => {

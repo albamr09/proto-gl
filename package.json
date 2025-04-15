@@ -1,19 +1,20 @@
 {
+  "name": "webgl",
   "type": "module",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.14.9",
-    "copyfiles": "^2.4.1",
-    "serve": "^14.2.1",
     "terser": "^5.21.0",
+    "tsc-alias": "1.8.15",
     "typescript": "^5.2.2"
   },
   "scripts": {
-    "copy-files": "copyfiles -u 1 src/**/*.html build/ && cp -r data build/ && copyfiles -u 1 src/public/* build",
-    "minify": "find ./build -name \"*.js\" -exec sh -c 'terser \"$1\" -o \"${1%.js}.js\"' _ {} \\;",
-    "build": "rm -rf build && tsc && yarn minify && yarn copy-files",
-    "serve": "cd build && serve",
-    "start": "rm -rf build && yarn copy-files && tsc -w",
-    "test": "tsc -p tsconfig.test.json && cd .test && node tests/main.js && cd .. && rm -rf .test"
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch",
+    "test": "tsc -p tsconfig.test.json && cd .test_build && node tests/main.js && cd .. && rm -rf .test_build"
   }
 }

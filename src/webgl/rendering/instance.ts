@@ -1,6 +1,6 @@
 import { Matrix4 } from "../../math/matrix.js";
 import { Vector } from "../../math/vector.js";
-import { uuidv4 } from "../../utils.js";
+import { uuidv4 } from "../../utils/utils.js";
 import Program from "../core/program.js";
 import TextureFactory from "../core/texture/factory.js";
 import Texture from "../core/texture/texture.js";

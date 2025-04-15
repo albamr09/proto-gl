@@ -2,6 +2,7 @@ let lut: string[] = [];
 for (var i = 0; i < 256; i++) {
   lut[i] = (i < 16 ? "0" : "") + i.toString(16);
 }
+
 export const uuidv4 = () => {
   var d0 = (Math.random() * 0xffffffff) | 0;
   var d1 = (Math.random() * 0xffffffff) | 0;
@@ -29,4 +30,9 @@ export const uuidv4 = () => {
     lut[(d3 >> 16) & 0xff] +
     lut[(d3 >> 24) & 0xff]
   );
+};
+
+// De-normalize colors from [0,1] to [0,255]
+export const denormalizeColor = (color: number[]) => {
+  return color.map((c) => c * 255);
 };

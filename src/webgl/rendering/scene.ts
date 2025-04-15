@@ -1,6 +1,6 @@
 import { computeNormalMatrix } from "../../math/3d.js";
 import { Matrix4 } from "../../math/matrix.js";
-import { uuidv4 } from "../../utils.js";
+import { uuidv4 } from "../../utils/utils.js";
 import { TextureParameters } from "../core/texture/types.js";
 import { UniformConfig } from "../core/uniform/types.js";
 import EditorController from "./editor/controller.js";

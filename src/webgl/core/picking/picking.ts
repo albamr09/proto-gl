@@ -1,4 +1,4 @@
-import { denormalizeColor } from "../../../colors.js";
+import { denormalizeColor } from "../../../utils/utils.js";
 import { Vector } from "../../../math/vector.js";
 import { GuideIntances } from "../../models/editor/types.js";
 import Instance from "../../rendering/instance.js";
