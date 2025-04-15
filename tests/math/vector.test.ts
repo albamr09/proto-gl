@@ -1,5 +1,5 @@
-import { Vector } from "../../src/math/vector.js";
-import { describe, it, expect } from "../test.js";
+import { Vector } from "../../src/math/vector";
+import { describe, it, expect } from "../test";
 
 describe("Vector", () => {
   it("should create a vector", () => {
