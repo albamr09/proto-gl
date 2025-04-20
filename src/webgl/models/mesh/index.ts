@@ -1,12 +1,12 @@
-import Instance from "../../rendering/instance.js";
+import Instance from "../../rendering/instance";
 import {
   AttributeConfig,
   InstanceConfiguration,
   UniformDefinition,
-} from "../../rendering/types.js";
+} from "../../rendering/types";
 
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
 
 const DefaultAttributes = ["aPosition", "aNormal"] as const;
 const DefaultUniforms = [

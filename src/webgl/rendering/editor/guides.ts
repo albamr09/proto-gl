@@ -1,12 +1,12 @@
-import { computeGeometryCenter, transformVertices } from "../../../math/3d.js";
-import { Matrix4 } from "../../../math/matrix.js";
-import { Vector } from "../../../math/vector.js";
-import { Angle } from "../../../math/angle.js";
-import Arrow from "../../models/editor/arrow/index.js";
-import Instance from "../instance.js";
-import { InstanceDragPayload } from "../types.js";
-import { InstanceProperties } from "./controller.js";
-import Circle from "../../models/editor/circle/index.js";
+import { computeGeometryCenter, transformVertices } from "../../../math/3d";
+import { Matrix4 } from "../../../math/matrix";
+import { Vector } from "../../../math/vector";
+import { Angle } from "../../../math/angle";
+import Arrow from "../../models/editor/arrow/index";
+import Instance from "../instance";
+import { InstanceDragPayload } from "../types";
+import { InstanceProperties } from "./controller";
+import Circle from "../../models/editor/circle/index";
 
 class GuidesController {
   private moveGuideInstances: Arrow[];

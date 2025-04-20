@@ -1,4 +1,4 @@
-import { UniformConfig, UniformDataMapping, UniformKind } from "./types.js";
+import { UniformConfig, UniformDataMapping, UniformKind } from "./types";
 
 abstract class Uniform<T extends UniformKind> {
   protected name: string;

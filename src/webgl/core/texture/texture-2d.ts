@@ -1,6 +1,6 @@
-import TextureImage from "./image.js";
-import Texture from "./texture.js";
-import { TextureConfiguration } from "./types.js";
+import TextureImage from "./image";
+import Texture from "./texture";
+import { TextureConfiguration } from "./types";
 
 class Texture2D extends Texture {
   private image?: TextureImage;

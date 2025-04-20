@@ -1,4 +1,4 @@
-import { Vector } from "../../../../math/vector.js";
+import { Vector } from "../../../../math/vector";
 import { GuideProperties } from "../types";
 
 export const DefaultProperties: GuideProperties = {

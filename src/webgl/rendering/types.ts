@@ -1,12 +1,12 @@
-import { Vector } from "../../math/vector.js";
-import Program from "../core/program.js";
-import { TextureDefinition } from "../core/texture/types.js";
+import { Vector } from "../../math/vector";
+import Program from "../core/program";
+import { TextureDefinition } from "../core/texture/types";
 import {
   UniformConfig,
   UniformDataMapping,
   UniformKind,
-} from "../core/uniform/types.js";
-import Instance from "./instance.js";
+} from "../core/uniform/types";
+import Instance from "./instance";
 
 export type UniformDefinition<K extends UniformKind = UniformKind> =
   UniformConfig & {

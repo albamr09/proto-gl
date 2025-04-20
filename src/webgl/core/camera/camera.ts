@@ -1,8 +1,8 @@
-import { Angle } from "../../../math/angle.js";
-import { Matrix4 } from "../../../math/matrix.js";
-import { Vector } from "../../../math/vector.js";
-import Scene from "../../rendering/scene.js";
-import { CameraType, ProjectionType } from "./types.js";
+import { Angle } from "../../../math/angle";
+import { Matrix4 } from "../../../math/matrix";
+import { Vector } from "../../../math/vector";
+import Scene from "../../rendering/scene";
+import { CameraType, ProjectionType } from "./types";
 
 class Camera {
   // Camera config
@@ -248,7 +248,7 @@ class Camera {
       // where the camera is. This makes the illusion we are
       // "moving the camera"
       this.modelViewMatrix = this.modelViewMatrix.rotateVecDeg(
-        new Vector([this.elevation, this.azimuth, 0]),
+        new Vector([this.elevation, this.azimuth, 0])
       );
       this.modelViewMatrix = this.modelViewMatrix.translate(negatedPosition);
     } else {
@@ -262,7 +262,7 @@ class Camera {
       // i know sorry this does not make much sense)
       this.modelViewMatrix = this.modelViewMatrix.translate(negatedPosition);
       this.modelViewMatrix = this.modelViewMatrix.rotateVecDeg(
-        this.getRotation(),
+        this.getRotation()
       );
     }
 
@@ -281,7 +281,7 @@ class Camera {
         this.aspectRatio,
         this.near,
         this.far,
-        this.isProjectionTransposed(),
+        this.isProjectionTransposed()
       );
     } else if (this.projection == ProjectionType.ORTHOGRAPHIC) {
       this.projectionMatrix = Matrix4.ortho(
@@ -291,7 +291,7 @@ class Camera {
         this.height / this.fov,
         -this.far,
         this.far,
-        this.isProjectionTransposed(),
+        this.isProjectionTransposed()
       );
     }
     this.scene?.updateProjectionMatrix(this.projectionMatrix);

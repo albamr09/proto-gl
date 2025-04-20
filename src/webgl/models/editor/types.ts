@@ -1,6 +1,6 @@
-import { Vector } from "../../../math/vector.js";
-import Arrow from "./arrow/index.js";
-import Circle from "./circle/index.js";
+import { Vector } from "../../../math/vector";
+import Arrow from "./arrow/index";
+import Circle from "./circle/index";
 
 export type GuideProperties = {
   color?: number[];

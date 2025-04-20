@@ -1,14 +1,14 @@
-import { Matrix4 } from "../../../math/matrix.js";
-import { Vector } from "../../../math/vector.js";
-import Instance from "../instance.js";
+import { Matrix4 } from "../../../math/matrix";
+import { Vector } from "../../../math/vector";
+import Instance from "../instance";
 import {
   InstanceClickPayload,
   InstanceDragEndPayload,
   InstanceDragPayload,
   InstanceTransformationProperties,
-} from "../types.js";
-import GuidesController from "./guides.js";
-import { computeMotionFactorForZoom, computeDragVector } from "./math.js";
+} from "../types";
+import GuidesController from "./guides";
+import { computeMotionFactorForZoom, computeDragVector } from "./math";
 
 export type InstanceProperties = {
   scaleVector: Vector;

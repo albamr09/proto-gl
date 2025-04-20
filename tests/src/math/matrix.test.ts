@@ -1,5 +1,5 @@
-import { Matrix4 } from "../../src/math/matrix";
-import { Vector } from "../../src/math/vector";
+import { Matrix4 } from "../../../src/math/matrix";
+import { Vector } from "../../../src/math/vector";
 import { describe, expect, it } from "../test";
 
 describe("Matrix4", () => {

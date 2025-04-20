@@ -2,8 +2,8 @@ import {
   DEFAULT_HEIGHT,
   DEFAULT_N_SEGMENTS,
   DEFAULT_RADIOUS,
-} from "./constants.js";
-import { ArrowHead } from "../types.js";
+} from "./constants";
+import { ArrowHead } from "../types";
 
 const generateCubeVertices = (length: number, heightOffset: number) => {
   const vertices = [];

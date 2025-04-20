@@ -1,13 +1,13 @@
-import { computeNormalMatrix } from "../../math/3d.js";
-import { Matrix4 } from "../../math/matrix.js";
-import { uuidv4 } from "../../utils/utils.js";
-import { TextureParameters } from "../core/texture/types.js";
-import { UniformConfig } from "../core/uniform/types.js";
-import EditorController from "./editor/controller.js";
+import { computeNormalMatrix } from "../../math/3d";
+import { Matrix4 } from "../../math/matrix";
+import { uuidv4 } from "../../utils/utils";
+import { TextureParameters } from "../core/texture/types";
+import { UniformConfig } from "../core/uniform/types";
+import EditorController from "./editor/controller";
 import Instance from "./instance";
-import Filter from "./postprocess/filters/index.js";
-import PostProcess from "./postprocess/index.js";
-import { FilterTypes } from "./postprocess/types.js";
+import Filter from "./postprocess/filters/index";
+import PostProcess from "./postprocess/index";
+import { FilterTypes } from "./postprocess/types";
 import {
   SceneEventTypes,
   InstanceConfiguration,
@@ -16,7 +16,7 @@ import {
   InstanceDragEndPayload,
   SceneRenderOptions,
   AttributeConfig,
-} from "./types.js";
+} from "./types";
 
 class Scene extends EventTarget {
   private gl: WebGL2RenderingContext;

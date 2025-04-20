@@ -1,7 +1,7 @@
-import { objectEntries } from "../../../utils/generics.js";
-import TextureImage from "./image.js";
-import Texture from "./texture.js";
-import { CubeMapTargets, TextureConfiguration } from "./types.js";
+import { objectEntries } from "../../../utils/generics";
+import TextureImage from "./image";
+import Texture from "./texture";
+import { CubeMapTargets, TextureConfiguration } from "./types";
 
 class CubeMapTexture extends Texture {
   private faces?: Map<CubeMapTargets, TextureImage>;

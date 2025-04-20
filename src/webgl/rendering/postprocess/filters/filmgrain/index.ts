@@ -1,8 +1,8 @@
-import Texture2D from "../../../../core/texture/texture-2d.js";
-import { UniformKind } from "../../../../core/uniform/types.js";
-import Filter from "../index.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
+import Texture2D from "../../../../core/texture/texture-2d";
+import { UniformKind } from "../../../../core/uniform/types";
+import Filter from "../index";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
 
 const attributes = [] as const;
 const uniforms = ["uInverseTextureSize", "uTime", "uNoiseSampler"] as const;

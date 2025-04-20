@@ -1,5 +1,5 @@
-import { Angle } from "./angle.js";
-import { Vector } from "./vector.js";
+import { Angle } from "./angle";
+import { Vector } from "./vector";
 
 export class Matrix {
   public matrix: Vector[];
@@ -102,7 +102,7 @@ export class Matrix {
       .filter(
         (_, rowIdx) =>
           // Filters out row with idx = i
-          rowIdx != i,
+          rowIdx != i
       )
       .map((row) => {
         // Filters out columns with idx = j
@@ -346,7 +346,7 @@ export class Matrix4 extends Matrix {
     aspect: number,
     near: number,
     far: number,
-    transpose = true,
+    transpose = true
   ) {
     const rad = Angle.toRadians(fovy);
     const t = Math.tan(rad / 2) * near;
@@ -390,7 +390,7 @@ export class Matrix4 extends Matrix {
     t: number,
     n: number,
     f: number,
-    transpose = true,
+    transpose = true
   ) {
     const m = new Matrix4([
       [2 / (r - l), 0, 0, -(r + l) / (r - l)],

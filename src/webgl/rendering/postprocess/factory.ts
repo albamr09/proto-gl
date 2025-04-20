@@ -1,12 +1,12 @@
-import Texture2D from "../../core/texture/texture-2d.js";
-import BlurFilter from "./filters/blur/index.js";
-import FilmgrainFilter from "./filters/filmgrain/index.js";
-import GrayScaleFilter from "./filters/grayscale/index.js";
-import Filter from "./filters/index.js";
-import InvertFilter from "./filters/invert/index.js";
-import StretchFilter from "./filters/stretch/index.js";
-import WavyFilter from "./filters/wavy/index.js";
-import { FilterTypes } from "./types.js";
+import Texture2D from "../../core/texture/texture-2d";
+import BlurFilter from "./filters/blur/index";
+import FilmgrainFilter from "./filters/filmgrain/index";
+import GrayScaleFilter from "./filters/grayscale/index";
+import Filter from "./filters/index";
+import InvertFilter from "./filters/invert/index";
+import StretchFilter from "./filters/stretch/index";
+import WavyFilter from "./filters/wavy/index";
+import { FilterTypes } from "./types";
 
 class FilterFactory {
   static create({

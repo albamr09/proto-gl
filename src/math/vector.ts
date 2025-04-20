@@ -1,5 +1,5 @@
-import { Angle } from "./angle.js";
-import { Matrix3 } from "./matrix.js";
+import { Angle } from "./angle";
+import { Matrix3 } from "./matrix";
 
 export class Vector {
   public elements: number[];

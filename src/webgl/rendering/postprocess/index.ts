@@ -1,8 +1,8 @@
-import Framebuffer from "../../core/framebuffer/framebuffer.js";
-import Texture2D from "../../core/texture/texture-2d.js";
-import FilterFactory from "./factory.js";
-import Filter from "./filters/index.js";
-import { FilterTypes } from "./types.js";
+import Framebuffer from "../../core/framebuffer/framebuffer";
+import Texture2D from "../../core/texture/texture-2d";
+import FilterFactory from "./factory";
+import Filter from "./filters/index";
+import { FilterTypes } from "./types";
 
 class PostProcess {
   private frameBuffer: Framebuffer;

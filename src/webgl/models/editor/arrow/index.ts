@@ -1,15 +1,15 @@
-import { UniformKind } from "../../../core/uniform/types.js";
-import Instance from "../../../rendering/instance.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
-import generateArrow from "./geometry.js";
-import { Matrix4 } from "../../../../math/matrix.js";
-import { ArrowHead, GuideProperties } from "../types.js";
-import { DefaultProperties } from "./constants.js";
+import { UniformKind } from "../../../core/uniform/types";
+import Instance from "../../../rendering/instance";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
+import generateArrow from "./geometry";
+import { Matrix4 } from "../../../../math/matrix";
+import { ArrowHead, GuideProperties } from "../types";
+import { DefaultProperties } from "./constants";
 import {
   InstanceDragEndPayload,
   InstanceDragPayload,
-} from "../../../rendering/types.js";
+} from "../../../rendering/types";
 
 const DefaultAttributes = ["aPosition"] as const;
 const DefaultUniforms = [
@@ -21,7 +21,7 @@ const DefaultUniforms = [
 
 class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
   private properties: GuideProperties;
-  public onDrag?: ({
+  public declare onDrag?: ({
     instance,
     dx,
     dy,
@@ -29,7 +29,7 @@ class Arrow extends Instance<typeof DefaultAttributes, typeof DefaultUniforms> {
     typeof DefaultAttributes,
     typeof DefaultUniforms
   >) => void;
-  public onDragFinish?: (
+  public declare onDragFinish?: (
     o: InstanceDragEndPayload<typeof DefaultAttributes, typeof DefaultUniforms>
   ) => void;
 

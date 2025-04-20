@@ -1,6 +1,6 @@
-import Filter from "../index.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
+import Filter from "../index";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
 
 class InvertFilter extends Filter {
   constructor() {

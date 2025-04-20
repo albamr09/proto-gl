@@ -1,4 +1,4 @@
-import TextureImage from "./image.js";
+import TextureImage from "./image";
 import { CubeMapTargets, TextureConfiguration, TextureTargets } from "./types";
 
 abstract class Texture {

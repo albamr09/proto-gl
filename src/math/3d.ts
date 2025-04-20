@@ -1,5 +1,5 @@
-import { Matrix4 } from "./matrix.js";
-import { Vector } from "./vector.js";
+import { Matrix4 } from "./matrix";
+import { Vector } from "./vector";
 
 /**
  * Source: https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal#Algorithm
@@ -38,7 +38,7 @@ const computeTriangleNormal = (A: Vector, B: Vector, C: Vector) => {
 export const calculateNormals = (
   vertices: number[],
   indices: number[],
-  size: GLint,
+  size: GLint
 ) => {
   const numVertices = vertices.length / size;
   let normals = Array.from(Array(numVertices)).map(() => new Vector([0, 0, 0]));
@@ -87,7 +87,7 @@ export const calculateNormals = (
 export const computeTangents = (
   vertices: number[],
   uvs: number[],
-  indices: number[],
+  indices: number[]
 ) => {
   let tangents = new Array(vertices.length / 3)
     .fill(0)
@@ -100,7 +100,7 @@ export const computeTangents = (
         vector.push(arr[baseIndex + i]);
         return vector;
       },
-      [],
+      []
     );
     return new Vector(vectorElements);
   }
@@ -169,7 +169,7 @@ const unFlattenVertices = (vertices: number[]) => {
  * */
 export const transformVertices = (
   vertices: number[],
-  transformationMatrix: Matrix4,
+  transformationMatrix: Matrix4
 ) => {
   return unFlattenVertices(vertices)
     .map((vertex) => {

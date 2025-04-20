@@ -23,17 +23,14 @@ async function traverseAndExecute(dir: string): Promise<void> {
 
     if (entry.isDirectory()) {
       await traverseAndExecute(fullPath);
-    } else if (
-      entry.isFile() &&
-      fullPath.endsWith(".test.js")
-    ) {
+    } else if (entry.isFile() && fullPath.endsWith(".test.js")) {
       await executeNodeOnJsFile(fullPath);
     }
   }
 }
 
 const executeAllTests = () => {
-  traverseAndExecute("./tests/");
+  traverseAndExecute("./");
 };
 
 executeAllTests();

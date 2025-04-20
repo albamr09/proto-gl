@@ -1,11 +1,11 @@
-import { Matrix4 } from "../../../math/matrix.js";
+import { Matrix4 } from "../../../math/matrix";
 import {
   FloatUniform,
   IntUniform,
   MatrixUniform,
   VectorFloatUniform,
   VectorIntUniform,
-} from "./uniforms.js";
+} from "./uniforms";
 
 export const TRANSFORM_UNIFORM_NAMES = [
   "uModelViewMatrix",

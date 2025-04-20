@@ -1,15 +1,15 @@
-import { UniformKind } from "../../../core/uniform/types.js";
-import Instance from "../../../rendering/instance.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
-import { Matrix4 } from "../../../../math/matrix.js";
-import { GuideProperties } from "../types.js";
-import { DefaultProperties } from "./constants.js";
+import { UniformKind } from "../../../core/uniform/types";
+import Instance from "../../../rendering/instance";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
+import { Matrix4 } from "../../../../math/matrix";
+import { GuideProperties } from "../types";
+import { DefaultProperties } from "./constants";
 import {
   InstanceDragEndPayload,
   InstanceDragPayload,
-} from "../../../rendering/types.js";
-import { generateCircle } from "./geometry.js";
+} from "../../../rendering/types";
+import { generateCircle } from "./geometry";
 
 const DefaultAttributes = ["aPosition"] as const;
 const DefaultUniforms = [
@@ -24,7 +24,7 @@ class Circle extends Instance<
   typeof DefaultUniforms
 > {
   private properties: GuideProperties;
-  public onDrag?: ({
+  public declare onDrag?: ({
     instance,
     dx,
     dy,
@@ -32,7 +32,7 @@ class Circle extends Instance<
     typeof DefaultAttributes,
     typeof DefaultUniforms
   >) => void;
-  public onDragFinish?: (
+  public declare onDragFinish?: (
     o: InstanceDragEndPayload<typeof DefaultAttributes, typeof DefaultUniforms>
   ) => void;
 

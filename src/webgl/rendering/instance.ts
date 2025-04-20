@@ -1,12 +1,12 @@
-import { Matrix4 } from "../../math/matrix.js";
-import { Vector } from "../../math/vector.js";
-import { uuidv4 } from "../../utils/utils.js";
-import Program from "../core/program.js";
-import TextureFactory from "../core/texture/factory.js";
-import Texture from "../core/texture/texture.js";
-import { TextureDefinition, TextureParameters } from "../core/texture/types.js";
-import { Uniforms } from "../core/types.js";
-import { UniformFactory } from "../core/uniform/factory.js";
+import { Matrix4 } from "../../math/matrix";
+import { Vector } from "../../math/vector";
+import { uuidv4 } from "../../utils/utils";
+import Program from "../core/program";
+import TextureFactory from "../core/texture/factory";
+import Texture from "../core/texture/texture";
+import { TextureDefinition, TextureParameters } from "../core/texture/types";
+import { Uniforms } from "../core/types";
+import { UniformFactory } from "../core/uniform/factory";
 import {
   ConcreteUniforms,
   TRANSFORM_UNIFORM_CONFIG_MAP,
@@ -14,7 +14,7 @@ import {
   UniformConfig,
   UniformDataMapping,
   UniformKind,
-} from "../core/uniform/types.js";
+} from "../core/uniform/types";
 import {
   AttributeConfig,
   InstanceClickPayload,
@@ -25,7 +25,7 @@ import {
   InstanceProps,
   InstanceTransformationProperties,
   UniformDefinition,
-} from "./types.js";
+} from "./types";
 
 const defaultConfiguration: InstanceConfiguration = {
   pickable: true,

@@ -1,7 +1,7 @@
-import CubeMapTexture from "./cubemap-texture.js";
-import Texture2D from "./texture-2d.js";
-import Texture from "./texture.js";
-import { TextureDefinition } from "./types.js";
+import CubeMapTexture from "./cubemap-texture";
+import Texture2D from "./texture-2d";
+import Texture from "./texture";
+import { TextureDefinition } from "./types";
 
 class TextureFactory {
   static create({

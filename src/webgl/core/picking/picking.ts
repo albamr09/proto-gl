@@ -1,13 +1,13 @@
-import { denormalizeColor } from "../../../utils/utils.js";
-import { Vector } from "../../../math/vector.js";
-import { GuideIntances } from "../../models/editor/types.js";
-import Instance from "../../rendering/instance.js";
-import Scene from "../../rendering/scene.js";
+import { denormalizeColor } from "../../../utils/utils";
+import { Vector } from "../../../math/vector";
+import { GuideIntances } from "../../models/editor/types";
+import Instance from "../../rendering/instance";
+import Scene from "../../rendering/scene";
 import {
   InstanceAddedPayload,
   InstanceRemovedPayload,
-} from "../../rendering/types.js";
-import Framebuffer from "../framebuffer/framebuffer.js";
+} from "../../rendering/types";
+import Framebuffer from "../framebuffer/framebuffer";
 
 class PickingController extends EventTarget {
   private canvas: HTMLCanvasElement;

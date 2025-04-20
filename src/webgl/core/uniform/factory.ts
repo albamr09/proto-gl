@@ -1,11 +1,11 @@
-import { ConcreteUniforms, UniformDataMapping, UniformKind } from "./types.js";
+import { ConcreteUniforms, UniformDataMapping, UniformKind } from "./types";
 import {
   FloatUniform,
   IntUniform,
   MatrixUniform,
   VectorFloatUniform,
   VectorIntUniform,
-} from "./uniforms.js";
+} from "./uniforms";
 
 export class UniformFactory {
   static createUniform(

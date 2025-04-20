@@ -1,5 +1,5 @@
 import Texture2D from "../../../core/texture/texture-2d";
-import Instance from "../../instance.js";
+import Instance from "../../instance";
 import { InstanceProps } from "../../types";
 import { FilterTypes } from "../types";
 

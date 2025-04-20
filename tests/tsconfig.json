@@ -4,7 +4,6 @@
     "rootDirs": ["./src", "./tests"],
     "allowJs": true,
     "checkJs": false,
-    "outDir": "tests/build",
     "noEmitOnError": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -12,6 +11,5 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "skipLibCheck": true
-  },
-  "exclude": ["dist", "example"]
+  }
 }

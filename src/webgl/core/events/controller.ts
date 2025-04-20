@@ -1,6 +1,6 @@
-import { Vector } from "../../../math/vector.js";
-import PickingController from "../../core/picking/picking.js";
-import Camera from "../camera/camera.js";
+import { Vector } from "../../../math/vector";
+import PickingController from "../../core/picking/picking";
+import Camera from "../camera/camera";
 
 class Controller {
   private camera: Camera;

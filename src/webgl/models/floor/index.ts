@@ -1,7 +1,7 @@
-import { UniformKind } from "../../core/uniform/types.js";
-import Instance from "../../rendering/instance.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
+import { UniformKind } from "../../core/uniform/types";
+import Instance from "../../rendering/instance";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
 
 const DefaultAttributes = ["aPosition"] as const;
 const DefaultUniforms = ["uMaterialDiffuse"] as const;

@@ -1,5 +1,5 @@
-import { Attributes, ProgramType, Uniforms } from "./types.js";
-import { TRANSFORM_UNIFORM_NAMES } from "./uniform/types.js";
+import { Attributes, ProgramType, Uniforms } from "./types";
+import { TRANSFORM_UNIFORM_NAMES } from "./uniform/types";
 
 class Program<
   A extends readonly string[] = [],
