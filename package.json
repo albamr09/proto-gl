@@ -1,5 +1,5 @@
 {
-  "name": "webgl",
+  "name": "proto-gl",
   "type": "module",
   "version": "1.0.0",
   "main": "dist/index.js",

@@ -1,9 +1,13 @@
 {
+  "include": ["src/**/*.ts"],
+  "exclude": ["example", "tests", "dist", "node_modules"],
   "compilerOptions": {
     "rootDir": "src",
     "target": "ES2019",
     "strict": true,
     "noImplicitAny": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "noEmit": true
   }
 }

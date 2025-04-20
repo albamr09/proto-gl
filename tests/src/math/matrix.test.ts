@@ -1,5 +1,5 @@
-import { Matrix4 } from "@/math/matrix";
-import { Vector } from "@/math/vector";
+import { Matrix4 } from "@proto-gl/math/matrix";
+import { Vector } from "@proto-gl/math/vector";
 import { describe, expect, it } from "@test/test";
 
 describe("Matrix4", () => {

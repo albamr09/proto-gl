@@ -1,4 +1,4 @@
-import { Vector } from "@/math/vector";
+import { Vector } from "@proto-gl/math/vector";
 import { describe, it, expect } from "@test/test";
 
 describe("Vector", () => {
