@@ -1,5 +1,5 @@
-import { Vector } from "../../../src/math/vector";
-import { describe, it, expect } from "../test";
+import { Vector } from "@/math/vector";
+import { describe, it, expect } from "@test/test";
 
 describe("Vector", () => {
   it("should create a vector", () => {

@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["src/*"],
+      "@test/*": ["tests/src/*"]
+    },
     "target": "ES2019",
     "rootDirs": ["./src", "./tests"],
     "allowJs": true,

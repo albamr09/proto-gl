@@ -1,6 +1,6 @@
-import { Matrix4 } from "../../../src/math/matrix";
-import { Vector } from "../../../src/math/vector";
-import { describe, expect, it } from "../test";
+import { Matrix4 } from "@/math/matrix";
+import { Vector } from "@/math/vector";
+import { describe, expect, it } from "@test/test";
 
 describe("Matrix4", () => {
   it("should create an identity matrix", () => {
