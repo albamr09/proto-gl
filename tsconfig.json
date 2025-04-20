@@ -1,16 +1,9 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
-    "declaration": true,
-    "emitDeclarationOnly": false,
+    "rootDir": "src",
     "target": "ES2019",
-    "noEmitOnError": true,
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitAny": true,
-    "strictNullChecks": true,
-    "skipLibCheck": true,
-    "rootDir": "src"
-  },
-  "include": ["src/**/*"]
+    "strictNullChecks": true
+  }
 }

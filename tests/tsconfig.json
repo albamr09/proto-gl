@@ -1,20 +1,14 @@
 {
   "compilerOptions": {
+    "rootDirs": ["./src", "./tests"],
     "baseUrl": "..",
     "paths": {
       "@/*": ["src/*"],
       "@test/*": ["tests/src/*"]
     },
     "target": "ES2019",
-    "rootDirs": ["./src", "./tests"],
-    "allowJs": true,
-    "checkJs": false,
-    "noEmitOnError": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitAny": true,
-    "strictNullChecks": true,
-    "skipLibCheck": true
+    "strictNullChecks": true
   }
 }

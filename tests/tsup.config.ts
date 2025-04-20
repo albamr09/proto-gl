@@ -4,7 +4,7 @@ export default defineConfig({
   entry: ["tests/src/**/*.ts"],
   outDir: "tests/build",
   clean: true,
-  format: ["cjs", "esm"],
+  format: ["esm"],
   tsconfig: "./tests/tsconfig.json",
   dts: true,
   silent: true,
