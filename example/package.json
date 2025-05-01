@@ -8,6 +8,6 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "NODE_ENV=development tsup"
   }
 }

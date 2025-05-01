@@ -10,5 +10,5 @@ export default defineConfig({
   silent: false,
   splitting: false,
   bundle: false,
-  sourcemap: true,
+  sourcemap: true
 });

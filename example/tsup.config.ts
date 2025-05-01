@@ -27,6 +27,8 @@ async function copyHtmlFiles() {
   }
 }
 
+const isDev = process.env.NODE_ENV === 'development';
+
 export default defineConfig({
   entry: ["src/ch01/**/*.ts", "src/utilities/**/*.ts"],
   clean: true,
@@ -39,6 +41,7 @@ export default defineConfig({
   splitting: false,
   // Bundles local library together with examples
   noExternal: ["@proto-gl"],
+  ...(isDev && { watch: ['src/**/*.{ts,tsx}', '../src/**/*.ts'] }),
   // Copy html files
   async onSuccess() {
     console.log("Build succeeded, copying HTML files...");
