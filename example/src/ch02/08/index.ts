@@ -1,11 +1,11 @@
-import { vertexShaderSource } from "./vs.glsl.js";
-import { fragmentShaderSource } from "./fs.glsl.js";
+import { vertexShaderSource } from "./vs.glsl";
+import { fragmentShaderSource } from "./fs.glsl";
 
 import {
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../lib/web-gl.js";
+} from "@example/utilities/web-gl";
 
 import {
   initGUI,
@@ -13,7 +13,7 @@ import {
   createSelectorForm,
   createDescriptionPanel,
   addChildrenToController,
-} from "../../lib/gui/index.js";
+} from "@example/utilities/gui/index";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
@@ -179,7 +179,7 @@ const draw = () => {
 };
 
 /**
- * Show form to change rendering mode (provided from utils.js)
+ * Show form to change rendering mode (provided from utils)
  */
 const initControls = () => {
   // Initialize form

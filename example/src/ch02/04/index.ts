@@ -1,13 +1,13 @@
-import { vertexShaderSource } from "./vs.glsl.js";
-import { fragmentShaderSource } from "./fs.glsl.js";
+import { vertexShaderSource } from "./vs.glsl";
+import { fragmentShaderSource } from "./fs.glsl";
 
 import {
   autoResizeCanvas,
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../lib/web-gl.js";
-import { initGUI, createDescriptionPanel } from "../../lib/gui/index.js";
+} from "@example/utilities/web-gl";
+import { initGUI, createDescriptionPanel } from "@example/utilities/gui/index";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,
