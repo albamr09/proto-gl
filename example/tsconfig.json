@@ -6,9 +6,9 @@
     "esModuleInterop": true,
     "strict": true,
     "baseUrl": ".",
+    "rootDir": "src",
     "paths": {
-      "webgl": ["../dist"]
-    }
+      "@example/*": ["src/*"],
+    },
   },
-  "include": ["index.ts"]
 }

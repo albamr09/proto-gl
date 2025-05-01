@@ -1,6 +1,6 @@
 "use strict";
 
-import { initGUI, createDescriptionPanel } from "../../lib/gui/index.js";
+import { initGUI, createDescriptionPanel } from "@example/utilities/gui/index";
 
 let gl: WebGL2RenderingContext | null;
 

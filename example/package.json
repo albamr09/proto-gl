@@ -3,9 +3,11 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "webgl": "file:../"
+    "@proto-gl": "file:..",
+    "tsup": "^8.4.0"
   },
   "scripts": {
-    "start": "ts-node index.ts"
+    "build": "tsup",
+    "dev": "tsup --watch"
   }
 }

@@ -12,3 +12,5 @@ export { CameraType, ProjectionType } from "./camera/types";
 export {default as Controller} from "./events/controller";
 
 export {default as Framebuffer} from "./framebuffer/framebuffer";
+
+export * from "./types"

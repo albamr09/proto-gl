@@ -1,7 +1,7 @@
 "use strict";
 
-import { createDescriptionPanel } from "../../lib/gui/index.js";
-import { initGUI } from "../../lib/gui/index.js";
+import { createDescriptionPanel } from "@example/utilities/gui/index";
+import { initGUI } from "@example/utilities/gui/index";
 
 const init = () => {
   // Setup GUI

@@ -1,4 +1,4 @@
-import { ProgramType } from "./webgl/core/types.js";
+import {ProgramType} from "@proto-gl"
 
 /**
  * Sets the canvas to be as large as the window that contains it

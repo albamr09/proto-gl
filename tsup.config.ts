@@ -8,4 +8,7 @@ export default defineConfig({
   dts: true,
   platform: "browser",
   silent: false,
+  splitting: false,
+  bundle: false,
+  sourcemap: true,
 });
