@@ -8,6 +8,9 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "NODE_ENV=development tsup"
+    "dev": "NODE_ENV=development tsup & serve dist"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
   }
 }
