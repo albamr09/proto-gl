@@ -1,4 +1,4 @@
-import { loadData } from "../../lib/files.js";
+import { loadData } from "@example/utilities/files";
 import {
   addChildrenToController,
   createDescriptionPanel,
@@ -6,30 +6,26 @@ import {
   createSelectorForm,
   initController,
   initGUI,
-} from "../../lib/gui/index.js";
-import { calculateNormals } from "../../lib/math/3d.js";
+} from "@example/utilities/gui/index";
 import {
-  bSplineInterpolation,
-  lagrangeInterpolation,
+  calculateNormals,
+  Camera,
+  Controller,
+  Axis,
+  Floor,
+  Scene,
+  UniformKind,
+  Mesh,
   linearInterpolation,
-} from "../../lib/math/interpolation.js";
-import { Vector } from "../../lib/math/vector.js";
+  lagrangeInterpolation,
+  bSplineInterpolation,
+  Vector,
+} from "@proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,
   getGLContext,
-} from "../../lib/web-gl.js";
-import Camera from "../../lib/webgl/core/camera/camera.js";
-import {
-  CameraType,
-  ProjectionType,
-} from "../../lib/webgl/core/camera/types.js";
-import Controller from "../../lib/webgl/core/events/controller.js";
-import Axis from "../../lib/webgl/models/axis/index.js";
-import Floor from "../../lib/webgl/models/floor/index.js";
-import Mesh from "../../lib/webgl/models/mesh/index.js";
-import Scene from "../../lib/webgl/rendering/scene.js";
-import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
+} from "@example/utilities/web-gl";
 
 enum INTERPOLATION {
   LINEAR = "linear",

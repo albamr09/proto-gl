@@ -1,30 +1,29 @@
-import { loadData } from "../../lib/files.js";
+import { loadData } from "@example/utilities/files";
 import {
   addChildrenToController,
   createDescriptionPanel,
   createSelectorForm,
   initController,
   initGUI,
-} from "../../lib/gui/index.js";
-import { calculateNormals } from "../../lib/math/3d.js";
-import { Matrix4 } from "../../lib/math/matrix.js";
-import { Vector } from "../../lib/math/vector.js";
+} from "@example/utilities/gui/index";
+import {
+  calculateNormals,
+  Vector,
+  Camera,
+  CameraType,
+  ProjectionType,
+  Controller,
+  Axis,
+  Floor,
+  Scene,
+  UniformKind,
+  Mesh,
+} from "@proto-gl";
 import {
   configureCanvas,
   getGLContext,
   autoResizeCanvas,
-} from "../../lib/web-gl.js";
-import Camera from "../../lib/webgl/core/camera/camera.js";
-import {
-  CameraType,
-  ProjectionType,
-} from "../../lib/webgl/core/camera/types.js";
-import Controller from "../../lib/webgl/core/events/controller.js";
-import Axis from "../../lib/webgl/models/axis/index.js";
-import Floor from "../../lib/webgl/models/floor/index.js";
-import Mesh from "../../lib/webgl/models/mesh/index.js";
-import Scene from "../../lib/webgl/rendering/scene.js";
-import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
+} from "@example/utilities/web-gl";
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
