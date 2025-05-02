@@ -3,8 +3,8 @@ import {
   hexToRgb,
   normalizeColor,
   rgbToHex,
-} from "../../lib/colors.js";
-import { loadData } from "../../lib/files.js";
+} from "@example/utilities/colors";
+import { loadData } from "@example/utilities/files";
 import {
   createNumericInput,
   createVector3dSliders,
@@ -15,19 +15,22 @@ import {
   createColorInputForm,
   addChildrenToController,
   createCollapsibleComponent,
-} from "../../lib/gui/index.js";
-import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
-import { Matrix4 } from "../../lib/math/matrix.js";
-import { Vector } from "../../lib/math/vector.js";
+} from "@example/utilities/gui/index";
+import {
+  calculateNormals,
+  computeNormalMatrix,
+  Matrix4,
+  Vector,
+} from "@proto-gl";
 import {
   configureCanvas,
   autoResizeCanvas,
   getGLContext,
   createProgram,
   clearScene,
-} from "../../lib/web-gl.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
+} from "@example/utilities/web-gl";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
 
 type ProgramAttributes = {
   aPosition: number;

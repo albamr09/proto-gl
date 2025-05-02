@@ -4,10 +4,10 @@ import {
   createProgram,
   getGLContext,
   clearScene,
-} from "../../lib/web-gl.js";
-import vertexShaderSource from "./vs.glsl.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import { vertices, indices } from "../data/data.js";
+} from "@example/utilities/web-gl";
+import vertexShaderSource from "./vs.glsl";
+import fragmentShaderSource from "./fs.glsl";
+import { vertices, indices } from "../data/data";
 import {
   addChildrenToController,
   createColorInputForm,
@@ -15,15 +15,14 @@ import {
   createSliderInputForm,
   initController,
   initGUI,
-} from "../../lib/gui/index.js";
+} from "@example/utilities/gui/index";
 import {
   denormalizeColor,
   hexToRgb,
   normalizeColor,
   rgbToHex,
-} from "../../lib/colors.js";
-import { calculateNormals } from "../../lib/math/3d.js";
-import { Matrix4 } from "../../lib/math/matrix.js";
+} from "@example/utilities/colors";
+import { Matrix4, calculateNormals } from "@proto-gl";
 
 type ProgramAttributes = {
   aPosition: number;

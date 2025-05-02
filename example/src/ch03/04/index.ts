@@ -3,7 +3,7 @@ import {
   hexToRgb,
   normalizeColor,
   rgbToHex,
-} from "../../lib/colors.js";
+} from "@example/utilities/colors";
 import {
   addChildrenToController,
   createCollapsibleComponent,
@@ -13,20 +13,23 @@ import {
   createVector3dSliders,
   initController,
   initGUI,
-} from "../../lib/gui/index.js";
-import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
-import { Matrix4 } from "../../lib/math/matrix.js";
-import { Vector } from "../../lib/math/vector.js";
+} from "@example/utilities/gui/index";
+import {
+  calculateNormals,
+  computeNormalMatrix,
+  Matrix4,
+  Vector,
+} from "@proto-gl";
 import {
   autoResizeCanvas,
   clearScene,
   configureCanvas,
   createProgram,
   getGLContext,
-} from "../../lib/web-gl.js";
-import { indices, vertices } from "../data/data.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
+} from "@example/utilities/web-gl";
+import { indices, vertices } from "../data/data";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
 
 type ProgramUniforms = {
   uModelViewMatrix: WebGLUniformLocation | null;

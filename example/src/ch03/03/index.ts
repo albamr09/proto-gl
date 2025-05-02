@@ -7,27 +7,30 @@ import {
   createVector3dSliders,
   initController,
   initGUI,
-} from "../../lib/gui/index.js";
+} from "@example/utilities/gui/index";
 import {
   getGLContext,
   configureCanvas,
   autoResizeCanvas,
   clearScene,
   createProgram,
-} from "../../lib/web-gl.js";
-import { vertices, indices } from "../data/data.js";
-import vertexShaderSource from "./vs.glsl.js";
-import fragmentShaderSource from "./fs.glsl.js";
+} from "@example/utilities/web-gl";
+import { vertices, indices } from "../data/data";
+import vertexShaderSource from "./vs.glsl";
+import fragmentShaderSource from "./fs.glsl";
 import {
   denormalizeColor,
   hexToRgb,
   normalizeColor,
   rgbToHex,
   rgbToRgba,
-} from "../../lib/colors.js";
-import { Matrix4 } from "../../lib/math/matrix.js";
-import { calculateNormals, computeNormalMatrix } from "../../lib/math/3d.js";
-import { Vector } from "../../lib/math/vector.js";
+} from "@example/utilities/colors";
+import {
+  Matrix4,
+  calculateNormals,
+  computeNormalMatrix,
+  Vector,
+} from "@proto-gl";
 
 type ProgramAttributes = {
   aPosition: number;

@@ -44,7 +44,12 @@ async function copyDataFiles() {
 const isDev = process.env.NODE_ENV === "development";
 
 export default defineConfig({
-  entry: ["src/ch01/**/*.ts", "src/ch02/**/*.ts", "src/utilities/**/*.ts"],
+  entry: [
+    "src/ch01/**/*.ts",
+    "src/ch02/**/*.ts",
+    "src/ch03/**/*.ts",
+    "src/utilities/**/*.ts",
+  ],
   clean: true,
   format: ["esm"],
   tsconfig: "./tsconfig.json",
