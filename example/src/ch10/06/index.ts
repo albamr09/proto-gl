@@ -1,12 +1,11 @@
-import { createDescriptionPanel, initGUI } from "../../lib/gui/index.js";
+import { createDescriptionPanel, initGUI } from "@example/utilities/gui/index";
 import {
   autoResizeCanvas,
   configureCanvas,
   getGLContext,
-} from "../../lib/web-gl.js";
-import Filter from "../../lib/webgl/rendering/postprocess/filters/index.js";
-import Scene from "../../lib/webgl/rendering/scene.js";
-import RayTrace from "./ray-trace.js";
+} from "@example/utilities/web-gl";
+import { Scene, Filter } from "@proto-gl";
+import RayTrace from "./ray-trace";
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;

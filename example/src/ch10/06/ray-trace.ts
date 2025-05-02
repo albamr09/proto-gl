@@ -1,8 +1,6 @@
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
-import Texture2D from "../../lib/webgl/core/texture/texture-2d";
-import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
-import Filter from "../../lib/webgl/rendering/postprocess/filters/index.js";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
+import { Texture2D, UniformKind, Filter } from "@proto-gl";
 
 const attributes = [] as const;
 const uniforms = ["uTime", "uInverseTextureSize"] as const;

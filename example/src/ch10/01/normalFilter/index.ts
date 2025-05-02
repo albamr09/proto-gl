@@ -1,6 +1,6 @@
-import Filter from "../../../lib/webgl/rendering/postprocess/filters/index.js";
-import vertexShaderSource from "./vs.glsl.js";
-import fragmentShaderSource from "./fs.glsl.js";
+import { Filter } from "@proto-gl";
+import vertexShaderSource from "./vs.glsl";
+import fragmentShaderSource from "./fs.glsl";
 
 class NormalFilter extends Filter {
   constructor() {
