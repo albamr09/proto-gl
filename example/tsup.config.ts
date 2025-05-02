@@ -44,19 +44,7 @@ async function copyDataFiles() {
 const isDev = process.env.NODE_ENV === "development";
 
 export default defineConfig({
-  entry: [
-    "src/ch01/**/*.ts",
-    "src/ch02/**/*.ts",
-    "src/ch03/**/*.ts",
-    "src/ch04/**/*.ts",
-    "src/ch05/**/*.ts",
-    "src/ch06/**/*.ts",
-    "src/ch07/**/*.ts",
-    "src/ch08/**/*.ts",
-    "src/ch09/**/*.ts",
-    "src/ch10/**/*.ts",
-    "src/utilities/**/*.ts",
-  ],
+  entry: ["src/**/*.ts"],
   clean: true,
   format: ["esm"],
   tsconfig: "./tsconfig.json",
@@ -64,7 +52,6 @@ export default defineConfig({
   platform: "browser",
   silent: false,
   minify: "terser",
-  splitting: false,
   // Bundles local library together with examples
   noExternal: ["@proto-gl"],
   ...(isDev && { watch: ["src/**/*.{ts,tsx}", "../src/**/*.ts"] }),

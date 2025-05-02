@@ -1,10 +1,6 @@
-import Program from "../../lib/webgl/core/program.js";
-import Instance from "../../lib/webgl/rendering/instance.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
-import { Matrix4 } from "../../lib/math/matrix.js";
-import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
-import { Vector } from "../../lib/math/vector.js";
+import { Program, Instance, Matrix4, UniformKind, Vector } from "@proto-gl";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
 
 const attributes = ["aPos"] as const;
 const uniforms = ["uRotation"] as const;
