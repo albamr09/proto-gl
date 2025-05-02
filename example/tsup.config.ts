@@ -27,7 +27,7 @@ async function copyHtmlFiles() {
 
 async function copyDataFiles() {
   try {
-    const dataFiles = await glob("data/**/*.{json,png}");
+    const dataFiles = await glob("data/**/*.{json,png,jpg}");
 
     for (const file of dataFiles) {
       const outputPath = path.join("dist", file);
