@@ -1,37 +1,32 @@
-import { loadData } from "../../lib/files.js";
+import { loadData } from "@example/utilities/files";
 import {
   addChildrenToController,
   createCheckboxInputForm,
   createDescriptionPanel,
   initController,
   initGUI,
-} from "../../lib/gui/index.js";
-import { calculateNormals } from "../../lib/math/3d.js";
-import { Matrix4 } from "../../lib/math/matrix.js";
-import { Vector } from "../../lib/math/vector.js";
+} from "@example/utilities/gui/index";
+import {
+  calculateNormals,
+  Matrix4,
+  Vector,
+  Camera,
+  Controller,
+  Program,
+  UniformKind,
+  Floor,
+  Instance,
+  PickingController,
+  Scene,
+  Axis,
+} from "@proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,
   getGLContext,
-} from "../../lib/web-gl.js";
-import Camera from "../../lib/webgl/core/camera/camera.js";
-import {
-  CameraType,
-  ProjectionType,
-} from "../../lib/webgl/core/camera/types.js";
-import Controller from "../../lib/webgl/core/events/controller.js";
-import PickingController from "../../lib/webgl/core/picking/picking.js";
-import Program from "../../lib/webgl/core/program.js";
-import {
-  ConcreteUniforms,
-  UniformKind,
-} from "../../lib/webgl/core/uniform/types.js";
-import Axis from "../../lib/webgl/models/axis/index.js";
-import Floor from "../../lib/webgl/models/floor/index.js";
-import Instance from "../../lib/webgl/rendering/instance.js";
-import Scene from "../../lib/webgl/rendering/scene.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
+} from "@example/utilities/web-gl";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
 
 const attributes = ["aPosition", "aNormal"] as const;
 const uniforms = [
@@ -154,10 +149,10 @@ const loadObject = (
       transformationProperties: { ...properties },
       onClick: (instance) => {
         previousColor = (
-          instance.getUniform("uMaterialDiffuse") as ConcreteUniforms
+          instance.getUniform("uMaterialDiffuse") as any
         ).getData() as number[];
         const labelColor = (
-          instance.getUniform("uLabelColor") as ConcreteUniforms
+          instance.getUniform("uLabelColor") as any
         ).getData();
         instance.updateUniform("uMaterialDiffuse", labelColor);
       },
