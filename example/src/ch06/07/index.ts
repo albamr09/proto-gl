@@ -1,4 +1,4 @@
-import { loadData } from "../../lib/files.js";
+import { loadData } from "@example/utilities/files";
 import {
   createDescriptionPanel,
   initGUI,
@@ -7,24 +7,22 @@ import {
   createSliderInputForm,
   createSelectorForm,
   addChildrenToController,
-} from "../../lib/gui/index.js";
-import { Vector } from "../../lib/math/vector.js";
+} from "@example/utilities/gui/index";
+import {
+  Vector,
+  Controller,
+  Camera,
+  Instance,
+  Scene,
+  UniformKind,
+} from "@proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,
   getGLContext,
-} from "../../lib/web-gl.js";
-import Camera from "../../lib/webgl/core/camera/camera.js";
-import {
-  CameraType,
-  ProjectionType,
-} from "../../lib/webgl/core/camera/types.js";
-import Controller from "../../lib/webgl/core/events/controller.js";
-import Instance from "../../lib/webgl/rendering/instance.js";
-import Scene from "../../lib/webgl/rendering/scene.js";
-import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
-import fragmentShaderSource from "./fs.glsl.js";
-import vertexShaderSource from "./vs.glsl.js";
+} from "@example/utilities/web-gl";
+import fragmentShaderSource from "./fs.glsl";
+import vertexShaderSource from "./vs.glsl";
 
 enum CullingMode {
   FRONT = "FRONT",

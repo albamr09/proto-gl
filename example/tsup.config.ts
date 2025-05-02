@@ -50,6 +50,7 @@ export default defineConfig({
     "src/ch03/**/*.ts",
     "src/ch04/**/*.ts",
     "src/ch05/**/*.ts",
+    "src/ch06/**/*.ts",
     "src/utilities/**/*.ts",
   ],
   clean: true,
