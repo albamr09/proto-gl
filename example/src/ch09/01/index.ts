@@ -7,33 +7,31 @@ import {
   createSelectorForm,
   initController,
   initGUI,
-} from "../../lib/gui/index.js";
+} from "@example/utilities/gui/index";
 import {
   autoResizeCanvas,
   configureCanvas,
   getGLContext,
-} from "../../lib/web-gl.js";
-import Camera from "../../lib/webgl/core/camera/camera.js";
+} from "@example/utilities/web-gl";
 import {
-  CameraType,
-  ProjectionType,
-} from "../../lib/webgl/core/camera/types.js";
-import Controller from "../../lib/webgl/core/events/controller.js";
-import Floor from "../../lib/webgl/models/floor/index.js";
-import Scene from "../../lib/webgl/rendering/scene.js";
-import { loadData } from "../../lib/files.js";
-import Instance from "../../lib/webgl/rendering/instance.js";
-import vertexShaderSource from "./vs.gsls.js";
-import fragmentShaderSource from "./fs.gsls.js";
-import { Vector } from "../../lib/math/vector.js";
-import { UniformKind } from "../../lib/webgl/core/uniform/types.js";
-import { calculateNormals } from "../../lib/math/3d.js";
+  Camera,
+  Controller,
+  Floor,
+  Scene,
+  Instance,
+  Vector,
+  UniformKind,
+  calculateNormals,
+} from "@proto-gl";
+import { loadData } from "@example/utilities/files";
+import vertexShaderSource from "./vs.gsls";
+import fragmentShaderSource from "./fs.gsls";
 import {
   denormalizeColor,
   hexToRgb,
   normalizeColor,
   rgbToHex,
-} from "../../lib/colors.js";
+} from "@example/utilities/colors";
 
 let gl: WebGL2RenderingContext;
 let canvas: HTMLCanvasElement;
