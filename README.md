@@ -1,6 +1,6 @@
 # CS10CG
 
-Real Time Computer Graphics with WebGL
+Computer Graphics Library on the Web.
 
 ---
 
