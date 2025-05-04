@@ -212,7 +212,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we will showcase how we can use unique ids in order to determine which object is selected."
+    "On this example we will showcase how we can use unique ids in order to determine which object is selected.",
+    "ch08/02/"
   );
 
   gl = getGLContext();

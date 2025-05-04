@@ -241,7 +241,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we will show how to render particle effects for bubbles =)."
+    "On this example we will show how to render particle effects for bubbles =).",
+    "ch10/03/"
   );
 
   gl = getGLContext();

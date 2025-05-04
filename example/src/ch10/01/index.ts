@@ -186,7 +186,8 @@ const createFilterSelector = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we show how to apply post-processing effects to your scene"
+    "On this example we show how to apply post-processing effects to your scene",
+    "ch10/01/"
   );
 
   gl = getGLContext();

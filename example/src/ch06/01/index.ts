@@ -252,7 +252,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we show the difference between constant coloring and per-vertex coloring."
+    "On this example we show the difference between constant coloring and per-vertex coloring.",
+    "ch06/01/"
   );
 
   gl = getGLContext();

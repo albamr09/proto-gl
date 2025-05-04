@@ -172,7 +172,8 @@ const render = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we show how to use parametric curves to control an animation. To be more concrete, we compute the position of every object (sphere) at time t."
+    "On this example we show how to use parametric curves to control an animation. To be more concrete, we compute the position of every object (sphere) at time t.",
+    "ch05/02/"
   );
 
   gl = getGLContext();

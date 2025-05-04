@@ -86,7 +86,10 @@ const draw = () => {
 const init = () => {
   // Setup gui
   initGUI();
-  createDescriptionPanel("Challenge: Renders a square using drawElements");
+  createDescriptionPanel(
+    "Challenge: Renders a square using drawElements",
+    "ch02/03/"
+  );
 
   // Setup canvas
   configureCanvas();

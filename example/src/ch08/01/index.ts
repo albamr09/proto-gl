@@ -180,7 +180,8 @@ const render = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "This is an example on how to implement picking based on the color of each object using an offscreen framebuffer. On this example you can click objects in order to edit them (translate, scale and rotate them). To change between each edition mode use the keys: M (translate the object), S (scale the object) and R (rotate the object). To exit the edition mode press the ESC key."
+    "This is an example on how to implement picking based on the color of each object using an offscreen framebuffer. On this example you can click objects in order to edit them (translate, scale and rotate them). To change between each edition mode use the keys: M (translate the object), S (scale the object) and R (rotate the object). To exit the edition mode press the ESC key.",
+    "ch08/01/"
   );
 
   gl = getGLContext();

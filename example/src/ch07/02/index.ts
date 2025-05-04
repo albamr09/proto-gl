@@ -230,7 +230,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we show how to render a simple texture while allowing to select any image as a texture."
+    "On this example we show how to render a simple texture while allowing to select any image as a texture.",
+    "ch07/02/"
   );
 
   gl = getGLContext();

@@ -158,7 +158,10 @@ const initControls = () => {
 
 const init = () => {
   initGUI();
-  createDescriptionPanel("On this example we show how to use normal maps");
+  createDescriptionPanel(
+    "On this example we show how to use normal maps",
+    "ch10/04/"
+  );
 
   gl = getGLContext();
   canvas = configureCanvas();

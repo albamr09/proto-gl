@@ -283,7 +283,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will show how to render different light sources on the same scene. Also we compute the color on the fragment shader, so we compute a color per pixel."
+    "In this example we will show how to render different light sources on the same scene. Also we compute the color on the fragment shader, so we compute a color per pixel.",
+    "ch06/02/"
   );
 
   gl = getGLContext();

@@ -154,7 +154,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we will showcase how face culling works by enabling/disabling this phase on the rendering line. When it is enabled we can also configure how face culling is applied. Either by rendering either the front face of each polygon or by rendering the back face. Back culling means we discard the faces not 'visible' by the user, while front culling means we discard the faces seen by the user."
+    "On this example we will showcase how face culling works by enabling/disabling this phase on the rendering line. When it is enabled we can also configure how face culling is applied. Either by rendering either the front face of each polygon or by rendering the back face. Back culling means we discard the faces not 'visible' by the user, while front culling means we discard the faces seen by the user.",
+    "ch06/07/"
   );
 
   gl = getGLContext();

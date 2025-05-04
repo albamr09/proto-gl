@@ -355,7 +355,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will show how to use spotlights or what we call directional point lights. . But with a twist! We know add an attenuation factor based on the angle between the light and the surface that makes for a more realistic effect."
+    "In this example we will show how to use spotlights or what we call directional point lights. But with a twist! We know add an attenuation factor based on the angle between the light and the surface that makes for a more realistic effect.",
+    "ch06/05/"
   );
 
   gl = getGLContext();

@@ -218,7 +218,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we show how to render a simple texture."
+    "On this example we show how to render a simple texture.",
+    "ch07/01/"
   );
 
   gl = getGLContext();

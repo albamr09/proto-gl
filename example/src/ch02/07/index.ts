@@ -206,7 +206,7 @@ const initControls = () => {
 const init = () => {
   // Setup gui
   initGUI();
-  createDescriptionPanel("Challenge: Renders a M using LINES mode");
+  createDescriptionPanel("Challenge: Renders a M using LINES mode", "ch02/07/");
   // Setup canvas
   configureCanvas();
   gl = getGLContext();

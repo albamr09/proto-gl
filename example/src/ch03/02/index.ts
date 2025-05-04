@@ -22,7 +22,12 @@ import {
   normalizeColor,
   rgbToHex,
 } from "@example/utilities/colors";
-import { calculateNormals, computeNormalMatrix, Matrix4, Vector } from "@proto-gl";
+import {
+  calculateNormals,
+  computeNormalMatrix,
+  Matrix4,
+  Vector,
+} from "@proto-gl";
 
 type ProgramAttributes = {
   aPosition: number;
@@ -235,7 +240,8 @@ const init = () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Challenge: Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model. In addition the sphere is animated to rotate on the Y axis."
+    "Challenge: Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model. In addition the sphere is animated to rotate on the Y axis.",
+    "ch03/02/"
   );
 
   // Setup canvas

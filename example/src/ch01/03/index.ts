@@ -57,7 +57,8 @@ const init = () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Creates a canvas that changes colors when pressing the keys: 1, 2, 3 or 4"
+    "Creates a canvas that changes colors when pressing the keys: 1, 2, 3 or 4",
+    "ch01/02/"
   );
 
   // Setup canvas

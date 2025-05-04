@@ -192,7 +192,8 @@ const initControls = () => {
 const init = async () => {
   initGUI();
   createDescriptionPanel(
-    "See how camera rotation works. Note that the camera is located at [0, 2, 50] in world coordinates. The controls allow you to rotate the camera. The rotation will be done with respect to the origin (the objects are the ones rotating) when we are using world coordinates. But when we use the camera coordinate system the rotation will be done with respect the camera position"
+    "See how camera rotation works. Note that the camera is located at [0, 2, 50] in world coordinates. The controls allow you to rotate the camera. The rotation will be done with respect to the origin (the objects are the ones rotating) when we are using world coordinates. But when we use the camera coordinate system the rotation will be done with respect the camera position",
+    "ch04/02/"
   );
   createLowerLeftPanel(coordinateSystem);
   createMatrixElement("lower-left-panel", 4);

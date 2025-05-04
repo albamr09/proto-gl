@@ -355,7 +355,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will show how to use spotlights or what we call directional point lights."
+    "In this example we will show how to use spotlights or what we call directional point lights.",
+    "ch06/04/"
   );
 
   gl = getGLContext();

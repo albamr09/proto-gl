@@ -356,7 +356,8 @@ const init = () => {
   // Set up GUI
   initGUI();
   createDescriptionPanel(
-    "Renders an sphere while applying Goraud Shading in combination with the Phong Light Model."
+    "Renders an sphere while applying Goraud Shading in combination with the Phong Light Model.",
+    "ch03/03/"
   );
 
   const canvas = configureCanvas();

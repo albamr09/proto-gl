@@ -249,7 +249,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will show how different texture filter modes work"
+    "In this example we will show how different texture filter modes work",
+    "ch07/03/"
   );
 
   gl = getGLContext();

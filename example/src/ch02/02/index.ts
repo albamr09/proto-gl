@@ -92,7 +92,10 @@ const draw = () => {
 const init = () => {
   // Setup GUI
   initGUI();
-  createDescriptionPanel("Challenge: Renders a pentagon on the canvas.");
+  createDescriptionPanel(
+    "Challenge: Renders a pentagon on the canvas.",
+    "ch02/02/"
+  );
 
   // Setup canvas
   configureCanvas();

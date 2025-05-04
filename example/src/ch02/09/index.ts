@@ -161,7 +161,8 @@ const init = () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Shows a panel with information about a vertex buffer object (VBO) and a index buffer object (IBO)"
+    "Shows a panel with information about a vertex buffer object (VBO) and a index buffer object (IBO)",
+    "ch02/09/"
   );
 
   // Setup canvas

@@ -156,7 +156,8 @@ const render = (time: number) => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we showcase how the linear interpolation method work."
+    "On this example we showcase how the linear interpolation method work.",
+    "ch05/03/"
   );
   canvas = configureCanvas();
   autoResizeCanvas(canvas);

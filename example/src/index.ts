@@ -1,8 +1,7 @@
 import linkGroups from "@example/data/examplesData";
 import createStyles from "@example/styles";
 import { createFavIcon } from "@example/utilities/gui/styles";
-
-const REPO_URL = "https://github.com/albamr09/proto-gl";
+import { REPO_URL } from "./constants";
 
 document.addEventListener("DOMContentLoaded", () => {
   const root = document.getElementById("root");

@@ -208,7 +208,8 @@ const init = () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Challenge: Renders the outline of a trapezoid using LINE_LOOP rendering mode"
+    "Challenge: Renders the outline of a trapezoid using LINE_LOOP rendering mode",
+    "ch02/08/"
   );
   // Setup canvas
   configureCanvas();

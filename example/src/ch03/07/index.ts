@@ -331,7 +331,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "Renders a complex model using Phong shading and Phong lights."
+    "Renders a complex model using Phong shading and Phong lights.",
+    "ch03/07/"
   );
 
   const canvas = configureCanvas();

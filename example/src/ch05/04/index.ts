@@ -291,7 +291,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we showcase how different interpolation methods work."
+    "On this example we showcase how different interpolation methods work.",
+    "ch05/04/"
   );
   canvas = configureCanvas();
   autoResizeCanvas(canvas);

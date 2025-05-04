@@ -353,7 +353,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "Render lights using Phong Shading alongside the Phong Light Model. The lights are computed on the fragment shader summing up ambient lights, diffuse lights and specular lights."
+    "Render lights using Phong Shading alongside the Phong Light Model. The lights are computed on the fragment shader summing up ambient lights, diffuse lights and specular lights.",
+    "ch03/04/"
   );
 
   // Setup

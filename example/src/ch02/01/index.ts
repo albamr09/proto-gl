@@ -87,7 +87,7 @@ const draw = () => {
 const init = () => {
   // Setup GUI
   initGUI();
-  createDescriptionPanel("Renders a square");
+  createDescriptionPanel("Renders a square", "ch02/02/");
 
   // Setup canvas
   const canvas = configureCanvas();

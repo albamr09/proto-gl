@@ -279,7 +279,8 @@ const init = () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model"
+    "Renders an sphere while applying Goraud Shading in combination with the Lambert Light Model",
+    "ch03/01/"
   );
 
   // Setup canvas

@@ -23,7 +23,8 @@ const render = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we'll show how to use ray tracing to render not one! but sevearl spheres!"
+    "On this example we'll show how to use ray tracing to render not one! but sevearl spheres!",
+    "ch10/06/"
   );
 
   gl = getGLContext();

@@ -7,7 +7,8 @@ const init = () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Simply creates a WebGL canvas if possible, else shows an alert."
+    "Simply creates a WebGL canvas if possible, else shows an alert.",
+    "ch01/01/"
   );
 
   // Init canvas

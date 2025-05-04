@@ -111,7 +111,8 @@ const init = async () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Shows how to load information from a JSON file and render the object described by the JSON file."
+    "Shows how to load information from a JSON file and render the object described by the JSON file.",
+    "ch02/010/"
   );
 
   // Setup canvas

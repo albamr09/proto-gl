@@ -366,7 +366,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "Challenge: On this example you can test how changing the size of the viewport using gl.viewport changes how you render the scene."
+    "Challenge: On this example you can test how changing the size of the viewport using gl.viewport changes how you render the scene.",
+    "ch04/07/"
   );
 
   canvas = configureCanvas();

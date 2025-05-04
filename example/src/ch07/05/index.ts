@@ -217,7 +217,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will show how to use multiple textures."
+    "In this example we will show how to use multiple textures.",
+    "ch07/05/"
   );
 
   gl = getGLContext();

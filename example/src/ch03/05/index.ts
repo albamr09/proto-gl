@@ -226,7 +226,8 @@ const handleKeyInput = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "Renders a wall with lights. By pressing the WASD keys you can move the light."
+    "Renders a wall with lights. By pressing the WASD keys you can move the light.",
+    "ch03/05/"
   );
 
   const canvas = configureCanvas();

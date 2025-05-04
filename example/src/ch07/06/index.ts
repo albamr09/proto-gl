@@ -113,7 +113,8 @@ const render = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we'll show how you can use cube maps in order to map textures using 3D coordinates"
+    "On this example we'll show how you can use cube maps in order to map textures using 3D coordinates",
+    "ch07/06/"
   );
 
   gl = getGLContext();

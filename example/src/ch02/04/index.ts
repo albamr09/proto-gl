@@ -98,7 +98,10 @@ const draw = () => {
 const init = () => {
   // Setup GUI
   initGUI();
-  createDescriptionPanel("Renders a square using Vertex Array Objects (VAO)");
+  createDescriptionPanel(
+    "Renders a square using Vertex Array Objects (VAO)",
+    "ch02/04/"
+  );
 
   // Setup canvas
   const canvas = configureCanvas();

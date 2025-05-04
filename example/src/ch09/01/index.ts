@@ -353,7 +353,8 @@ const render = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we will create a demo application using our WebGL library."
+    "On this example we will create a demo application using our WebGL library.",
+    "ch09/01/"
   );
 
   gl = getGLContext();

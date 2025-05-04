@@ -271,7 +271,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will show how to use the differente texture wrapping modes."
+    "In this example we will show how to use the differente texture wrapping modes.",
+    "ch07/04/"
   );
 
   gl = getGLContext();

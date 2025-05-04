@@ -343,7 +343,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "In this example we will show how to render different light sources on the same scene by using uniform arrays instead of individual uniforms."
+    "In this example we will show how to render different light sources on the same scene by using uniform arrays instead of individual uniforms.",
+    "ch06/03/"
   );
 
   gl = getGLContext();

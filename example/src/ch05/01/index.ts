@@ -189,7 +189,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "On this example we showcase a simple animation of two objects. Such that you can see how to apply both global and local transforms."
+    "On this example we showcase a simple animation of two objects. Such that you can see how to apply both global and local transforms.",
+    "ch05/01/"
   );
 
   canvas = configureCanvas();

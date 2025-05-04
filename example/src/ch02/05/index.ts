@@ -208,7 +208,8 @@ const init = () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Showcases the different rendering modes when using drawElements: TRIANGLES, LINES, POINTS, LINE_LOOP, LINE_STRIP, TRIANGLE_STRIP, TRIANGLE_FAN"
+    "Showcases the different rendering modes when using drawElements: TRIANGLES, LINES, POINTS, LINE_LOOP, LINE_STRIP, TRIANGLE_STRIP, TRIANGLE_FAN",
+    "ch02/05/"
   );
 
   // Setup canvas

@@ -205,7 +205,10 @@ const initControls = () => {
 const init = () => {
   // Setup style
   initGUI();
-  createDescriptionPanel("Challenge: Renders a trapezoid using TRIANGLES mode");
+  createDescriptionPanel(
+    "Challenge: Renders a trapezoid using TRIANGLES mode",
+    "ch02/06/"
+  );
 
   // Init canvas
   configureCanvas();

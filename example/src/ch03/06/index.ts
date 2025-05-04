@@ -347,7 +347,8 @@ const initGUIControl = () => {
 const init = async () => {
   initGUI();
   createDescriptionPanel(
-    "Renders a scene with directional lights as well as directional lights."
+    "Renders a scene with directional lights as well as directional lights.",
+    "ch03/06/"
   );
 
   const canvas = configureCanvas();

@@ -138,7 +138,8 @@ const init = async () => {
   // Setup GUI
   initGUI();
   createDescriptionPanel(
-    "Renders a Nissan car using JSON data as the input data."
+    "Renders a Nissan car using JSON data as the input data.",
+    "ch02/11/"
   );
 
   // Setup canvas

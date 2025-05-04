@@ -297,7 +297,8 @@ const initControls = () => {
 const init = () => {
   initGUI();
   createDescriptionPanel(
-    "This example renders a complex object (a car) and defines a camera that can be interacted with using the mouse."
+    "This example renders a complex object (a car) and defines a camera that can be interacted with using the mouse.",
+    "ch04/05/"
   );
 
   canvas = configureCanvas();
