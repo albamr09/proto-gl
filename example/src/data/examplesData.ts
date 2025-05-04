@@ -10,7 +10,7 @@ const linkGroups = [
       {
         title: "Colorful Canvas",
         description: "Creates a canvas that changes its background color",
-        url: "ch01/02/",
+        url: "ch01/03/",
       },
     ],
   },
