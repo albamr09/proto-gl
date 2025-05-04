@@ -2,12 +2,18 @@ import linkGroups from "@example/data/examplesData";
 import createStyles from "@example/styles";
 import { createFavIcon } from "@example/utilities/gui/styles";
 
+const REPO_URL = "https://github.com/albamr09/proto-gl";
+
 document.addEventListener("DOMContentLoaded", () => {
   const root = document.getElementById("root");
 
-  // Create header
-  const header = document.createElement("header");
-  header.className = "header";
+  // Create sticky header container
+  const stickyHeader = document.createElement("div");
+  stickyHeader.className = "sticky-header";
+
+  // Create title section
+  const titleSection = document.createElement("div");
+  titleSection.className = "title-section";
 
   const title = document.createElement("h1");
   title.textContent = "ProtoGL Examples";
@@ -17,8 +23,23 @@ document.addEventListener("DOMContentLoaded", () => {
   subTitle.textContent = "A collection of examples using ProtoGL";
   subTitle.className = "subtitle";
 
-  header.appendChild(title);
-  header.appendChild(subTitle);
+  titleSection.appendChild(title);
+  titleSection.appendChild(subTitle);
+
+  // Create GitHub link
+  const githubLink = document.createElement("a");
+  githubLink.href = REPO_URL;
+  githubLink.className = "github-link";
+  githubLink.target = "_blank";
+  githubLink.rel = "noopener noreferrer";
+  githubLink.title = "View source on GitHub";
+
+  // GitHub SVG icon
+  githubLink.innerHTML = `
+    <svg height="28" width="28" viewBox="0 0 16 16" version="1.1" aria-hidden="true">
+      <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+    </svg>
+  `;
 
   // Create search bar
   const searchContainer = document.createElement("div");
@@ -39,6 +60,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   searchContainer.appendChild(searchIcon);
   searchContainer.appendChild(searchInput);
+
+  // Add all elements to sticky header
+  const headerContent = document.createElement("div");
+  headerContent.className = "header-content";
+
+  headerContent.appendChild(titleSection);
+  headerContent.appendChild(searchContainer);
+  headerContent.appendChild(githubLink);
+
+  stickyHeader.appendChild(headerContent);
+  // stickyHeader.appendChild(searchContainer);
 
   // Create main content
   const mainContent = document.createElement("main");
@@ -99,8 +131,19 @@ document.addEventListener("DOMContentLoaded", () => {
     linkDescription.className = "link-description";
     linkDescription.textContent = link.description;
 
+    const linkSource = document.createElement("a");
+    linkSource.className = "link-source";
+    linkSource.href = `${REPO_URL}/tree/main/example/src/${link.url}/index.ts`;
+    linkSource.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M17 7.82959L18.6965 9.35641C20.239 10.7447 21.0103 11.4389 21.0103 12.3296C21.0103 13.2203 20.239 13.9145 18.6965 15.3028L17 16.8296" stroke="#8e9095" stroke-width="1.5" stroke-linecap="round"></path> <path opacity="0.5" d="M13.9868 5L10.0132 19.8297" stroke="#8e9095" stroke-width="1.5" stroke-linecap="round"></path> <path d="M7.00005 7.82959L5.30358 9.35641C3.76102 10.7447 2.98975 11.4389 2.98975 12.3296C2.98975 13.2203 3.76102 13.9145 5.30358 15.3028L7.00005 16.8296" stroke="#8e9095" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>`;
+    linkSource.addEventListener("click", (e) => e.stopPropagation());
+
+    const linkInfo = document.createElement("div");
+    linkInfo.className = "link-info";
+    linkInfo.appendChild(linkDescription);
+    linkInfo.appendChild(linkSource);
+
     linkElement.appendChild(linkTitle);
-    linkElement.appendChild(linkDescription);
+    linkElement.appendChild(linkInfo);
 
     linkElement.onclick = (e) => {
       console.log("i have been clicked");
@@ -168,10 +211,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial render
   renderAllLinkGroups();
 
-  // Add everything to the root
-  root.appendChild(header);
-  root.appendChild(searchContainer);
-  root.appendChild(mainContent);
+  // Add main content to the root
+  // Add padding to account for the sticky header
+  const contentWrapper = document.createElement("div");
+  contentWrapper.className = "content-wrapper";
+  contentWrapper.appendChild(mainContent);
+
+  // Add sticky header
+  root.appendChild(stickyHeader);
+  root.appendChild(contentWrapper);
 
   // Create the CSS
   createStyles();

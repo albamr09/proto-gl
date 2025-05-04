@@ -9,36 +9,74 @@ const createStyles = () => {
       }
       
       body {
-        background-color: #f7f7f7;
+        background-color:rgb(252, 252, 252);
         color: #37352f;
+        padding-top: 0;
+        margin: 0;
       }
       
-      .header {
-        margin: 40px auto 25px;
-        max-width: 800px;
+      .sticky-header {
+        position: sticky;
+        top: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        width: 100%;
+        padding: 15px 0;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 80vw;
+        max-width: 1200px;
+        margin: 0 auto;
         padding: 0 20px;
       }
       
+      .title-section {
+        flex: 1;
+      }
+      
       .title {
-        font-size: 40px;
+        font-size: 28px;
         font-weight: 700;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
       }
       
       .subtitle {
-        font-size: 16px;
-        color:rgb(155, 155, 155);
+        font-size: 14px;
+        color: rgb(155, 155, 155);
+      }
+      
+      .github-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #37352f;
+        text-decoration: none;
+        transition: transform 0.2s ease;
+        margin-left: 20px;
+      }
+      
+      .github-link:hover {
+        transform: scale(1.05);
+      }
+      
+      .github-link svg {
+        fill: #37352f;
       }
       
       .search-container {
         display: flex;
         align-items: center;
-        max-width: 800px;
-        margin: 0 auto 30px;
-        padding: 0 20px;
+        flex: 1;
+        margin: 10px auto 0;
         background-color: white;
         border-radius: 8px;
-        box-shadow: rgba(15, 15, 15, 0.1) 0px 1px 3px;
+        border: 1px solid #e5e7eb;
       }
       
       .search-icon {
@@ -49,14 +87,19 @@ const createStyles = () => {
       
       .search-input {
         flex: 1;
-        padding: 14px 0;
+        padding: 12px 0;
         border: none;
         outline: none;
         font-size: 16px;
       }
       
+      .content-wrapper {
+        padding-top: 30px;
+      }
+      
       .main-content {
-        max-width: 80vw;
+        max-width: 1200px;
+        width: 80vw;
         margin: 0 auto;
         padding: 0 20px;
       }
@@ -102,20 +145,34 @@ const createStyles = () => {
       }
       
       .link-title a {
-        color:rgb(54, 54, 54);
+        color: rgb(54, 54, 54);
         text-decoration: none;
       }
       
       .link-title a:hover {
         text-decoration: underline;
       }
+
+      .link-info {
+        display: flex;
+        height: 100%;
+        color: #9ca3af;
+        gap: 15px;
+      }
+
+      .link-source {
+        display: flex;
+        align-items: end;
+        text-decoration: none;
+        width: 25px;
+      }
       
       .link-description {
-        color: #9ca3af;
         line-height: 1.5;
         flex-grow: 1;
         font-size: 14px;
         padding-top: 5px;
+        flex: 1;
       }
       
       .no-results {
@@ -124,8 +181,33 @@ const createStyles = () => {
         text-align: center;
         background-color: white;
         border-radius: 8px;
-        color: #6b7280;
         font-size: 16px;
+        color: #9ca3af;
+      }
+      
+      @media (max-width: 768px) {
+        .sticky-header {
+          padding: 10px 0;
+        }
+        
+        .header-content {
+          width: 90vw;
+          flex-direction: row;
+          align-items: center;
+        }
+        
+        .search-container,
+        .main-content {
+          width: 90vw;
+        }
+        
+        .title {
+          font-size: 24px;
+        }
+        
+        .subtitle {
+          font-size: 12px;
+        }
       }
       
       @media (max-width: 600px) {
@@ -133,12 +215,19 @@ const createStyles = () => {
           grid-template-columns: 1fr;
         }
         
-        .title {
-          font-size: 32px;
-        }
-        
         .group-title {
           font-size: 20px;
+        }
+        
+        .header-content {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .github-link {
+          margin-left: 0;
+          margin-top: 10px;
+          align-self: flex-end;
         }
       }
     `;
