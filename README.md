@@ -1,4 +1,4 @@
-# CS10CG
+# proto-gl
 
 Computer Graphics Library on the Web.
 
