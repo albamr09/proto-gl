@@ -1,0 +1,17 @@
+{
+  "include": ["src/**/*.ts"],
+  "compilerOptions": {
+    "rootDirs": ["./src", "./tests"],
+    "baseUrl": "..",
+    "paths": {
+      "@proto-gl/*": ["src/*"],
+      "@test/*": ["tests/src/*"]
+    },
+    "target": "ES2019",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  }
+}

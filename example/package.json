@@ -1,0 +1,16 @@
+{
+  "name": "my-lib-example",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@proto-gl": "file:..",
+    "tsup": "^8.4.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "NODE_ENV=development tsup & serve dist"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
