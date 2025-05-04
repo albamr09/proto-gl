@@ -147,19 +147,24 @@ button:hover {
 }
 `;
 
+export const createFavIcon = () => {
+  // Create a <link> element to fav icon
+  const favIcon = document.createElement("link");
+  favIcon.setAttribute("rel", "icon");
+  favIcon.setAttribute("type", "image/x-icon");
+  favIcon.setAttribute("href", "/public/favicon.ico");
+  // Append the <link> element to the <head>
+  document.head.appendChild(favIcon);
+};
+
 export const setupStyles = () => {
   // Create a <style> element
   const styleElement = document.createElement("style");
   styleElement.appendChild(document.createTextNode(cssCode));
 
   // Create a <link> element to fav icon
-  const favIcon = document.createElement("link");
-  favIcon.setAttribute("rel", "icon");
-  favIcon.setAttribute("type", "image/x-icon");
-  favIcon.setAttribute("href", "/public/favicon.ico");
+  createFavIcon();
 
   // Append the <style> element to the <head>
   document.head.appendChild(styleElement);
-  // Append the <link> element to the <head>
-  document.head.appendChild(favIcon);
 };
