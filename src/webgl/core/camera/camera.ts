@@ -1,8 +1,8 @@
-import { Angle } from "../../../math/angle";
-import { Matrix4 } from "../../../math/matrix";
-import { Vector } from "../../../math/vector";
-import Scene from "../../rendering/scene";
-import { CameraType, ProjectionType } from "./types";
+import { Angle } from "@proto-gl/math/angle";
+import { Matrix4 } from "@proto-gl/math/matrix";
+import { Vector } from "@proto-gl/math/vector";
+import Scene from "@proto-gl/webgl/rendering/scene";
+import { CameraType, ProjectionType } from "@proto-gl/webgl/core/camera/types";
 
 class Camera {
   // Camera config

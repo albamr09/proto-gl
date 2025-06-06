@@ -1,15 +1,15 @@
-import { UniformKind } from "../../../core/uniform/types";
-import Instance from "../../../rendering/instance";
+import { UniformKind } from "@proto-gl/webgl/core/uniform/types";
+import Instance from "@proto-gl/webgl/rendering/instance";
 import fragmentShaderSource from "./fs.glsl";
 import vertexShaderSource from "./vs.glsl";
-import { Matrix4 } from "../../../../math/matrix";
-import { GuideProperties } from "../types";
-import { DefaultProperties } from "./constants";
+import { Matrix4 } from "@proto-gl/math/matrix";
+import { GuideProperties } from "@proto-gl/webgl/models/editor/types";
+import { DefaultProperties } from "@proto-gl/webgl/models/editor/circle/constants";
 import {
   InstanceDragEndPayload,
   InstanceDragPayload,
-} from "../../../rendering/types";
-import { generateCircle } from "./geometry";
+} from "@proto-gl/webgl/rendering/types";
+import { generateCircle } from "@proto-gl/webgl/models/editor/circle/geometry";
 
 const DefaultAttributes = ["aPosition"] as const;
 const DefaultUniforms = [

@@ -1,6 +1,6 @@
-import TextureImage from "./image";
-import Texture from "./texture";
-import { TextureConfiguration } from "./types";
+import TextureImage from "@proto-gl/webgl/core/texture/image";
+import Texture from "@proto-gl/webgl/core/texture/texture";
+import { TextureConfiguration } from "@proto-gl/webgl/core/texture/types";
 
 class Texture2D extends Texture {
   private image?: TextureImage;

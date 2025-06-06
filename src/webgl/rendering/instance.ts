@@ -1,12 +1,15 @@
-import { Matrix4 } from "../../math/matrix";
-import { Vector } from "../../math/vector";
-import { uuidv4 } from "../../utils/utils";
-import Program from "../core/program";
-import TextureFactory from "../core/texture/factory";
-import Texture from "../core/texture/texture";
-import { TextureDefinition, TextureParameters } from "../core/texture/types";
-import { Uniforms } from "../core/types";
-import { UniformFactory } from "../core/uniform/factory";
+import { Matrix4 } from "@proto-gl/math/matrix";
+import { Vector } from "@proto-gl/math/vector";
+import { uuidv4 } from "@proto-gl/utils/utils";
+import Program from "@proto-gl/webgl/core/program";
+import TextureFactory from "@proto-gl/webgl/core/texture/factory";
+import Texture from "@proto-gl/webgl/core/texture/texture";
+import {
+  TextureDefinition,
+  TextureParameters,
+} from "@proto-gl/webgl/core/texture/types";
+import { Uniforms } from "@proto-gl/webgl/core/types";
+import { UniformFactory } from "@proto-gl/webgl/core/uniform/factory";
 import {
   ConcreteUniforms,
   TRANSFORM_UNIFORM_CONFIG_MAP,
@@ -14,7 +17,7 @@ import {
   UniformConfig,
   UniformDataMapping,
   UniformKind,
-} from "../core/uniform/types";
+} from "@proto-gl/webgl/core/uniform/types";
 import {
   AttributeConfig,
   InstanceClickPayload,
@@ -25,7 +28,7 @@ import {
   InstanceProps,
   InstanceTransformationProperties,
   UniformDefinition,
-} from "./types";
+} from "@proto-gl/webgl/rendering/types";
 
 const defaultConfiguration: InstanceConfiguration = {
   pickable: true,

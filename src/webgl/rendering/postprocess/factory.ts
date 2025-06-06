@@ -1,12 +1,12 @@
-import Texture2D from "../../core/texture/texture-2d";
-import BlurFilter from "./filters/blur/index";
-import FilmgrainFilter from "./filters/filmgrain/index";
-import GrayScaleFilter from "./filters/grayscale/index";
-import Filter from "./filters/index";
-import InvertFilter from "./filters/invert/index";
-import StretchFilter from "./filters/stretch/index";
-import WavyFilter from "./filters/wavy/index";
-import { FilterTypes } from "./types";
+import Texture2D from "@proto-gl/webgl/core/texture/texture-2d";
+import BlurFilter from "@proto-gl/webgl/rendering/postprocess/filters/blur/index";
+import FilmgrainFilter from "@proto-gl/webgl/rendering/postprocess/filters/filmgrain/index";
+import GrayScaleFilter from "@proto-gl/webgl/rendering/postprocess/filters/grayscale/index";
+import Filter from "@proto-gl/webgl/rendering/postprocess/filters/index";
+import InvertFilter from "@proto-gl/webgl/rendering/postprocess/filters/invert/index";
+import StretchFilter from "@proto-gl/webgl/rendering/postprocess/filters/stretch/index";
+import WavyFilter from "@proto-gl/webgl/rendering/postprocess/filters/wavy/index";
+import { FilterTypes } from "@proto-gl/webgl/rendering/postprocess/types";
 
 class FilterFactory {
   static create({

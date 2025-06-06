@@ -1,7 +1,10 @@
-import { objectEntries } from "../../../utils/generics";
-import TextureImage from "./image";
-import Texture from "./texture";
-import { CubeMapTargets, TextureConfiguration } from "./types";
+import { objectEntries } from "@proto-gl/utils/generics";
+import TextureImage from "@proto-gl/webgl/core/texture/image";
+import Texture from "@proto-gl/webgl/core/texture/texture";
+import {
+  CubeMapTargets,
+  TextureConfiguration,
+} from "@proto-gl/webgl/core/texture//types";
 
 class CubeMapTexture extends Texture {
   private faces?: Map<CubeMapTargets, TextureImage>;

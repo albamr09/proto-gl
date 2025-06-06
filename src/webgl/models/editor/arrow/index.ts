@@ -1,15 +1,15 @@
-import { UniformKind } from "../../../core/uniform/types";
-import Instance from "../../../rendering/instance";
+import { UniformKind } from "@proto-gl/webgl/core/uniform/types";
+import Instance from "@proto-gl/webgl/rendering/instance";
 import fragmentShaderSource from "./fs.glsl";
 import vertexShaderSource from "./vs.glsl";
-import generateArrow from "./geometry";
-import { Matrix4 } from "../../../../math/matrix";
+import generateArrow from "@proto-gl/webgl/models/editor/arrow/geometry";
+import { Matrix4 } from "@proto-gl/math/matrix";
 import { ArrowHead, GuideProperties } from "../types";
-import { DefaultProperties } from "./constants";
+import { DefaultProperties } from "@proto-gl/webgl/models/editor/arrow/constants";
 import {
   InstanceDragEndPayload,
   InstanceDragPayload,
-} from "../../../rendering/types";
+} from "@proto-gl/webgl/rendering/types";
 
 const DefaultAttributes = ["aPosition"] as const;
 const DefaultUniforms = [

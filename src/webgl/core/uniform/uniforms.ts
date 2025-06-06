@@ -1,4 +1,8 @@
-import { UniformConfig, UniformDataMapping, UniformKind } from "./types";
+import {
+  UniformConfig,
+  UniformDataMapping,
+  UniformKind,
+} from "@proto-gl/webgl/core/uniform/types";
 
 abstract class Uniform<T extends UniformKind> {
   protected name: string;

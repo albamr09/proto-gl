@@ -1,13 +1,13 @@
-import { computeNormalMatrix } from "../../math/3d";
-import { Matrix4 } from "../../math/matrix";
-import { uuidv4 } from "../../utils/utils";
-import { TextureParameters } from "../core/texture/types";
-import { UniformConfig } from "../core/uniform/types";
-import EditorController from "./editor/controller";
-import Instance from "./instance";
-import Filter from "./postprocess/filters/index";
-import PostProcess from "./postprocess/index";
-import { FilterTypes } from "./postprocess/types";
+import { computeNormalMatrix } from "@proto-gl/math/3d";
+import { Matrix4 } from "@proto-gl/math/matrix";
+import { uuidv4 } from "@proto-gl/utils/utils";
+import { TextureParameters } from "@proto-gl/webgl/core/texture/types";
+import { UniformConfig } from "@proto-gl/webgl/core/uniform/types";
+import EditorController from "@proto-gl/webgl/rendering/editor/controller";
+import Instance from "@proto-gl/webgl/rendering/instance";
+import Filter from "@proto-gl/webgl/rendering/postprocess/filters/index";
+import PostProcess from "@proto-gl/webgl/rendering/postprocess/index";
+import { FilterTypes } from "@proto-gl/webgl/rendering/postprocess/types";
 import {
   SceneEventTypes,
   InstanceConfiguration,
@@ -16,7 +16,7 @@ import {
   InstanceDragEndPayload,
   SceneRenderOptions,
   AttributeConfig,
-} from "./types";
+} from "@proto-gl/webgl/rendering/types";
 
 class Scene extends EventTarget {
   private gl: WebGL2RenderingContext;

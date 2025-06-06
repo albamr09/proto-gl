@@ -1,5 +1,5 @@
-import { Matrix4 } from "./matrix";
-import { Vector } from "./vector";
+import { Matrix4 } from "@proto-gl/math/matrix";
+import { Vector } from "@proto-gl/math/vector";
 
 /**
  * Source: https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal#Algorithm

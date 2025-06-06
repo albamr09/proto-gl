@@ -1,7 +1,7 @@
-import CubeMapTexture from "./cubemap-texture";
-import Texture2D from "./texture-2d";
-import Texture from "./texture";
-import { TextureDefinition } from "./types";
+import CubeMapTexture from "@proto-gl/webgl/core/texture/cubemap-texture";
+import Texture2D from "@proto-gl/webgl/core/texture/texture-2d";
+import Texture from "@proto-gl/webgl/core/texture/texture";
+import { TextureDefinition } from "@proto-gl/webgl/core/texture/types";
 
 class TextureFactory {
   static create({

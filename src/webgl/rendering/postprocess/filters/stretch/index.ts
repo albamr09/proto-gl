@@ -1,4 +1,4 @@
-import Filter from "../index";
+import Filter from "@proto-gl/webgl/rendering/postprocess/filters/index";
 import fragmentShaderSource from "./fs.glsl";
 import vertexShaderSource from "./vs.glsl";
 

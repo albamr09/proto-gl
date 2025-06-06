@@ -1,8 +1,8 @@
-export { default as Filter } from "./postprocess/filters/index";
+export { default as Filter } from "@proto-gl/webgl/rendering/postprocess/filters/index";
 
-export { default as Scene } from "./scene";
+export { default as Scene } from "@proto-gl/webgl/rendering/scene";
 
-export { default as Instance } from "./instance";
+export { default as Instance } from "@proto-gl/webgl/rendering/instance";
 
-export * from "./types";
-export * from "./postprocess/types";
+export * from "@proto-gl/webgl/rendering/types";
+export * from "@proto-gl/webgl/rendering/postprocess/types";

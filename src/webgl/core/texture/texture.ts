@@ -1,5 +1,9 @@
-import TextureImage from "./image";
-import { CubeMapTargets, TextureConfiguration, TextureTargets } from "./types";
+import TextureImage from "@proto-gl/webgl/core/texture/image";
+import {
+  CubeMapTargets,
+  TextureConfiguration,
+  TextureTargets,
+} from "@proto-gl/webgl/core/texture/types";
 
 abstract class Texture {
   protected glTexture?: WebGLTexture | null;
