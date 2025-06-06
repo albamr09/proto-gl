@@ -4,7 +4,7 @@
   "type": "module",
   "dependencies": {
     "@proto-gl": "file:..",
-    "tsup": "^8.4.0"
+    "tsup": "8.3.0"
   },
   "scripts": {
     "preinstall": "cd .. && yarn && yarn build",

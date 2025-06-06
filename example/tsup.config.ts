@@ -30,10 +30,11 @@ export default defineConfig({
   dts: false, // Generate type definitions
   platform: "browser",
   silent: false,
-  minify: "terser",
+  minify: isDev ? "terser" : undefined,
+  splitting: isDev ? false : true,
   // Bundles local library together with examples
   noExternal: ["@proto-gl"],
-  ...(isDev && { watch: ["src/**/*.{ts,tsx}", "../src/**/*.ts"] }),
+  watch: isDev ? ["src/**/*.{ts,html}"] : undefined,
   // Copy html files
   async onSuccess() {
     console.log("Build succeeded, copying static files...");
