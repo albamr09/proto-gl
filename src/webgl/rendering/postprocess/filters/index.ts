@@ -1,7 +1,7 @@
-import Texture2D from "../../../core/texture/texture-2d";
-import Instance from "../../instance";
-import { InstanceProps } from "../../types";
-import { FilterTypes } from "../types";
+import Texture2D from "@proto-gl/webgl/core/texture/texture-2d";
+import Instance from "@proto-gl/webgl/rendering/instance";
+import { InstanceProps } from "@proto-gl/webgl/rendering/types";
+import { FilterTypes } from "@proto-gl/webgl/rendering/postprocess/types";
 
 const attributes = ["aPosition", "aTextureCoords"] as const;
 const uniforms = ["uSampler"] as const;

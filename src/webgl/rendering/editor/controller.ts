@@ -1,14 +1,17 @@
-import { Matrix4 } from "../../../math/matrix";
-import { Vector } from "../../../math/vector";
-import Instance from "../instance";
+import { Matrix4 } from "@proto-gl/math/matrix";
+import { Vector } from "@proto-gl/math/vector";
+import Instance from "@proto-gl/webgl/rendering/instance";
 import {
   InstanceClickPayload,
   InstanceDragEndPayload,
   InstanceDragPayload,
   InstanceTransformationProperties,
-} from "../types";
-import GuidesController from "./guides";
-import { computeMotionFactorForZoom, computeDragVector } from "./math";
+} from "@proto-gl/webgl/rendering/types";
+import GuidesController from "@proto-gl/webgl/rendering/editor/guides";
+import {
+  computeMotionFactorForZoom,
+  computeDragVector,
+} from "@proto-gl/webgl/rendering/editor/math";
 
 export type InstanceProperties = {
   scaleVector: Vector;

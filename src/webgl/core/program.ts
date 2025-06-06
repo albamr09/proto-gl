@@ -1,5 +1,5 @@
-import { Attributes, ProgramType, Uniforms } from "./types";
-import { TRANSFORM_UNIFORM_NAMES } from "./uniform/types";
+import { Attributes, ProgramType, Uniforms } from "@proto-gl/webgl/core/types";
+import { TRANSFORM_UNIFORM_NAMES } from "@proto-gl/webgl/core/uniform/types";
 
 class Program<
   A extends readonly string[] = [],

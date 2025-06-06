@@ -1,6 +1,6 @@
-import { Vector } from "../../../math/vector";
-import Arrow from "./arrow/index";
-import Circle from "./circle/index";
+import { Vector } from "@proto-gl/math/vector";
+import Arrow from "@proto-gl/webgl/models/editor/arrow/index";
+import Circle from "@proto-gl/webgl/models/editor/circle/index";
 
 export type GuideProperties = {
   color?: number[];

@@ -1,5 +1,5 @@
-import { Vector } from "../../../../math/vector";
-import { GuideProperties } from "../types";
+import { Vector } from "@proto-gl/math/vector";
+import { GuideProperties } from "@proto-gl/webgl/models/editor/types";
 
 export const DefaultProperties: GuideProperties = {
   color: [0.9, 0.0, 0.0, 1.0],

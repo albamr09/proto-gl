@@ -1,5 +1,5 @@
-import { UniformKind } from "../../core/uniform/types";
-import Instance from "../../rendering/instance";
+import { UniformKind } from "@proto-gl/webgl/core/uniform/types";
+import Instance from "@proto-gl/webgl/rendering/instance";
 import fragmentShaderSource from "./fs.glsl";
 import vertexShaderSource from "./vs.glsl";
 

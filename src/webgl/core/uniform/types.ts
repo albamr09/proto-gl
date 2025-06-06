@@ -1,11 +1,11 @@
-import { Matrix4 } from "../../../math/matrix";
+import { Matrix4 } from "@proto-gl/math/matrix";
 import {
   FloatUniform,
   IntUniform,
   MatrixUniform,
   VectorFloatUniform,
   VectorIntUniform,
-} from "./uniforms";
+} from "@proto-gl/webgl/core/uniform/uniforms";
 
 export const TRANSFORM_UNIFORM_NAMES = [
   "uModelViewMatrix",

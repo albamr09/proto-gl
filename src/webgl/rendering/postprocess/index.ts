@@ -1,8 +1,8 @@
-import Framebuffer from "../../core/framebuffer/framebuffer";
-import Texture2D from "../../core/texture/texture-2d";
-import FilterFactory from "./factory";
-import Filter from "./filters/index";
-import { FilterTypes } from "./types";
+import Framebuffer from "@proto-gl/webgl/core/framebuffer/framebuffer";
+import Texture2D from "@proto-gl/webgl/core/texture/texture-2d";
+import FilterFactory from "@proto-gl/webgl/rendering/postprocess/factory";
+import Filter from "@proto-gl/webgl/rendering/postprocess/filters/index";
+import { FilterTypes } from "@proto-gl/webgl/rendering/postprocess/types";
 
 class PostProcess {
   private frameBuffer: Framebuffer;

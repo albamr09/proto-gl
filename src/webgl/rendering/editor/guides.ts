@@ -1,12 +1,12 @@
-import { computeGeometryCenter, transformVertices } from "../../../math/3d";
-import { Matrix4 } from "../../../math/matrix";
-import { Vector } from "../../../math/vector";
-import { Angle } from "../../../math/angle";
-import Arrow from "../../models/editor/arrow/index";
-import Instance from "../instance";
-import { InstanceDragPayload } from "../types";
-import { InstanceProperties } from "./controller";
-import Circle from "../../models/editor/circle/index";
+import { computeGeometryCenter, transformVertices } from "@proto-gl/math/3d";
+import { Matrix4 } from "@proto-gl/math/matrix";
+import { Vector } from "@proto-gl/math/vector";
+import { Angle } from "@proto-gl/math/angle";
+import Arrow from "@proto-gl/webgl/models/editor/arrow/index";
+import Instance from "@proto-gl/webgl/rendering/instance";
+import { InstanceDragPayload } from "@proto-gl/webgl/rendering/types";
+import { InstanceProperties } from "@proto-gl/webgl/rendering/editor/controller";
+import Circle from "@proto-gl/webgl/models/editor/circle/index";
 
 class GuidesController {
   private moveGuideInstances: Arrow[];

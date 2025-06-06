@@ -1,12 +1,12 @@
-import { Vector } from "../../math/vector";
-import Program from "../core/program";
-import { TextureDefinition } from "../core/texture/types";
+import { Vector } from "@proto-gl/math/vector";
+import Program from "@proto-gl/webgl/core/program";
+import { TextureDefinition } from "@proto-gl/webgl/core/texture/types";
 import {
   UniformConfig,
   UniformDataMapping,
   UniformKind,
-} from "../core/uniform/types";
-import Instance from "./instance";
+} from "@proto-gl/webgl/core/uniform/types";
+import Instance from "@proto-gl/webgl/rendering/instance";
 
 export type UniformDefinition<K extends UniformKind = UniformKind> =
   UniformConfig & {

@@ -3,7 +3,7 @@ import {
   DEFAULT_N_SEGMENTS,
   DEFAULT_RADIOUS,
 } from "./constants";
-import { ArrowHead } from "../types";
+import { ArrowHead } from "@proto-gl/webgl/models/editor/types";
 
 const generateCubeVertices = (length: number, heightOffset: number) => {
   const vertices = [];

@@ -1,13 +1,13 @@
-import { denormalizeColor } from "../../../utils/utils";
-import { Vector } from "../../../math/vector";
-import { GuideIntances } from "../../models/editor/types";
-import Instance from "../../rendering/instance";
-import Scene from "../../rendering/scene";
+import { denormalizeColor } from "@proto-gl/utils/utils";
+import { Vector } from "@proto-gl/math/vector";
+import { GuideIntances } from "@proto-gl/webgl/models/editor/types";
+import Instance from "@proto-gl/webgl/rendering/instance";
+import Scene from "@proto-gl/webgl/rendering/scene";
 import {
   InstanceAddedPayload,
   InstanceRemovedPayload,
-} from "../../rendering/types";
-import Framebuffer from "../framebuffer/framebuffer";
+} from "@proto-gl/webgl/rendering/types";
+import Framebuffer from "@proto-gl/webgl/core/framebuffer/framebuffer";
 
 class PickingController extends EventTarget {
   private canvas: HTMLCanvasElement;

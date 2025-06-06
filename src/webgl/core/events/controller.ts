@@ -1,6 +1,6 @@
-import { Vector } from "../../../math/vector";
-import PickingController from "../../core/picking/picking";
-import Camera from "../camera/camera";
+import { Vector } from "@proto-gl/math/vector";
+import PickingController from "@proto-gl/webgl/core/picking/picking";
+import Camera from "@proto-gl/webgl/core/camera/camera";
 
 class Controller {
   private camera: Camera;

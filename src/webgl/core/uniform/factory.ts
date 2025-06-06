@@ -1,11 +1,15 @@
-import { ConcreteUniforms, UniformDataMapping, UniformKind } from "./types";
+import {
+  ConcreteUniforms,
+  UniformDataMapping,
+  UniformKind,
+} from "@proto-gl/webgl/core/uniform/types";
 import {
   FloatUniform,
   IntUniform,
   MatrixUniform,
   VectorFloatUniform,
   VectorIntUniform,
-} from "./uniforms";
+} from "@proto-gl/webgl/core/uniform/uniforms";
 
 export class UniformFactory {
   static createUniform(

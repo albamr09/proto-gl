@@ -1,9 +1,9 @@
-import Instance from "../../rendering/instance";
+import Instance from "@proto-gl/webgl/rendering/instance";
 import {
   AttributeConfig,
   InstanceConfiguration,
   UniformDefinition,
-} from "../../rendering/types";
+} from "@proto-gl/webgl/rendering/types";
 
 import fragmentShaderSource from "./fs.glsl";
 import vertexShaderSource from "./vs.glsl";

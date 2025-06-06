@@ -1,5 +1,5 @@
-import { Angle } from "./angle";
-import { Vector } from "./vector";
+import { Angle } from "@proto-gl/math/angle";
+import { Vector } from "@proto-gl/math/vector";
 
 export class Matrix {
   public matrix: Vector[];

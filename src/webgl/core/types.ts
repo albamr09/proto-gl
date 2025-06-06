@@ -1,4 +1,4 @@
-import { TransformUniformKeys } from "./uniform/types";
+import { TransformUniformKeys } from "@proto-gl/webgl/core/uniform/types";
 
 export enum ProgramType {
   VERTEX_SHADER,

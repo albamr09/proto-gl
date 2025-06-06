@@ -1,6 +1,6 @@
-import Texture2D from "../../../../core/texture/texture-2d";
-import { UniformKind } from "../../../../core/uniform/types";
-import Filter from "../index";
+import Texture2D from "@proto-gl/webgl/core/texture/texture-2d";
+import { UniformKind } from "@proto-gl/webgl/core/uniform/types";
+import Filter from "@proto-gl/webgl/rendering/postprocess/filters/index";
 import fragmentShaderSource from "./fs.glsl";
 import vertexShaderSource from "./vs.glsl";
 
