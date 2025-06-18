@@ -1,17 +1,17 @@
 {
-  "name": "my-lib-example",
+  "name": "proto-gl-examples",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@proto-gl": "file:..",
-    "tsup": "8.3.0"
-  },
-  "scripts": {
-    "preinstall": "cd .. && yarn && yarn build",
-    "build": "tsup",
-    "dev": "NODE_ENV=development tsup & serve dist"
+    "@proto-gl": "file:.."
   },
   "devDependencies": {
-    "serve": "^14.2.4"
+    "serve": "^14.2.4",
+    "tsup": "8.3.0",
+    "concurrently": "^9.1.2"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "concurrently \"NODE_ENV=development tsup\" & \"serve dist\""
   }
 }

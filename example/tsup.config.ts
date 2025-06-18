@@ -27,14 +27,14 @@ export default defineConfig({
   clean: true,
   format: ["esm"],
   tsconfig: "./tsconfig.json",
-  dts: false, // Generate type definitions
+  dts: false,
   platform: "browser",
   silent: false,
   minify: isDev ? "terser" : undefined,
-  splitting: isDev ? false : true,
+  splitting: true,
   // Bundles local library together with examples
   noExternal: ["@proto-gl"],
-  watch: isDev ? ["src/**/*.{ts,html}"] : undefined,
+  watch: isDev ? ["src/**/*.{ts,html}", "../dist/index.js"] : undefined,
   // Copy html files
   async onSuccess() {
     console.log("Build succeeded, copying static files...");

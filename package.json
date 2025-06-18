@@ -4,17 +4,22 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.14.9",
+    "concurrently": "^9.1.2",
     "terser": "^5.21.0",
     "tsup": "8.3.0",
     "typescript": "^5.2.2"
   },
   "scripts": {
     "build": "tsup",
+    "build:watch": "NODE_ENV=development tsup",
     "clean": "rm -rf dist",
-    "dev": "tsup --watch",
+    "dev": "cd example && yarn && cd .. && concurrently \"yarn build:watch\" \"cd example && yarn dev\"",
     "test": "tsup --config tests/tsup.config.ts && node tests/build/main.js && rm -rf tests/build"
   }
 }

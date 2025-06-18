@@ -220,8 +220,8 @@ document.addEventListener("DOMContentLoaded", () => {
   contentWrapper.appendChild(mainContent);
 
   // Add sticky header
-  root.appendChild(stickyHeader);
-  root.appendChild(contentWrapper);
+  root?.appendChild(stickyHeader);
+  root?.appendChild(contentWrapper);
 
   // Create the CSS
   createStyles();
