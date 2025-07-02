@@ -13,6 +13,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "build:production": "cd .. && pnpm build && cd example && tsup",
     "build:watch": "NODE_ENV=development tsup --no-clean",
     "preview": "vite dist",
     "dev": "concurrently 'pnpm run preview' 'pnpm run build:watch'"
