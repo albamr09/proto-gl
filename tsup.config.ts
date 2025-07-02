@@ -9,7 +9,6 @@ export default defineConfig({
   tsconfig: "./tsconfig.json",
   dts: true,
   platform: "browser",
-  watch: isDev ? ["src/**/*.ts"] : undefined,
   silent: false,
   onSuccess: async () => {
     console.log("🔧 ProtoGL rebuilt successfully");

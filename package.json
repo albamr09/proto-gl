@@ -19,7 +19,7 @@
     "build": "tsup",
     "build:watch": "NODE_ENV=development tsup",
     "clean": "rm -rf dist",
-    "dev": "cd example && yarn && cd .. && concurrently \"yarn build:watch\" \"cd example && yarn dev\"",
+    "dev": "tsup --watch --onSuccess \"cd example && rm -rf node_modules && pnpm install && pnpm run dev\"",
     "test": "tsup --config tests/tsup.config.ts && node tests/build/main.js && rm -rf tests/build"
   }
 }
