@@ -7,7 +7,7 @@ import {
   getGLContext,
 } from "@example/utilities/web-gl";
 import { initGUI, createDescriptionPanel } from "@example/utilities/gui/index";
-import { Matrix4, Vector } from "@proto-gl";
+import { Matrix4, Vector } from "proto-gl";
 
 let gl: WebGL2RenderingContext,
   program: WebGLProgram,

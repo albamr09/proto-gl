@@ -1,4 +1,4 @@
-import { Program, Instance, Matrix4, UniformKind, Vector } from "@proto-gl";
+import { Program, Instance, Matrix4, UniformKind, Vector } from "proto-gl";
 import fragmentShaderSource from "./fs.glsl";
 import vertexShaderSource from "./vs.glsl";
 

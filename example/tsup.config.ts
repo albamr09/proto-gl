@@ -33,7 +33,7 @@ export default defineConfig({
   minify: isDev ? "terser" : undefined,
   splitting: true,
   // Bundles local library together with examples
-  noExternal: ["@proto-gl"],
+  noExternal: ["proto-gl"],
   watch: isDev ? ["src/**/*.{ts,html}", "../dist/index.js"] : undefined,
   // Copy html files
   async onSuccess() {

@@ -22,7 +22,7 @@ import {
   Program,
   Scene,
   UniformKind,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,

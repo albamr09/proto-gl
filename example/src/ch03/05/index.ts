@@ -14,7 +14,7 @@ import {
   Matrix4,
   Vector,
   Angle,
-} from "@proto-gl";
+} from "proto-gl";
 
 type ProgramAttributes = {
   aPosition: number;

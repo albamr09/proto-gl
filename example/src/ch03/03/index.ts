@@ -30,7 +30,7 @@ import {
   calculateNormals,
   computeNormalMatrix,
   Vector,
-} from "@proto-gl";
+} from "proto-gl";
 
 type ProgramAttributes = {
   aPosition: number;

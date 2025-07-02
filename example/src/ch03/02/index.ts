@@ -27,7 +27,7 @@ import {
   computeNormalMatrix,
   Matrix4,
   Vector,
-} from "@proto-gl";
+} from "proto-gl";
 
 type ProgramAttributes = {
   aPosition: number;

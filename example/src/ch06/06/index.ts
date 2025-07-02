@@ -27,7 +27,7 @@ import {
   Axis,
   Floor,
   Matrix4,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,

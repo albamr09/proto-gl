@@ -21,7 +21,7 @@ import {
   Matrix4,
   Vector,
   Program,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   getGLContext,
   configureCanvas,

@@ -17,7 +17,7 @@ import {
   UniformKind,
   Matrix4,
   FilterTypes,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,

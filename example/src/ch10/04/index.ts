@@ -15,7 +15,7 @@ import {
   UniformKind,
   computeTangents,
   calculateNormals,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,

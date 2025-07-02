@@ -28,7 +28,7 @@ import {
   CameraType,
   Controller,
   ProjectionType,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,

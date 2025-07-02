@@ -4,7 +4,7 @@ import {
   configureCanvas,
   getGLContext,
 } from "@example/utilities/web-gl";
-import { Scene, Filter } from "@proto-gl";
+import { Scene, Filter } from "proto-gl";
 import RayTrace from "./ray-trace";
 
 let gl: WebGL2RenderingContext;

@@ -18,7 +18,7 @@ import {
   UniformKind,
   Axis,
   Floor,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,

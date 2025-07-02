@@ -19,7 +19,7 @@ import {
   computeNormalMatrix,
   Matrix4,
   Vector,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   autoResizeCanvas,
   clearScene,

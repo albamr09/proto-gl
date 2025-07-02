@@ -12,7 +12,7 @@ import {
   Instance,
   PickingController,
   Scene,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,

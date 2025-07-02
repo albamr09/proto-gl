@@ -8,7 +8,7 @@
     "baseUrl": ".",
     "rootDir": "src",
     "paths": {
-      "@example/*": ["src/*"],
-    },
-  },
+      "@example/*": ["src/*"]
+    }
+  }
 }

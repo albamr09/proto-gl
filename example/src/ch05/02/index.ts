@@ -14,7 +14,7 @@ import {
   Scene,
   UniformKind,
   Mesh,
-} from "@proto-gl";
+} from "proto-gl";
 
 let canvas: HTMLCanvasElement;
 let gl: WebGL2RenderingContext;

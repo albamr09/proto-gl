@@ -1,4 +1,4 @@
-import { Filter } from "@proto-gl";
+import { Filter } from "proto-gl";
 import vertexShaderSource from "./vs.glsl";
 import fragmentShaderSource from "./fs.glsl";
 

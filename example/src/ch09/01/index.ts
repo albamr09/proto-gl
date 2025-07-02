@@ -22,7 +22,7 @@ import {
   Vector,
   UniformKind,
   calculateNormals,
-} from "@proto-gl";
+} from "proto-gl";
 import { loadData } from "@example/utilities/files";
 import vertexShaderSource from "./vs.gsls";
 import fragmentShaderSource from "./fs.gsls";

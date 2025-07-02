@@ -20,7 +20,7 @@ import {
   lagrangeInterpolation,
   bSplineInterpolation,
   Vector,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,

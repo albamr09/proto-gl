@@ -22,7 +22,7 @@ import {
   normalizeColor,
   rgbToHex,
 } from "@example/utilities/colors";
-import { Matrix4, calculateNormals } from "@proto-gl";
+import { Matrix4, calculateNormals } from "proto-gl";
 
 type ProgramAttributes = {
   aPosition: number;

@@ -11,7 +11,7 @@ import {
   Mesh,
   linearInterpolation,
   Vector,
-} from "@proto-gl";
+} from "proto-gl";
 import {
   autoResizeCanvas,
   configureCanvas,

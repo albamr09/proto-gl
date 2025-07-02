@@ -1,6 +1,6 @@
 import fragmentShaderSource from "./fs.glsl";
 import vertexShaderSource from "./vs.glsl";
-import { Texture2D, UniformKind, Filter } from "@proto-gl";
+import { Texture2D, UniformKind, Filter } from "proto-gl";
 
 const attributes = [] as const;
 const uniforms = ["uTime", "uInverseTextureSize"] as const;
