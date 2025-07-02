@@ -34,7 +34,7 @@ export default defineConfig({
   splitting: true,
   // Bundles local library together with examples
   noExternal: ["proto-gl"],
-  watch: isDev ? ["src/**/*.{ts,html}", "../dist/index.js"] : undefined,
+  watch: isDev ? ["src/**/*.{ts,html}"] : undefined,
   // Copy html files
   async onSuccess() {
     console.log("Build succeeded, copying static files...");
