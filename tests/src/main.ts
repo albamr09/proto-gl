@@ -30,7 +30,7 @@ async function traverseAndExecute(dir: string): Promise<void> {
 }
 
 const executeAllTests = () => {
-  traverseAndExecute("./");
+  traverseAndExecute("./tests");
 };
 
 executeAllTests();
